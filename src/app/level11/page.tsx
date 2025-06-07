@@ -91,7 +91,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const Level11Page = () => {
   const router = useRouter();
-  const { trackLevelCompletion } = useFeedback();
+  const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [currentProblem, setCurrentProblem] = useState<VerbIngProblem>(verbProblemsBank[0]);
   
@@ -214,18 +214,33 @@ const Level11Page = () => {
           </div>
           
           {/* Finalizar Curso Button */}
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-col items-center gap-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleFinishCourse}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+              className="px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
             >
               <span>Finalizar Curso</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </motion.button>
+
+            {/* Feedback Button */}
+            {!hasShownFeedback && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowFeedbackModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-base font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+              >
+                <span>Enviar Feedback</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </motion.button>
+            )}
           </div>
         </div>
       </main>

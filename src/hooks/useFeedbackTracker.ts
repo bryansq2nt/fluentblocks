@@ -89,6 +89,7 @@ export const useFeedbackTracker = () => {
     trackLevelCompletion,
     showFeedbackModal,
     setShowFeedbackModal,
-    markFeedbackShown
+    markFeedbackShown,
+    hasShownFeedback: feedbackState.hasShownFeedback
   };
 };
