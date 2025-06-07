@@ -157,10 +157,58 @@ const Level8Page = () => {
             </div>
 
             <div className="flex justify-center items-center gap-0 mb-10 flex-wrap min-h-[80px]">
-              <motion.div whileHover={{ y: -2 }} className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[120px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 shadow-lg`} style={{ background: 'linear-gradient(145deg, #4f46e5, #3730a3)', clipPath: 'polygon(0% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 0% 100%)', borderRadius: '0px', boxShadow: '0 8px 25px rgba(79,70,229,0.25),0 3px 0 rgba(55,48,163,0.6),inset 0 1px 0 rgba(255,255,255,0.3)'}}>The</motion.div>
-              <motion.div whileHover={selectedAdjective ? { y: -2 } : {}} className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedAdjective ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`} style={{ background: selectedAdjective ? 'linear-gradient(145deg, #8b5cf6, #7c3aed)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', clipPath: selectedAdjective ? 'polygon(0% 20%,10% 20%,15% 0%,85% 0%,90% 20%,100% 20%,100% 80%,90% 80%,85% 100%,15% 100%,10% 80%,0% 80%)' : 'none', marginLeft: '-12px', marginRight: '-12px', borderRadius: selectedAdjective ? '0px' : '0px', boxShadow: selectedAdjective ? '0 8px 25px rgba(139,92,246,0.25),0 3px 0 rgba(124,58,237,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'}}>{selectedAdjective?.superlative_en || 'Adjetivo-est'}</motion.div>
-              <motion.div whileHover={selectedNoun ? { y: -2 } : {}} className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10 ${selectedNoun ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`} style={{ background: selectedNoun ? 'linear-gradient(145deg, #f97316, #ea580c)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', clipPath: selectedNoun ? 'polygon(0% 20%,10% 20%,15% 0%,100% 0%,100% 100%,15% 100%,10% 80%,0% 80%)' : 'none', borderRadius: selectedNoun ? '0px' : '0 12px 12px 0', boxShadow: selectedNoun ? '0 8px 25px rgba(249,115,22,0.25),0 3px 0 rgba(234,88,12,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'}}>{selectedNoun?.en || 'Sustantivo'}</motion.div>
-            </div>
+  {/* Primer bloque "The" - siempre seleccionado, texto blanco */}
+  <motion.div 
+    whileHover={{ y: -2 }} 
+    className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[120px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 shadow-lg`} 
+    style={{ 
+      background: 'linear-gradient(145deg, #4f46e5, #3730a3)', 
+      clipPath: 'polygon(0% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 0% 100%)', 
+      borderRadius: '0px', 
+      boxShadow: '0 8px 25px rgba(79,70,229,0.25),0 3px 0 rgba(55,48,163,0.6),inset 0 1px 0 rgba(255,255,255,0.3)'
+    }}
+  >
+    The
+  </motion.div>
+
+  {/* Segundo bloque - condicional */}
+  <motion.div 
+    whileHover={selectedAdjective ? { y: -2 } : {}} 
+    className={`px-7 py-4 font-semibold text-lg relative min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${
+      selectedAdjective 
+        ? 'text-white shadow-lg' 
+        : 'text-gray-800 border-2 border-dashed border-gray-300 shadow-sm'
+    }`} 
+    style={{ 
+      background: selectedAdjective ? 'linear-gradient(145deg, #8b5cf6, #7c3aed)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', 
+      clipPath: selectedAdjective ? 'polygon(0% 20%,10% 20%,15% 0%,85% 0%,90% 20%,100% 20%,100% 80%,90% 80%,85% 100%,15% 100%,10% 80%,0% 80%)' : 'none', 
+      marginLeft: '-12px', 
+      marginRight: '-12px', 
+      borderRadius: selectedAdjective ? '0px' : '0px', 
+      boxShadow: selectedAdjective ? '0 8px 25px rgba(139,92,246,0.25),0 3px 0 rgba(124,58,237,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'
+    }}
+  >
+    {selectedAdjective?.superlative_en || 'Adjetivo-est'}
+  </motion.div>
+
+  {/* Tercer bloque - condicional */}
+  <motion.div 
+    whileHover={selectedNoun ? { y: -2 } : {}} 
+    className={`px-7 py-4 font-semibold text-lg relative min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10 ${
+      selectedNoun 
+        ? 'text-white shadow-lg' 
+        : 'text-gray-800 border-2 border-dashed border-gray-300 shadow-sm'
+    }`} 
+    style={{ 
+      background: selectedNoun ? 'linear-gradient(145deg, #f97316, #ea580c)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', 
+      clipPath: selectedNoun ? 'polygon(0% 20%,10% 20%,15% 0%,100% 0%,100% 100%,15% 100%,10% 80%,0% 80%)' : 'none', 
+      borderRadius: selectedNoun ? '0px' : '0 12px 12px 0', 
+      boxShadow: selectedNoun ? '0 8px 25px rgba(249,115,22,0.25),0 3px 0 rgba(234,88,12,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'
+    }}
+  >
+    {selectedNoun?.en || 'Sustantivo'}
+  </motion.div>
+</div>
 
             <motion.div className="rounded-2xl p-7 text-center border mb-8" style={{ background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255,255,255,0.3)', boxShadow: '0 10px 25px rgba(0,0,0,0.08),0 1px 0 rgba(255,255,255,0.5) inset' }} animate={selectedAdjective && selectedNoun ? { scale: [1, 1.02, 1] } : {}} transition={{ duration: 0.6 }}>
               {selectedAdjective && selectedNoun ? (

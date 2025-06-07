@@ -253,7 +253,7 @@ const Level3Page = () => {
               <motion.div
                 whileHover={selectedSubject ? { y: -2 } : {}}
                 className={`
-                  text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30
+                  text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30
                   ${selectedSubject 
                     ? 'text-white shadow-lg' 
                     : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'
@@ -279,7 +279,7 @@ const Level3Page = () => {
               <motion.div
                 whileHover={selectedVerb ? { y: -2 } : {}}
                 className={`
-                  text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20
+                  text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20
                   ${selectedVerb 
                     ? 'text-white shadow-lg' 
                     : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'
@@ -307,7 +307,7 @@ const Level3Page = () => {
               <motion.div
                 whileHover={selectedTime ? { y: -2 } : {}}
                 className={`
-                  text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10
+                  text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10
                   ${selectedTime 
                     ? 'text-white shadow-lg' 
                     : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'

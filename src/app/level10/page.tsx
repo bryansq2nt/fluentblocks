@@ -251,8 +251,9 @@ const Level10Page = () => {
             {/* Paso 1: Yes/No */}
             {!userYesNoChoice && !showFullAnswer && (
               <div className="mb-6">
-                <p className="text-center text-slate-700 font-medium mb-3 text-base">1. ¿La respuesta es afirmativa o negativa?</p>
-                <div className="grid grid-cols-2 gap-3">
+<p className="text-center text-slate-700 font-medium mb-3 text-base">
+  1. Según la pista, ¿cómo responderías?
+</p>                <div className="grid grid-cols-2 gap-3">
                   <motion.button whileHover={{scale:1.03}} whileTap={{scale:0.97}} onClick={() => handleYesNoSelect('yes')} className="w-full px-4 py-3 bg-green-500 text-white text-xl font-bold rounded-lg shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-400 focus:ring-offset-2">Yes</motion.button>
                   <motion.button whileHover={{scale:1.03}} whileTap={{scale:0.97}} onClick={() => handleYesNoSelect('no')} className="w-full px-4 py-3 bg-red-500 text-white text-xl font-bold rounded-lg shadow-md hover:bg-red-600 focus:ring-2 focus:ring-red-400 focus:ring-offset-2">No</motion.button>
                 </div>

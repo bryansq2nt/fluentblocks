@@ -216,7 +216,7 @@ const Level5Page = () => {
               {/* Subject Block */}
               <motion.div
                 whileHover={selectedSubject ? { y: -2 } : {}}
-                className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-40 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-40 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedSubject ? 'linear-gradient(145deg, #3b82f6, #2563eb)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Blue
                   clipPath: selectedSubject ? 'polygon(0% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 0% 100%)' : 'none',
@@ -228,7 +228,7 @@ const Level5Page = () => {
               {/* "Can" Block (Modal) */}
               <motion.div
                 whileHover={selectedSubject ? { y: -2 } : {}}
-                className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedSubject ? 'linear-gradient(145deg, #d946ef, #c026d3)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Fuchsia
                   clipPath: selectedSubject ? 'polygon(0% 20%, 10% 20%, 15% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 15% 100%, 10% 80%, 0% 80%)' : 'none',
@@ -240,7 +240,7 @@ const Level5Page = () => {
               {/* Verb Block */}
               <motion.div
                 whileHover={selectedVerb ? { y: -2 } : {}}
-                className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedVerb ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedVerb ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedVerb ? 'linear-gradient(145deg, #8b5cf6, #7c3aed)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Purple
                   clipPath: selectedVerb ? 'polygon(0% 20%, 10% 20%, 15% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 15% 100%, 10% 80%, 0% 80%)' : 'none',
@@ -252,7 +252,7 @@ const Level5Page = () => {
               {/* Complement Block */}
               <motion.div
                 whileHover={selectedComplement ? { y: -2 } : {}}
-                className={`text-white px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10 ${selectedComplement ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10 ${selectedComplement ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedComplement ? 'linear-gradient(145deg, #f97316, #ea580c)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Orange
                   clipPath: selectedComplement ? 'polygon(0% 20%, 10% 20%, 15% 0%, 100% 0%, 100% 100%, 15% 100%, 10% 80%, 0% 80%)' : 'none',

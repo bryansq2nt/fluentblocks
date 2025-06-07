@@ -1,8 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
 
 // Types
@@ -146,6 +146,21 @@ export default function MapPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState('basic');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.scrollTo({
+        top: document.documentElement.scrollHeight,
+        behavior: 'smooth'
+      });
+      
+      // Ocultar el hint después del scroll
+      setTimeout(() => setShowScrollHint(false), 3000);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSectionClick = (section: NavSection) => {
     setActiveSection(section.id);
@@ -153,6 +168,17 @@ export default function MapPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-200 via-green-200 to-purple-200">
+      {/* Scroll Hint Arrow */}
+      {showScrollHint && (
+        <motion.div 
+          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40"
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
+        >
+          <span className="text-4xl">⬆️</span>
+        </motion.div>
+      )}
+
       {/* Header */}
       <header className="fixed top-0 right-0 p-4 z-50">
         <motion.button
@@ -231,48 +257,50 @@ export default function MapPage() {
       </nav>
 
       {/* Level Selection Modal */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
-        onClick={() => setSelectedLevel(null)}
-      >
+      <AnimatePresence>
         {selectedLevel && (
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            className="bg-white rounded-2xl p-6 max-w-sm w-full"
-            onClick={(e) => e.stopPropagation()}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedLevel(null)}
           >
-            <div className="text-center">
-              <div className="text-6xl mb-4">{selectedLevel.icon}</div>
-              <h3 className="text-xl font-bold mb-2">Nivel {selectedLevel.id}</h3>
-              <p className="text-gray-600 mb-6">{selectedLevel.pattern}</p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setSelectedLevel(null)}
-                  className="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-xl font-semibold"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedLevel(null);
-                    router.push(`/level${selectedLevel.id}`);
-                  }}
-                  className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold"
-                >
-                  Empezar
-                </button>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-sm w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center">
+                <div className="text-6xl mb-4">{selectedLevel.icon}</div>
+                <h3 className="text-xl text-black font-bold mb-2">Nivel {selectedLevel.id}</h3>
+                <p className="text-gray-600 mb-6">{selectedLevel.pattern}</p>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedLevel(null)}
+                    className="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-xl font-semibold"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedLevel(null);
+                      router.push(`/level${selectedLevel.id}`);
+                    }}
+                    className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold"
+                  >
+                    Empezar
+                  </button>
+                </div>
               </div>
-            </div>
+            </motion.div>
           </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
     </main>
   );
-} 
+}
