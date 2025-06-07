@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useFeedback } from '../../components/game/FeedbackProvider';
 
 interface SubjectOption {
   en: string;
@@ -19,6 +20,7 @@ interface VerbOption {
 
 const Level6Page = () => {
   const router = useRouter();
+  const { trackInteraction, trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<SubjectOption | null>(null);
@@ -74,10 +76,19 @@ const Level6Page = () => {
     { base: 'buy', es: 'comprar', complements: [{ en: 'a new phone', es: 'un teléfono nuevo' }, { en: 'some groceries', es: 'algunas compras' }, { en: 'a gift', es: 'un regalo' }] }
   ];
 
+  const handleWordSelect = (word: string) => {
+    trackInteraction();
+    // ... existing word selection logic ...
+  };
+
+  const handleNextLevel = () => {
+    trackLevelCompletion(6);
+    router.push('/level7');
+  };
 
   return (
     <div className="min-h-screen" style={{
-      background: 'linear-gradient(135deg, #ecfeff 0%, #cffafe 100%)' // Light Cyan gradient
+      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)'
     }}>
       {/* Header with glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b" style={{
@@ -95,7 +106,7 @@ const Level6Page = () => {
             </svg>
             <span>Back to Map</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-900">Level 6: &apos;Going to&apos; Future</h1>
+          <h1 className="text-xl font-bold text-gray-900">Level 6: Modal 'Can' (Ability)</h1>
           <div className="w-24" />
         </div>
       </header>
@@ -216,7 +227,7 @@ const Level6Page = () => {
               {/* Subject Block */}
               <motion.div
                 whileHover={selectedSubject ? { y: -2 } : {}}
-                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-40 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedSubject ? 'text-white' : 'text-black' } px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-40 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedSubject ? 'linear-gradient(145deg, #3b82f6, #2563eb)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Blue
                   clipPath: selectedSubject ? 'polygon(0% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 0% 100%)' : 'none',
@@ -228,7 +239,7 @@ const Level6Page = () => {
               {/* "am/is/are going to" Block */}
               <motion.div
                 whileHover={selectedSubject ? { y: -2 } : {}}
-                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[180px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedSubject ? 'text-white' : 'text-black' } px-7 py-4 font-semibold text-lg relative min-w-[180px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 ${selectedSubject ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedSubject ? 'linear-gradient(145deg, #0ea5e9, #0284c7)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Cyan/Sky Blue
                   clipPath: selectedSubject ? 'polygon(0% 20%, 10% 20%, 15% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 15% 100%, 10% 80%, 0% 80%)' : 'none',
@@ -240,7 +251,7 @@ const Level6Page = () => {
               {/* Verb Block */}
               <motion.div
                 whileHover={selectedVerb ? { y: -2 } : {}}
-                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedVerb ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedVerb ? 'text-white' : 'text-black' } px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedVerb ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedVerb ? 'linear-gradient(145deg, #8b5cf6, #7c3aed)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Purple
                   clipPath: selectedVerb ? 'polygon(0% 20%, 10% 20%, 15% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 15% 100%, 10% 80%, 0% 80%)' : 'none',
@@ -252,7 +263,7 @@ const Level6Page = () => {
               {/* Complement/Time Block */}
               <motion.div
                 whileHover={selectedComplement ? { y: -2 } : {}}
-                className={`text-black px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10 ${selectedComplement ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedComplement ? 'text-white' : 'text-black' } px-7 py-4 font-semibold text-lg relative min-w-[140px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-10 ${selectedComplement ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{
                   background: selectedComplement ? 'linear-gradient(145deg, #f97316, #ea580c)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', // Orange
                   clipPath: selectedComplement ? 'polygon(0% 20%, 10% 20%, 15% 0%, 100% 0%, 100% 100%, 15% 100%, 10% 80%, 0% 80%)' : 'none',
@@ -341,6 +352,21 @@ const Level6Page = () => {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Siguiente Ejercicio Button */}
+          <div className="mt-8 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleNextLevel}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            >
+              <span>Siguiente Ejercicio</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
           </div>
         </div>
       </main>

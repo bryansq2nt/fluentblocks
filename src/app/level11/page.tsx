@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
+import { useFeedback } from '../../components/game/FeedbackProvider';
 
 interface IngOption {
   text: string;
@@ -90,6 +91,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const Level11Page = () => {
   const router = useRouter();
+  const { trackInteraction, trackLevelCompletion } = useFeedback();
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [currentProblem, setCurrentProblem] = useState<VerbIngProblem>(verbProblemsBank[0]);
   
@@ -132,15 +134,22 @@ const Level11Page = () => {
     }
   };
   
+  const handleFinishCourse = () => {
+    trackLevelCompletion(11);
+    router.push('/map');
+  };
+
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 70%, #d8b4fe 100%)' }}> {/* Lavanda */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <button type="button" onClick={() => router.push('/map')} className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
             <span className="text-sm sm:text-base">Back to Map</span>
           </button>
-          <h1 className="text-lg sm:text-xl font-bold text-slate-800">Level 11: Verb + ING</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-slate-800">Level 11: Final Challenge</h1>
           <div className="w-24" />
         </div>
       </header>
@@ -202,6 +211,21 @@ const Level11Page = () => {
                  {currentProblemIndex < verbProblemsBank.length - 1 ? 'Siguiente Verbo' : 'Finalizar Nivel'}
                 </button>
             </div>
+          </div>
+          
+          {/* Finalizar Curso Button */}
+          <div className="mt-8 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleFinishCourse}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            >
+              <span>Finalizar Curso</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
           </div>
         </div>
       </main>

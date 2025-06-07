@@ -3,9 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useFeedback } from '../../components/game/FeedbackProvider';
 
 const Level1Page = () => {
   const router = useRouter();
+  const { trackInteraction, trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -16,6 +18,7 @@ const Level1Page = () => {
 
   // Handle word selection
   const handleSubjectSelect = (subject: string) => {
+    trackInteraction();
     const auxiliary = subject === 'I' ? 'am' : 
                      ['He', 'She', 'It'].includes(subject) ? 'is' : 'are';
     const subjectEs = subject === 'I' ? 'Yo' :
@@ -31,6 +34,7 @@ const Level1Page = () => {
   };
 
   const handleVerbSelect = (verb: string) => {
+    trackInteraction();
     const verbEs = verb === 'eating' ? 'comiendo' :
                   verb === 'sleeping' ? 'durmiendo' :
                   verb === 'studying' ? 'estudiando' :
@@ -50,6 +54,11 @@ const Level1Page = () => {
     if (selectedSubject === 'We') return 'estamos';
     if (selectedSubject === 'They') return 'están';
     return '';
+  };
+
+  const handleNextLevel = () => {
+    trackLevelCompletion(1);
+    router.push('/level2');
   };
 
   return (
@@ -430,6 +439,21 @@ const Level1Page = () => {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* Siguiente Ejercicio Button */}
+          <div className="mt-8 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleNextLevel}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            >
+              <span>Siguiente Ejercicio</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
           </div>
         </div>
       </main>

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useFeedback } from '../../components/game/FeedbackProvider';
 
 // --- Definiciones de Tipos Mejoradas ---
 type NounKey = 'animal' | 'car' | 'house' | 'tree' | 'person' | 'building' | 'player' | 'river' | 'mountain' | 'book' | 'city' | 'food';
@@ -53,6 +54,7 @@ const adjectivesData: SuperlativeAdjectiveOption[] = [
 
 const Level8Page = () => {
   const router = useRouter();
+  const { trackInteraction, trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedAdjective, setSelectedAdjective] = useState<SuperlativeAdjectiveOption | null>(null);
@@ -61,6 +63,7 @@ const Level8Page = () => {
   
   // Handle word selection
   const handleAdjectiveSelect = (adjective: SuperlativeAdjectiveOption) => {
+    trackInteraction();
     setSelectedAdjective(adjective);
     const nounsToShow = adjective.applicable_noun_keys
         .map(key => allNounsData[key])
@@ -70,6 +73,7 @@ const Level8Page = () => {
   };
 
   const handleNounSelect = (noun: NounDetails) => {
+    trackInteraction();
     setSelectedNoun(noun);
   };
   
@@ -98,15 +102,29 @@ const Level8Page = () => {
     return `${subjectPronoun} ${verbToBe} the ${selectedAdjective.superlative_en} ${selectedNoun.en}.`;
   }
 
+  const handleNextLevel = () => {
+    trackLevelCompletion(8);
+    router.push('/level9');
+  };
+
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)' }}>
-      <header className="fixed top-0 left-0 right-0 z-50 border-b" style={{ background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(20px)' }}>
+      <header className="fixed top-0 left-0 right-0 z-50 border-b" style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)'
+      }}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button type="button" onClick={() => router.push('/map')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          <button
+            type="button"
+            onClick={() => router.push('/map')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
             <span>Back to Map</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-900">Level 8: Superlatives (-est)</h1>
+          <h1 className="text-xl font-bold text-gray-900">Level 8: Comparatives (-er)</h1>
           <div className="w-24" />
         </div>
       </header>
@@ -246,6 +264,21 @@ const Level8Page = () => {
             <div className="mt-8 p-4 bg-indigo-50 rounded-xl border border-indigo-200">
               <div className="text-center"><h3 className="text-lg font-bold text-indigo-800 mb-2">🏆 ¡Eres el mejor!</h3><p className="text-indigo-700">¡Fantástico! Ahora sabes usar superlativos para destacar lo máximo de un grupo.</p><p className="text-indigo-600 text-sm mt-2">Continúa practicando para describir el mundo que te rodea con más precisión.</p></div>
             </div>
+          </div>
+
+          {/* Siguiente Ejercicio Button */}
+          <div className="mt-8 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleNextLevel}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            >
+              <span>Siguiente Ejercicio</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
           </div>
         </div>
       </main>

@@ -175,7 +175,7 @@ export default function MapPage() {
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
         >
-          <span className="text-4xl">⬆️</span>
+          <span className="text-4xl">👆</span>
         </motion.div>
       )}
 

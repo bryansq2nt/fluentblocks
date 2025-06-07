@@ -3,9 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { motion} from 'framer-motion';
 import { useState } from 'react';
+import { useFeedback } from '../../components/game/FeedbackProvider';
 
 const Level4Page = () => {
   const router = useRouter();
+  const { trackInteraction, trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -29,6 +31,11 @@ const Level4Page = () => {
   const handleTimeSelect = (time: { en: string; es: string }) => {
     setSelectedTime(time.en);
     setSelectedTimeEs(time.es);
+  };
+
+  const handleWordSelect = (word: string) => {
+    trackInteraction();
+    // ... existing word selection logic ...
   };
 
   // Smart translation for Future Simple
@@ -92,9 +99,14 @@ const Level4Page = () => {
     return `${selectedSubjectEs} ${verbTranslation} ${selectedTimeEs}`;
   };
 
+  const handleNextLevel = () => {
+    trackLevelCompletion(4);
+    router.push('/level5');
+  };
+
   return (
     <div className="min-h-screen" style={{
-      background: 'linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%)' // Emerald/Green gradient
+      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)'
     }}>
       {/* Header with glassmorphism */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b" style={{
@@ -546,6 +558,21 @@ const Level4Page = () => {
               </div>
             </div>
           </div> {/* End of Game Container */}
+
+          {/* Siguiente Ejercicio Button */}
+          <div className="mt-8 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleNextLevel}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            >
+              <span>Siguiente Ejercicio</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
+          </div>
         </div> {/* End of max-w-4xl mx-auto */}
       </main>
     </div>

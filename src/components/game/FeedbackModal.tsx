@@ -1,51 +1,16 @@
-'use client';
+// components/FeedbackModal.tsx - Versión con debug mejorado
 
-import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, ChevronDown, X, Star } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, X } from 'lucide-react';
 
-// FAQ Item Component
-const FAQItem = ({ question, answer }: { question: string; answer: string }) => {
-  const [isOpen, setIsOpen] = useState(false);
+interface FeedbackModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: () => void;
+}
 
-  return (
-    <motion.div
-      initial={false}
-      className="border-b border-gray-200 last:border-0"
-    >
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full py-4 flex items-center justify-between text-left"
-      >
-        <span className="text-lg font-medium text-gray-900">{question}</span>
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown className="w-5 h-5 text-gray-500" />
-        </motion.div>
-      </button>
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
-            <p className="pb-4 text-gray-600">{answer}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>
-  );
-};
-
-// Advanced Feedback Modal Component
-const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+export const FeedbackModal: React.FC<FeedbackModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -66,10 +31,11 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
       userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Unknown',
       url: typeof window !== 'undefined' ? window.location.href : 'Unknown',
       appName: 'FluentBlocks',
-      source: 'help-page'
+      source: 'feedback-modal'
     };
 
-    console.log('📤 Enviando datos al webhook desde Help:', feedbackData);
+    console.log('📤 Enviando datos al webhook:', feedbackData);
+    setDebugInfo(`Datos preparados: ${JSON.stringify(feedbackData, null, 2)}`);
     
     try {
       const response = await fetch('https://hook.us2.make.com/w2ajw433gnby32751sb5np7zo59aery1', {
@@ -83,19 +49,20 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
 
       console.log('📥 Respuesta del webhook:', {
         status: response.status,
-        statusText: response.statusText
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries())
       });
 
+      setDebugInfo(`Respuesta: ${response.status} ${response.statusText}`);
+
       if (response.ok) {
-        console.log('✅ Feedback enviado exitosamente desde Help');
+        console.log('✅ Feedback enviado exitosamente');
         setDebugInfo('¡Enviado exitosamente!');
-        // Reset form y cerrar
+        onSubmit();
+        // Reset form
         setRating(0);
         setComment('');
-        setTimeout(() => {
-          setDebugInfo('');
-          onClose();
-        }, 1500);
+        setTimeout(() => setDebugInfo(''), 2000);
       } else {
         const errorText = await response.text();
         console.error('❌ Error del servidor:', errorText);
@@ -115,6 +82,36 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     setRating(0);
     setComment('');
     setDebugInfo('');
+  };
+
+  // Función de prueba para enviar datos simples
+  const handleTestWebhook = async () => {
+    setDebugInfo('Enviando prueba...');
+    
+    try {
+      const testData = {
+        test: true,
+        message: 'Test desde FeedbackModal',
+        timestamp: new Date().toISOString()
+      };
+
+      console.log('🧪 Enviando datos de prueba:', testData);
+
+      const response = await fetch('https://hook.us2.make.com/cjp5l06n8zxrcm0q85chkgfhsfckphjr', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testData),
+      });
+
+      console.log('🧪 Respuesta de prueba:', response.status, response.statusText);
+      setDebugInfo(`Prueba: ${response.status} ${response.statusText}`);
+
+    } catch (error) {
+      console.error('🧪 Error en prueba:', error);
+      setDebugInfo(`Error de prueba: ${error instanceof Error ? error.message : 'Error'}`);
+    }
   };
 
   return (
@@ -142,7 +139,7 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-gray-900">¡Tu opinión importa!</h3>
-                  <p className="text-sm text-gray-600">Compártenos tu feedback</p>
+                  <p className="text-sm text-gray-600">Ayúdanos a mejorar</p>
                 </div>
               </div>
               <button
@@ -157,6 +154,12 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
             {process.env.NODE_ENV === 'development' && debugInfo && (
               <div className="mb-4 p-3 bg-gray-100 rounded-lg">
                 <p className="text-xs text-gray-600 font-mono">{debugInfo}</p>
+                <button
+                  onClick={handleTestWebhook}
+                  className="mt-2 px-3 py-1 bg-blue-500 text-white text-xs rounded"
+                >
+                  Test Webhook
+                </button>
               </div>
             )}
 
@@ -210,7 +213,7 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="¿Qué te gustó más? ¿Qué podríamos mejorar?"
-                className="text-black w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
                 rows={3}
                 maxLength={500}
               />
@@ -225,7 +228,7 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
                 onClick={handleClose}
                 className="flex-1 py-3 px-4 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
               >
-                Cancelar
+                Más tarde
               </button>
               <motion.button
                 whileHover={{ scale: 1.02 }}
@@ -259,111 +262,3 @@ const FeedbackModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => vo
     </AnimatePresence>
   );
 };
-
-// Main Component
-export default function HelpPage() {
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const faqItems = [
-    {
-      id: 'patterns',
-      question: "¿Por qué patrones en lugar de vocabulario?",
-      answer: "Porque saber palabras no significa saber construir oraciones. Los patrones te enseñan la ESTRUCTURA del inglés, como un molde que puedes reutilizar infinitas veces. Es la diferencia entre memorizar frases y realmente entender cómo funciona el idioma."
-    },
-    {
-      id: 'free',
-      question: "¿Es gratis FluentBlocks?",
-      answer: "Sí, FluentBlocks es completamente gratuito. Nuestro objetivo es democratizar el aprendizaje del inglés y ayudar a todos los hispanohablantes a superar la barrera de construir oraciones."
-    },
-    {
-      id: 'time',
-      question: "¿Cuánto tiempo es recomendado estudiar?",
-      answer: "Con solo 10-15 minutos diarios puedes ver resultados sorprendentes. La clave no es estudiar muchas horas, sino ser consistente. Es mejor 10 minutos todos los días que 2 horas una vez por semana."
-    },
-    {
-      id: 'beta',
-      question: "¿Cuándo se van a desbloquear las demás funciones?",
-      answer: "Esta es la versión beta de FluentBlocks. Por ahora solo está disponible el nivel básico para que pruebes nuestra metodología. Las funciones de ranking, perfil completo y niveles intermedio/avanzado estarán listas en un par de meses. ¡Estamos trabajando duro para traértelas pronto!"
-    }
-  ];
-
-  return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 p-4 sm:p-6 lg:p-8">
-      {/* Header */}
-      <header className="max-w-4xl mx-auto mb-8">
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={() => router.push('/home')}
-            className="p-2 hover:bg-white/50 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-600" />
-          </button>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-            Ayuda y Más
-          </h1>
-        </div>
-      </header>
-
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* FAQ Section */}
-        <section className="bg-white rounded-2xl p-6 shadow-lg">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Preguntas Frecuentes</h2>
-          <div className="space-y-2">
-            {faqItems.map((item) => (
-              <FAQItem key={item.id} question={item.question} answer={item.answer} />
-            ))}
-          </div>
-        </section>
-
-        {/* Feedback Section - TEXTO ACTUALIZADO */}
-        <section className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-8 text-center shadow-lg">
-          <h2 className="text-2xl font-bold text-white mb-4">¿Tienes algo que decirnos?</h2>
-          <p className="text-white/80 mb-6">Tu feedback nos ayuda a mejorar FluentBlocks</p>
-          <button
-            type="button"
-            onClick={() => setIsModalOpen(true)}
-            className="px-8 py-3 bg-white text-blue-600 rounded-xl font-medium hover:shadow-lg transition-shadow"
-          >
-            Compártenos tu feedback
-          </button>
-        </section>
-
-        {/* Credits Section */}
-        <section className="bg-white rounded-2xl p-8 shadow-lg">
-          <div className="prose prose-lg max-w-none">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Créditos</h2>
-            <p className="text-gray-600 mb-4">
-              ¡Hola! Soy Bryan Murgas, creador de FluentBlocks 👋
-            </p>
-            <p className="text-gray-600 mb-4">
-              Después de años estudiando inglés sin poder formar una sola oración fluida, estaba a punto de rendirme. Conocía cientos de palabras, pero cuando intentaba hablar, mi mente se bloqueaba completamente.
-            </p>
-            <p className="text-gray-600 mb-4">
-              Todo cambió cuando descubrí el secreto: no necesitas más vocabulario, necesitas entender los PATRONES.
-            </p>
-            <p className="text-gray-600 mb-4">
-              Una vez que aprendí que el inglés funciona como bloques LEGO que se conectan siguiendo reglas específicas, todo hizo clic. De repente, las palabras tenían un orden lógico, las oraciones fluían naturalmente, y por primera vez pude expresar mis ideas sin traducir en mi cabeza.
-            </p>
-            <p className="text-gray-600 mb-4">
-              FluentBlocks nació de esa revelación. Mi misión es simple: ayudar a cada hispanohablante a experimentar ese momento mágico donde el inglés finalmente &quot;hace sentido&quot;.
-            </p>
-            <p className="text-gray-600">
-              ¿Preguntas? ¿Sugerencias? Escríbeme:{' '}
-              <a
-                href="mailto:bryan.murgas@mutechlabs.com"
-                className="text-blue-600 hover:text-blue-700 font-medium"
-              >
-                bryan.murgas@mutechlabs.com
-              </a>
-            </p>
-          </div>
-        </section>
-      </div>
-
-      {/* Advanced Feedback Modal */}
-      <FeedbackModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </main>
-  );
-}

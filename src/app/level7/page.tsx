@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useFeedback } from '../../components/game/FeedbackProvider';
 
 interface NounOption {
   en: string;
@@ -18,6 +19,7 @@ interface AdjectiveOption {
 
 const Level7Page = () => {
   const router = useRouter();
+  const { trackInteraction, trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedNoun1, setSelectedNoun1] = useState<NounOption | null>(null);
@@ -69,18 +71,37 @@ const Level7Page = () => {
     return `${selectedNoun1.es} ${selectedNoun1.esSon} más ${selectedAdjective.base_es} que ${selectedNoun2.es}`;
   };
 
+  const handleWordSelect = (word: string) => {
+    trackInteraction();
+    // ... existing word selection logic ...
+  };
+
+  const handleNextLevel = () => {
+    trackLevelCompletion(7);
+    router.push('/level8');
+  };
+
   return (
     <div className="min-h-screen" style={{
-      background: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 100%)' // Light Yellow gradient
+      background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)'
     }}>
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b" style={{ background: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(20px)' }}>
+      <header className="fixed top-0 left-0 right-0 z-50 border-b" style={{
+        background: 'rgba(255, 255, 255, 0.8)',
+        backdropFilter: 'blur(20px)'
+      }}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button type="button" onClick={() => router.push('/map')} className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          <button
+            type="button"
+            onClick={() => router.push('/map')}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
             <span>Back to Map</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-900">Level 7: Comparatives (-er)</h1>
+          <h1 className="text-xl font-bold text-gray-900">Level 7: 'Going to' Future</h1>
           <div className="w-24" />
         </div>
       </header>
@@ -146,25 +167,25 @@ const Level7Page = () => {
             <div className="flex justify-center items-center gap-0 mb-10 flex-wrap min-h-[80px]">
               {/* Noun 1 + is/are Block */}
               <motion.div whileHover={selectedNoun1 ? { y: -2 } : {}}
-                className={`text-black px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[130px] sm:min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-50 ${selectedNoun1 ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedNoun1 ? 'text-white' : 'text-black' } px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[130px] sm:min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-50 ${selectedNoun1 ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{ background: selectedNoun1 ? 'linear-gradient(145deg, #3b82f6, #2563eb)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', clipPath: selectedNoun1 ? 'polygon(0% 0%, 85% 0%, 90% 20%, 100% 20%, 100% 80%, 90% 80%, 85% 100%, 0% 100%)' : 'none', borderRadius: selectedNoun1 ? '0px' : '12px 0 0 12px', boxShadow: selectedNoun1 ? '0 8px 25px rgba(59,130,246,0.25),0 3px 0 rgba(37,99,235,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'}}
               >{selectedNoun1 ? `${selectedNoun1.en} ${selectedNoun1.isAre}` : 'Sustantivo 1 + (be)'}</motion.div>
 
               {/* Adjective-er Block */}
               <motion.div whileHover={selectedAdjective ? { y: -2 } : {}}
-                className={`text-black px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[130px] sm:min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-40 ${selectedAdjective ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedAdjective ? 'text-white' : 'text-black' } px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[130px] sm:min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-40 ${selectedAdjective ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{ background: selectedAdjective ? 'linear-gradient(145deg, #ca8a04, #a16207)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', clipPath: selectedAdjective ? 'polygon(0% 20%,10% 20%,15% 0%,85% 0%,90% 20%,100% 20%,100% 80%,90% 80%,85% 100%,15% 100%,10% 80%,0% 80%)' : 'none', marginLeft: '-12px', marginRight: '-12px', borderRadius: selectedAdjective ? '0px' : '0px', boxShadow: selectedAdjective ? '0 8px 25px rgba(202,138,4,0.25),0 3px 0 rgba(161,98,7,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'}}
               >{selectedAdjective?.comparative || 'Adjetivo-er'}</motion.div>
 
               {/* Than Block */}
               <motion.div whileHover={selectedNoun1 && selectedAdjective ? { y: -2 } : {}}
-                className={`text-black px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[100px] sm:min-w-[120px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 ${selectedNoun1 && selectedAdjective ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedNoun1 && selectedAdjective ? 'text-white' : 'text-black' } px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[100px] sm:min-w-[120px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-30 ${selectedNoun1 && selectedAdjective ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{ background: selectedNoun1 && selectedAdjective ? 'linear-gradient(145deg, #84cc16, #65a30d)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', clipPath: selectedNoun1 && selectedAdjective ? 'polygon(0% 20%,10% 20%,15% 0%,85% 0%,90% 20%,100% 20%,100% 80%,90% 80%,85% 100%,15% 100%,10% 80%,0% 80%)' : 'none', marginLeft: '-12px', marginRight: '-12px', borderRadius: selectedNoun1 && selectedAdjective ? '0px' : '0px', boxShadow: selectedNoun1 && selectedAdjective ? '0 8px 25px rgba(132,204,22,0.25),0 3px 0 rgba(101,163,13,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'}}
               >than</motion.div>
 
               {/* Noun 2 Block */}
               <motion.div whileHover={selectedNoun2 ? { y: -2 } : {}}
-                className={`text-black px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[130px] sm:min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedNoun2 ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
+                className={`${selectedNoun2 ? 'text-white' : 'text-black' } px-6 py-4 font-semibold text-base sm:text-lg relative min-w-[130px] sm:min-w-[150px] text-center transition-all duration-400 h-[60px] flex items-center justify-center z-20 ${selectedNoun2 ? 'shadow-lg' : 'text-gray-400 border-2 border-dashed border-gray-300 shadow-sm'}`}
                 style={{ background: selectedNoun2 ? 'linear-gradient(145deg, #f97316, #ea580c)' : 'linear-gradient(145deg, #f8fafc, #e2e8f0)', clipPath: selectedNoun2 ? 'polygon(0% 20%,10% 20%,15% 0%,100% 0%,100% 100%,15% 100%,10% 80%,0% 80%)' : 'none', borderRadius: selectedNoun2 ? '0px' : '0 12px 12px 0', boxShadow: selectedNoun2 ? '0 8px 25px rgba(249,115,22,0.25),0 3px 0 rgba(234,88,12,0.6),inset 0 1px 0 rgba(255,255,255,0.3)' : '0 4px 12px rgba(0,0,0,0.05),inset 0 1px 0 rgba(255,255,255,0.8)'}}
               >{selectedNoun2?.en || 'Sustantivo 2'}</motion.div>
             </div>
@@ -233,6 +254,21 @@ const Level7Page = () => {
                 <p className="text-yellow-600 text-sm mt-2">Sigue practicando para describir las diferencias entre las cosas que te rodean.</p>
               </div>
             </div>
+          </div>
+
+          {/* Siguiente Ejercicio Button */}
+          <div className="mt-8 flex justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleNextLevel}
+              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3"
+            >
+              <span>Siguiente Ejercicio</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </motion.button>
           </div>
         </div>
       </main>
