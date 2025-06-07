@@ -7,7 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 
 const Level3Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const { trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -93,10 +93,7 @@ const Level3Page = () => {
     return `${selectedSubjectEs} ${verbTranslation} ${selectedTimeEs}`;
   };
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
+
 
   const handleNextLevel = () => {
     trackLevelCompletion(3);

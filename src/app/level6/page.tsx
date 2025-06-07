@@ -20,7 +20,7 @@ interface VerbOption {
 
 const Level6Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const {  trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<SubjectOption | null>(null);
@@ -76,10 +76,7 @@ const Level6Page = () => {
     { base: 'buy', es: 'comprar', complements: [{ en: 'a new phone', es: 'un teléfono nuevo' }, { en: 'some groceries', es: 'algunas compras' }, { en: 'a gift', es: 'un regalo' }] }
   ];
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
+  
 
   const handleNextLevel = () => {
     trackLevelCompletion(6);
@@ -106,7 +103,7 @@ const Level6Page = () => {
             </svg>
             <span>Back to Map</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-900">Level 6: Modal 'Can' (Ability)</h1>
+          <h1 className="text-xl font-bold text-gray-900">Level 6: Futuro con &quot;Going to&quot;</h1>
           <div className="w-24" />
         </div>
       </header>

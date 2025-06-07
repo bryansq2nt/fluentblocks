@@ -19,7 +19,7 @@ interface AdjectiveOption {
 
 const Level7Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const { trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedNoun1, setSelectedNoun1] = useState<NounOption | null>(null);
@@ -71,10 +71,7 @@ const Level7Page = () => {
     return `${selectedNoun1.es} ${selectedNoun1.esSon} más ${selectedAdjective.base_es} que ${selectedNoun2.es}`;
   };
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
+  
 
   const handleNextLevel = () => {
     trackLevelCompletion(7);
@@ -101,7 +98,7 @@ const Level7Page = () => {
             </svg>
             <span>Back to Map</span>
           </button>
-          <h1 className="text-xl font-bold text-gray-900">Level 7: 'Going to' Future</h1>
+          <h1 className="text-xl font-bold text-gray-900">Level 7: &apos;Going to`&apos; Future</h1>
           <div className="w-24" />
         </div>
       </header>

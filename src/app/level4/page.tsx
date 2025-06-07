@@ -7,7 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 
 const Level4Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const {  trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -33,10 +33,7 @@ const Level4Page = () => {
     setSelectedTimeEs(time.es);
   };
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
+
 
   // Smart translation for Future Simple
   const getSmartTranslation = () => {

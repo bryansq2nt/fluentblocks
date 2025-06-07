@@ -7,7 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 
 const Level5Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const { trackLevelCompletion } = useFeedback();
 
   // State management
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -39,11 +39,7 @@ const Level5Page = () => {
     setSelectedComplementEs(complement.es);
   };
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
-
+ 
   // Smart translation for "can"
   const getSmartTranslation = () => {
     if (!selectedSubject || !selectedVerb || !selectedComplement) return null;

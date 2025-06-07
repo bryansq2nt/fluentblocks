@@ -34,7 +34,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const Level9Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const {  trackLevelCompletion } = useFeedback();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState<QuestionData>(questionsBank[0]);
   const [userAnswerWords, setUserAnswerWords] = useState<string[]>([]);
@@ -98,10 +98,7 @@ const Level9Page = () => {
     setShowCorrect(false);
   }
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
+  
 
   const handleNextLevel = () => {
     trackLevelCompletion(9);

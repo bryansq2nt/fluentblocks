@@ -32,7 +32,7 @@ const scenariosBank: QuestionScenario[] = [
 
 const Level10Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const { trackLevelCompletion } = useFeedback();
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [currentScenario, setCurrentScenario] = useState<QuestionScenario>(scenariosBank[0]);
   
@@ -220,10 +220,7 @@ const Level10Page = () => {
     `${userYesNoChoice === 'yes' ? 'Yes' : 'No'}, ${currentScenario.correct_answer_pronoun_en} ${getCorrectAuxiliary(currentScenario.correct_answer_pronoun_en, userYesNoChoice === 'yes')}.`
     : "";
 
-  const handleWordSelect = (word: string) => {
-    trackInteraction();
-    // ... existing word selection logic ...
-  };
+ 
 
   const handleNextLevel = () => {
     trackLevelCompletion(10);

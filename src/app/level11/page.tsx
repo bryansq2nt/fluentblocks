@@ -91,7 +91,7 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const Level11Page = () => {
   const router = useRouter();
-  const { trackInteraction, trackLevelCompletion } = useFeedback();
+  const { trackLevelCompletion } = useFeedback();
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [currentProblem, setCurrentProblem] = useState<VerbIngProblem>(verbProblemsBank[0]);
   
