@@ -45,6 +45,8 @@ export const useFeedbackTracker = () => {
   };
 
   const trackLevelCompletion = (level: number) => {
+
+    
     setFeedbackState(prev => ({
       ...prev,
       levelsCompleted: Math.max(prev.levelsCompleted, level)

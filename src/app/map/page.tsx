@@ -8,51 +8,50 @@ import { Lock } from 'lucide-react';
 // Types
 interface Level {
   id: number;
+  title: string;
   pattern: string;
   icon: string;
+  pageId: string;
 }
 
 interface NavSection {
   id: string;
   label: string;
   icon: string;
-  progress: number;
   startLevel: number;
 }
 
-// Data
+// --- NEW CORRECTED & REORDERED DATA ---
 const levels: Level[] = [
-  { id: 1, pattern: "Present Continuous", icon: "⏳" },
-  { id: 2, pattern: "Present Perfect", icon: "✅" },
-  { id: 3, pattern: "Simple Past", icon: "🕰️" },
-  { id: 4, pattern: "Future Simple", icon: "🔮" },
-  { id: 5, pattern: "Modal 'Can' (Ability)", icon: "💪" },
-  { id: 6, pattern: "'Going to' Future", icon: "🎯" },
-  { id: 7, pattern: "Comparatives (-er)", icon: "📏" },
-  { id: 8, pattern: "Superlatives (-est)", icon: "🏆" },
-  { id: 9, pattern: "Forming Questions", icon: "❓" },
-  { id: 10, pattern: "Responding", icon: "💬" },
-  { id: 11, pattern: "Verb + ING", icon: "✍️" },
+  { id: 1, title: "The '-ing' Form", pattern: "Reglas de ortografía para el gerundio", icon: "⚙️", pageId: "ing" },
+  { id: 4, title: "Present Perfect", pattern: "Sujeto + have/has + participio + extra + tiempo", icon: "🔗", pageId: "presente-perfecto" },
+  { id: 2, title: "Present Continuous", pattern: "Sujeto + am/is/are + verbo-ing + extra", icon: "⚡️" , pageId: "presente-continuo"},
+  { id: 5, title: "Future Simple (Will)", pattern: "Sujeto + will + verbo + objeto + tiempo", icon: "🔮", pageId: "futuro-will" },
+  { id: 6, title: "Future 'Going to'", pattern: "Sujeto + am/is/are + going to + verbo + extra", icon: "📅", pageId: "futuro-going-to" },
+
+  { id: 3, title: "Simple Past", pattern: "Sujeto + verbo en pasado + complemento + tiempo", icon: "🕰️", pageId: "pasado-simple" },
+  { id: 7, title: "Modal 'Can'", pattern: "Sujeto + can + verbo + extra", icon: "💪", pageId: "modal-can" },
+  { id: 8, title: "Modal 'Could'", pattern: "Sujeto + could + verbo + extra", icon: "🤔", pageId: "modal-could" },
+  { id: 9, title: "Modal 'Would'", pattern: "Sujeto + would + verbo + extra", icon: "💭", pageId: "modal-would" },
+  { id: 10, title: "Modal 'Should'", pattern: "Sujeto + should + verbo + extra", icon: "🦉", pageId: "modal-should" },
 ];
 
 const navSections: NavSection[] = [
-  { id: 'basic', label: 'Básico', icon: '🌱', progress: 4, startLevel: 1 },
-  { id: 'intermediate', label: 'Intermedio', icon: '🏔️', progress: 4, startLevel: 5 },
-  { id: 'advanced', label: 'Avanzado', icon: '🔥', progress: 3, startLevel: 9 },
+  { id: 'basic', label: 'Fundamentos', icon: '🌱', startLevel: 1 },
+  { id: 'intermediate', label: 'Tiempos', icon: '🏔️', startLevel: 3 },
+  { id: 'advanced', label: 'Modales', icon: '🔥', startLevel: 7 },
 ];
 
 // Components
 const LevelNode = ({ level, index, onSelect }: { level: Level; index: number; onSelect: (level: Level) => void }) => {
-  
-  
   const handleClick = () => {
     onSelect(level);
   };
 
   const getColorClass = (levelId: number) => {
-    if (levelId <= 4) return 'green'; // Basic levels
-    if (levelId <= 8) return ''; // Default blue for intermediate 
-    return 'purple'; // Advanced levels
+    if (levelId <= 2) return 'green'; // Fundamentos
+    if (levelId <= 6) return 'blue';  // Tiempos y Futuro
+    return 'purple'; // Modales
   };
 
   return (
@@ -68,18 +67,16 @@ const LevelNode = ({ level, index, onSelect }: { level: Level; index: number; on
           marginRight: index % 2 !== 0 ? '5rem' : '0',
         }}
       >
-        {/* Icon with z-index to appear above overlays */}
         <span className="text-3xl relative z-20 drop-shadow-lg text-white">{level.icon}</span>
         
         <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-white/90 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-700 whitespace-nowrap shadow-sm">
-          {level.pattern}
+          Nivel {level.id}: {level.title}
         </div>
       </motion.div>
 
-      {/* Connecting path */}
       {index < levels.length - 1 && (
         <div className="relative w-1 h-16 mx-auto">
-          <div className="absolute inset-0 border-l-4 border-dashed border-blue-300 animate-pulse" />
+          <div className={`absolute inset-0 border-l-4 border-dashed border-${getColorClass(level.id + 1)}-300 animate-pulse`} />
         </div>
       )}
     </>
@@ -98,17 +95,13 @@ const NavItem = ({
   isLocked?: boolean;
 }) => {
   const getGradientClasses = () => {
-    if (isLocked) {
-      return 'from-gray-400 to-gray-500';
-    }
+    if (isLocked) return 'from-gray-400 to-gray-500';
     
     switch (section.id) {
-      case 'basic':
-        return isActive ? 'from-green-500 to-green-600' : 'from-green-400 to-green-500';
-      case 'intermediate':
-        return isActive ? 'from-blue-500 to-blue-600' : 'from-blue-400 to-blue-500';
-      case 'advanced':
-        return isActive ? 'from-red-500 to-red-600' : 'from-red-400 to-red-500';
+      case 'basic': return isActive ? 'from-green-500 to-green-600' : 'from-green-400 to-green-500';
+      case 'intermediate': return isActive ? 'from-blue-500 to-blue-600' : 'from-blue-400 to-blue-500';
+      case 'advanced': return isActive ? 'from-purple-500 to-purple-600' : 'from-purple-400 to-purple-500';
+      default: return 'from-gray-400 to-gray-500';
     }
   };
 
@@ -117,22 +110,9 @@ const NavItem = ({
       whileHover={!isLocked ? { y: -3 } : {}}
       whileTap={!isLocked ? { y: 0 } : {}}
       onClick={isLocked ? () => {} : onClick}
-      className={`
-        relative w-[120px] h-[140px] overflow-hidden rounded-2xl
-        bg-gradient-to-br ${getGradientClasses()}
-        transition-all duration-300
-        ${isActive ? 'text-white shadow-lg scale-105' : 'text-gray-600'}
-        ${isLocked ? 'cursor-not-allowed opacity-60' : ''}
-      `}
+      className={`relative w-[120px] h-[140px] overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClasses()} transition-all duration-300 ${isActive ? 'text-white shadow-lg scale-105' : 'text-white/80'} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
     >
-      {/* Lock icon overlay */}
-      {isLocked && (
-        <div className="absolute top-2 right-2 text-white/80">
-          <Lock className="w-4 h-4" />
-        </div>
-      )}
-
-      {/* Content */}
+      {isLocked && (<div className="absolute top-2 right-2 text-white/80"><Lock className="w-4 h-4" /></div>)}
       <div className="relative z-10 flex flex-col items-center gap-2 pt-4">
         <span className="text-3xl">{section.icon}</span>
         <span className="text-xs font-semibold uppercase tracking-wider">{section.label}</span>
@@ -141,7 +121,6 @@ const NavItem = ({
   );
 };
 
-// Main Component
 export default function MapPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState('basic');
@@ -150,36 +129,38 @@ export default function MapPage() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      window.scrollTo({
-        top: document.documentElement.scrollHeight,
-        behavior: 'smooth'
-      });
-      
-      // Ocultar el hint después del scroll
-      setTimeout(() => setShowScrollHint(false), 3000);
+      document.getElementById('map-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(() => setShowScrollHint(false), 2000);
     }, 500);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSectionClick = (section: NavSection) => {
-    setActiveSection(section.id);
+  const handleLevelSelect = (level: Level) => {
+    setSelectedLevel(level);
+  };
+
+  const handleStartLevel = () => {
+    if (selectedLevel) {
+      router.push(`/${selectedLevel.pageId}`);
+    }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-blue-200 via-green-200 to-purple-200">
-      {/* Scroll Hint Arrow */}
+    <main id="map-container" className="min-h-screen bg-gradient-to-b from-blue-200 via-green-200 to-purple-200">
       {showScrollHint && (
         <motion.div 
           className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40"
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 1, repeat: Number.POSITIVE_INFINITY }}
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <span className="text-4xl">👆</span>
+          <div className="flex flex-col items-center text-gray-600">
+            <span className="text-sm font-bold">Desliza</span>
+            <span className="text-4xl">👇</span>
+          </div>
         </motion.div>
       )}
 
-      {/* Header */}
       <header className="fixed top-0 right-0 p-4 z-50">
         <motion.button
           whileHover={{ scale: 1.1 }}
@@ -191,10 +172,8 @@ export default function MapPage() {
         </motion.button>
       </header>
 
-      {/* Map Container */}
       <div className="container mx-auto max-w-[400px] px-6 pb-40 pt-24">
         <div className="relative">
-          {/* Floating Clouds */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
             {[...Array(3)].map((_, i) => (
               <motion.div
@@ -205,58 +184,48 @@ export default function MapPage() {
                   height: i === 1 ? '40px' : '30px',
                   top: `${(i + 1) * 20}%`,
                 }}
-                animate={{
-                  x: ['-100px', 'calc(100vw + 100px)'],
-                }}
-                transition={{
-                  duration: 20,
-                  delay: i * -10,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: 'linear',
-                }}
+                animate={{ x: ['-100px', 'calc(100vw + 100px)']}}
+                transition={{ duration: 40 - i * 10, delay: i * -15, repeat: Infinity, ease: 'linear'}}
               />
             ))}
           </div>
 
-          {/* Level Path */}
-          <div className="relative flex flex-col-reverse items-center py-8 space-y-16">
+          <div className="relative flex flex-col-reverse items-center py-8">
             {levels.map((level, index) => (
               <LevelNode 
                 key={`level-${level.id}`} 
                 level={level} 
                 index={index} 
-                onSelect={setSelectedLevel}
+                onSelect={handleLevelSelect}
               />
             ))}
           </div>
         </div>
       </div>
 
-      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-[95%] max-w-[400px] bg-white/95 backdrop-blur-xl rounded-t-[25px] p-6 shadow-lg border-t border-white/50">
         <div className="flex gap-4 items-center justify-center">
           <NavItem
             section={navSections[0]}
             isActive={activeSection === navSections[0].id}
-            onClick={() => handleSectionClick(navSections[0])}
+            onClick={() => setActiveSection(navSections[0].id)}
             isLocked={false}
           />
           <NavItem
             section={navSections[1]}
             isActive={activeSection === navSections[1].id}
-            onClick={() => handleSectionClick(navSections[1])}
-            isLocked={true}
+            onClick={() => setActiveSection(navSections[1].id)}
+            isLocked={true} // Asumiendo que se desbloquean con el progreso
           />
           <NavItem
             section={navSections[2]}
             isActive={activeSection === navSections[2].id}
-            onClick={() => handleSectionClick(navSections[2])}
-            isLocked={true}
+            onClick={() => setActiveSection(navSections[2].id)}
+            isLocked={true} // Asumiendo que se desbloquean con el progreso
           />
         </div>
       </nav>
 
-      {/* Level Selection Modal */}
       <AnimatePresence>
         {selectedLevel && (
           <motion.div
@@ -275,8 +244,8 @@ export default function MapPage() {
             >
               <div className="text-center">
                 <div className="text-6xl mb-4">{selectedLevel.icon}</div>
-                <h3 className="text-xl text-black font-bold mb-2">Nivel {selectedLevel.id}</h3>
-                <p className="text-gray-600 mb-6">{selectedLevel.pattern}</p>
+                <h3 className="text-xl text-black font-bold mb-2">Nivel {selectedLevel.id}: {selectedLevel.title}</h3>
+                <p className="text-gray-600 mb-6 text-sm">{selectedLevel.pattern}</p>
                 <div className="flex gap-3">
                   <button
                     type="button"
@@ -287,10 +256,7 @@ export default function MapPage() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => {
-                      setSelectedLevel(null);
-                      router.push(`/level${selectedLevel.id}`);
-                    }}
+                    onClick={handleStartLevel}
                     className="flex-1 py-3 px-4 bg-blue-500 text-white rounded-xl font-semibold"
                   >
                     Empezar

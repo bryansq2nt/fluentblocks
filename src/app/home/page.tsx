@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Settings, ArrowLeft,User, HelpCircle, Trophy, PuzzleIcon, Lock } from 'lucide-react';
+import { ArrowLeft,User, HelpCircle, Trophy, PuzzleIcon, Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
@@ -95,10 +95,12 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
             FluentBlocks
           </h1>
+
+          <div></div>
           
-          <Link href="/settings" className="p-2 hover:bg-white/50 rounded-full transition-colors">
+          {/* <Link href="/settings" className="p-2 hover:bg-white/50 rounded-full transition-colors">
             <Settings className="w-6 h-6 text-gray-600" />
-          </Link>
+          </Link> */}
         </div>
       </header>
 
