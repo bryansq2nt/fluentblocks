@@ -112,22 +112,28 @@ export const MobileSentenceBuilder: React.FC<MobileBuilderProps> = ({
             ))}
           </div>
         </div>
-        <div className="relative min-h-[60px] flex flex-col justify-center pr-12"> {/* Añadido 'relative' y padding a la derecha */}
-  {partialSentence ? (
-    <AnimatePresence>
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <p className="text-xl font-bold text-gray-900 text-center">{partialSentence}</p>
-        {isComplete && fullSentenceEs && <p className="text-sm text-gray-600 text-center italic mt-1">({fullSentenceEs})</p>}
-      </motion.div>
-    </AnimatePresence>
-  ) : <p className="text-gray-400 text-center">Completa los pasos...</p>}
+       {/* Contenedor principal de la oración y el reproductor */}
+       <div className="min-h-[60px] flex items-center justify-between gap-2">
+  {/* Contenedor para el texto, que tomará el espacio disponible */}
+  <div className="flex-1 text-center">
+    {partialSentence ? (
+      <>
+        <p className="text-xl font-bold text-gray-900 break-words">{partialSentence}</p>
+        {isComplete && fullSentenceEs && (
+          <p className="text-sm text-gray-600 italic mt-1">({fullSentenceEs})</p>
+        )}
+      </>
+    ) : (
+      <p className="text-gray-400 text-center">Completa los pasos...</p>
+    )}
+  </div>
 
+  {/* Contenedor para el AudioPlayer, que solo aparece si es necesario */}
   {isComplete && audioPlayer && (
-    <div className="absolute top-1/2 right-0 -translate-y-1/2">
+    <div className="flex-shrink-0">
       {audioPlayer}
     </div>
   )}
-  {/* --- FIN DEL CÓDIGO AÑADIDO --- */}
 </div>
 
       </motion.div>
