@@ -1,34 +1,56 @@
 // app/api/generate-audio/route.ts
 
 import { NextResponse } from 'next/server';
-import { put } from '@vercel/blob'; // 1. Importamos 'put' de Vercel Blob
-import fetch from 'node-fetch';
+import { put, head } from '@vercel/blob'; // Importar 'put' y 'head'
+
+// NO necesitas 'node-fetch'. Las API Routes de Next.js tienen 'fetch' globalmente.
+// NO necesitas 'fs' ni 'path'. Todo se maneja en la nube.
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = 'TX3LPaxmHKxFdv7VOQHJ'; 
 
 export async function POST(request: Request) {
-  // Verificación de la API Key (sin cambios)
+  // 1. Verificación más robusta de la API Key
   if (!ELEVENLABS_API_KEY) {
-    return NextResponse.json({ error: "API key de ElevenLabs no configurada" }, { status: 500 });
+    console.error("Error: La variable de entorno ELEVENLABS_API_KEY no está configurada.");
+    return NextResponse.json({ error: "Configuración del servidor incompleta." }, { status: 500 });
   }
 
-  // Obtener el texto de la oración (sin cambios)
-  const { text } = await request.json();
+  // 2. Obtener el texto de la oración
+  let text;
+  try {
+    const body = await request.json();
+    text = body.text;
+  } catch (e) {
+    return NextResponse.json({ error: "Cuerpo de la solicitud inválido." }, { status: 400 });
+  }
+
   if (!text || typeof text !== 'string') {
-    return NextResponse.json({ error: "El texto es requerido" }, { status: 400 });
+    return NextResponse.json({ error: "El texto es requerido y debe ser un string." }, { status: 400 });
   }
 
-  // Crear un nombre de archivo seguro (sin cambios)
   const fileName = text.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.mp3';
-  
-  // ¡No necesitamos verificar si el archivo existe localmente, Vercel Blob se encarga!
+  const blobPath = `audios/${fileName}`;
 
   try {
-    // Llamar a la API de ElevenLabs (sin cambios)
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
-      {
+    // 3. (OPCIONAL PERO RECOMENDADO) Verificar si el archivo ya existe en Vercel Blob
+    // Esto evita generar un audio si otro usuario lo pidió un segundo antes.
+    const existingBlob = await head(blobPath);
+    if (existingBlob) {
+      console.log(`Blob ya existe para: ${text}`);
+      return NextResponse.json({ success: true, url: existingBlob.url, message: "El archivo ya existía." });
+    }
+  } catch (error: any) {
+    if (error.status !== 404) { // Si el error es diferente de "no encontrado", es un problema real
+       console.error("Error al verificar el blob:", error);
+    }
+    // Si es 404, continuamos con la generación, que es lo esperado.
+  }
+
+
+  try {
+    // 4. Llamar a la API de ElevenLabs
+    const elevenLabsResponse = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`, {
         method: 'POST',
         headers: {
           'Accept': 'audio/mpeg',
@@ -43,31 +65,24 @@ export async function POST(request: Request) {
       }
     );
 
-    if (!response.ok) {
-      const errorBody = await response.text();
-      throw new Error(`Error de la API de ElevenLabs: ${response.statusText} - ${errorBody}`);
+    if (!elevenLabsResponse.ok) {
+      const errorBody = await elevenLabsResponse.text();
+      console.error(`Error de ElevenLabs: ${elevenLabsResponse.status} ${errorBody}`);
+      return NextResponse.json({ error: 'Error al contactar al servicio de voz.' }, { status: 502 });
     }
 
-    const audioBuffer = await response.arrayBuffer();
+    const audioBuffer = await elevenLabsResponse.arrayBuffer();
 
-    // --- 👇 CAMBIO PRINCIPAL: DE GUARDAR LOCAL A SUBIR A VERCEL BLOB 👇 ---
-    // 4. Subir el archivo de audio a Vercel Blob
-    const blob = await put(
-      `audios/${fileName}`, // La ruta dentro del Blob store
-      audioBuffer,        // El contenido del archivo
-      {
-        access: 'public',       // Hacer el archivo públicamente accesible
-        contentType: 'audio/mpeg', // Especificar el tipo de contenido
-      }
-    );
-    // --- FIN DEL CAMBIO ---
+    // 5. Subir el archivo de audio a Vercel Blob
+    const blob = await put(blobPath, audioBuffer, {
+      access: 'public',
+      contentType: 'audio/mpeg',
+    });
 
-    console.log(`Audio subido a Vercel Blob: ${blob.url}`);
-    // Devolvemos el objeto blob completo, que incluye la URL pública
     return NextResponse.json(blob);
 
   } catch (error) {
-    console.error("Error en la generación de audio:", error);
+    console.error("Error catastrófico en la generación de audio:", error);
     return NextResponse.json({ error: "Falló la generación de audio." }, { status: 500 });
   }
 }

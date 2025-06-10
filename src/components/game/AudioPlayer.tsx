@@ -10,44 +10,55 @@ interface AudioPlayerProps {
   sentence: string;
 }
 
-const slowSpeeds = [0.75, 0.5]; // [Lento, Súper Lento]
+const slowSpeeds = [0.75, 0.5];
 
 export const AudioPlayer: React.FC<AudioPlayerProps> = ({ sentence }) => {
   const [status, setStatus] = useState<'idle' | 'loading'>('idle');
-  const [slowSpeedIndex, setSlowSpeedIndex] = useState(0); // Índice para el array de velocidades
+  const [slowSpeedIndex, setSlowSpeedIndex] = useState(0);
 
-  const playAudio = async (speed: number) => {
+  // Función de reproducción que ahora solo necesita una URL
+  const performPlay = (url: string, speed: number) => {
+    const audio = new Audio(url);
+    audio.playbackRate = speed;
+    audio.play();
+    audio.onended = () => setStatus('idle');
+    audio.onerror = (e) => {
+      console.error("Error al reproducir el audio:", e);
+      setStatus('idle');
+    };
+  };
+
+  const handlePlay = async (speed: number) => {
     if (!sentence || status === 'loading') return;
     setStatus('loading');
 
     const fileName = sentence.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.mp3';
-    const audioUrl = `/audios/${fileName}`;
-
-    const performPlay = (url: string) => {
-      const audio = new Audio(url);
-      audio.playbackRate = speed;
-      audio.play();
-      audio.onended = () => setStatus('idle');
-      audio.onerror = () => {
-        console.error("Error al reproducir audio.");
-        setStatus('idle'); // Resetea incluso si hay error
-      };
-    };
+    // Esta es la URL que Vercel Blob nos dará
+    // NOTA: Reemplaza 'fwrpzkasfeerhgsb' con tu propio ID de Blob store si es diferente
+    const publicUrl = `https://store_FwRpzKasFEerHgsb.public.blob.vercel-storage.com/audios/${fileName}`;
 
     try {
-      const response = await fetch(audioUrl);
+      // 1. Intentamos acceder a la URL pública directamente
+      const response = await fetch(publicUrl, { method: 'HEAD' }); // HEAD es más rápido que GET
+      
       if (response.ok) {
-        performPlay(audioUrl);
-      } else if (response.status === 404) {
+        // El archivo existe en Blob, lo reproducimos
+        performPlay(publicUrl, speed);
+      } else {
+        // El archivo NO existe, lo generamos
         const generateResponse = await fetch('/api/generate-audio', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ text: sentence }),
         });
+
         if (!generateResponse.ok) throw new Error("La generación en el servidor falló.");
-        performPlay(audioUrl);
-      } else {
-        throw new Error(`Error inesperado: ${response.status}`);
+
+        const blobResult = await generateResponse.json();
+        
+        // --- CAMBIO CLAVE ---
+        // Usamos la URL devuelta por la API, que es la URL directa del Blob
+        performPlay(blobResult.url, speed); 
       }
     } catch (error) {
       console.error("Error en el proceso de reproducción/generación:", error);
@@ -55,14 +66,10 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ sentence }) => {
     }
   };
 
-  const handleNormalPlay = () => {
-    playAudio(1.0); // Velocidad normal
-  };
-
+  const handleNormalPlay = () => handlePlay(1.0);
   const handleSlowPlay = () => {
     const currentSpeed = slowSpeeds[slowSpeedIndex];
-    playAudio(currentSpeed);
-    // Avanza al siguiente índice de velocidad, volviendo al principio si llega al final
+    handlePlay(currentSpeed);
     setSlowSpeedIndex((prevIndex) => (prevIndex + 1) % slowSpeeds.length);
   };
 
@@ -86,7 +93,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ sentence }) => {
         )}
       </motion.button>
       
-      {/* Botón de Reproducir Lento (Tortuguita) */}
+      {/* Botón de Reproducir Lento */}
       <motion.button
         onClick={handleSlowPlay}
         disabled={status === 'loading'}
@@ -96,7 +103,6 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({ sentence }) => {
         aria-label="Escuchar lentamente"
       >
         <Snail size={20} />
-        {/* Indicador de velocidad */}
         <span className="ml-1.5 text-xs font-semibold">
           {slowSpeeds[slowSpeedIndex]}x
         </span>
