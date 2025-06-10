@@ -22,6 +22,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     text = body.text;
   } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: "Cuerpo de la solicitud inválido." }, { status: 400 });
   }
 
@@ -40,6 +41,7 @@ export async function POST(request: Request) {
       console.log(`Blob ya existe para: ${text}`);
       return NextResponse.json({ success: true, url: existingBlob.url, message: "El archivo ya existía." });
     }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     if (error.status !== 404) { // Si el error es diferente de "no encontrado", es un problema real
        console.error("Error al verificar el blob:", error);
