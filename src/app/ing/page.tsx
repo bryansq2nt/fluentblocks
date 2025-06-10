@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
+import { ShareButton } from '../../components/game/ShareButton';
 
 // --- DATA STRUCTURES FOR THIS LEVEL ---
 interface IngOption {
@@ -110,7 +111,7 @@ const Level10Page = () => {
             </svg>
             <span className="text-sm sm:text-base">Back to Map</span>
           </button>
-          <h1 className="text-xl font-bold text-slate-800">Level 1: The "ing" Form</h1>
+          <h1 className="text-xl font-bold text-slate-800">Level 1: The &quot;ing&quot; Form</h1>
           <div className="w-24" />
         </div>
       </header>
@@ -119,7 +120,10 @@ const Level10Page = () => {
         <div className="max-w-lg mx-auto"> 
           <div className="rounded-2xl p-5 sm:p-7 bg-white shadow-xl border border-slate-200">
             <div className="mb-8 rounded-2xl border overflow-hidden" style={{ background: 'linear-gradient(135deg, #d9f99d 0%, #bef264 100%)', borderColor: 'rgba(132, 204, 22, 0.2)', boxShadow: '0 10px 25px rgba(132, 204, 22, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5) inset' }}>
-              <div className="p-8"><div className="text-center"><div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ background: 'linear-gradient(145deg, #a3e635, #84cc16)', boxShadow: '0 8px 20px rgba(132, 204, 22, 0.3)' }}><span className="text-3xl">⚙️</span></div><h3 className="text-2xl font-bold text-gray-800 mb-2">El Secreto del "ing"</h3><p className="text-gray-600 text-lg mb-6">El sufijo <strong className="font-semibold">"ing"</strong> en inglés es como añadir <strong className="font-semibold text-lime-700">"ando"</strong> o <strong className="font-semibold text-lime-700">"endo"</strong> en español.</p><div className="text-left bg-white/60 rounded-xl border border-gray-200 p-4 mb-8"><h4 className="text-lg font-bold text-center text-gray-800 mb-3">ing = ando / endo</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"><div><p className="text-gray-700">comer → comi<strong className="text-lime-700 font-bold">endo</strong></p><p className="text-gray-900 font-medium">eat → eat<strong className="text-lime-700 font-bold">ing</strong></p></div><div><p className="text-gray-700">hablar → habl<strong className="text-lime-700 font-bold">ando</strong></p><p className="text-gray-900 font-medium">talk → talk<strong className="text-lime-700 font-bold">ing</strong></p></div></div></div><p className="text-gray-600 text-lg mb-4">Aunque la idea es simple, ¡hay algunas <strong className="font-semibold">reglas de ortografía</strong> importantes que practicarás a continuación!</p></div></div>
+              <div className="p-8"><div className="text-center"><div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style={{ background: 'linear-gradient(145deg, #a3e635, #84cc16)', boxShadow: '0 8px 20px rgba(132, 204, 22, 0.3)' }}>
+                <span className="text-3xl">⚙️</span></div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">El Secreto del &quot;ing&quot;</h3>
+                <p className="text-gray-600 text-lg mb-6">El sufijo <strong className="font-semibold">&quot;ing&quot;</strong> en inglés es como añadir <strong className="font-semibold text-lime-700">&quot;ando&quot;</strong> o <strong className="font-semibold text-lime-700">&quot;endo&quot;</strong> en español.</p><div className="text-left bg-white/60 rounded-xl border border-gray-200 p-4 mb-8"><h4 className="text-lg font-bold text-center text-gray-800 mb-3">ing = ando / endo</h4><div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4"><div><p className="text-gray-700">comer → comi<strong className="text-lime-700 font-bold">endo</strong></p><p className="text-gray-900 font-medium">eat → eat<strong className="text-lime-700 font-bold">ing</strong></p></div><div><p className="text-gray-700">hablar → habl<strong className="text-lime-700 font-bold">ando</strong></p><p className="text-gray-900 font-medium">talk → talk<strong className="text-lime-700 font-bold">ing</strong></p></div></div></div><p className="text-gray-600 text-lg mb-4">Aunque la idea es simple, ¡hay algunas <strong className="font-semibold">reglas de ortografía</strong> importantes que practicarás a continuación!</p></div></div>
             </div>
 
             <div className="rounded-xl border border-purple-300 bg-gradient-to-br from-purple-500 to-violet-600 p-5 text-white shadow-lg">
@@ -134,7 +138,7 @@ const Level10Page = () => {
               </div>
             </div>
             
-            <p className="text-center text-slate-600 my-5 text-sm sm:text-base">Selecciona la forma correcta del verbo con "ing":</p>
+            <p className="text-center text-slate-600 my-5 text-sm sm:text-base">Selecciona la forma correcta del verbo con &quot;ing&quot;:</p>
 
             <div className="space-y-3 mb-6">
                 {currentProblem.options.map((option) => (
@@ -154,7 +158,7 @@ const Level10Page = () => {
               <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
                 className={`p-3 my-4 rounded-md text-center font-medium text-sm shadow ${ selectedOption?.isCorrect ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300' }`}>
                 {feedback}
-                 {selectedOption?.isCorrect && currentProblem.example_sentence && (<p className="text-xs italic mt-1">Ej: "{currentProblem.example_sentence}"</p>)}
+                 {selectedOption?.isCorrect && currentProblem.example_sentence && (<p className="text-xs italic mt-1">Ej: &quot;{currentProblem.example_sentence}&quot;</p>)}
               </motion.div>
             )}
             </AnimatePresence>
@@ -179,6 +183,10 @@ const Level10Page = () => {
           </div>
           
           <div className="mt-8 flex flex-col items-center gap-4">
+          <ShareButton
+  title="¡Estoy aprendiendo en FluentBlocks!"
+  text="Dominando las reglas del '-ing' en inglés. ¡Es más fácil de lo que parece!"
+/>
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
             <span>Siguiente Ejercicio</span>
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,6 +199,7 @@ const Level10Page = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               </motion.button>
             )}
+           
           </div>
         </div>
       </main>

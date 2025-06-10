@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../components/game/ShareButton';
 
 // --- DATA DEFINITIONS FOR LEVEL 5 (EXPANDED & MORE USEFUL) ---
 const subjectOptions: StepOption[] = [
@@ -212,11 +213,15 @@ const Level5Page = () => {
             <div className="mt-8 p-4 bg-green-50 rounded-xl border border-green-200">
               <div className="text-center">
                 <h3 className="text-lg font-bold text-green-800 mb-2">🎯 ¡Muy bien!</h3>
-                <p className="text-green-700">Ahora ya sabes cómo usar "can" para expresar habilidad.</p>
+                <p className="text-green-700">Ahora ya sabes cómo usar &quot;can&quot; para expresar habilidad.</p>
               </div>
             </div>
           </div>
           <div className="mt-8 flex flex-col items-center gap-4">
+          <ShareButton
+  title="¡Claro que puedo!"
+  text="Aprendiendo a expresar mis habilidades con el verbo modal 'can' en FluentBlocks."
+/>
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
             <span>Siguiente Ejercicio</span>
     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

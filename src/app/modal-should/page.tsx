@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../components/game/ShareButton';
 
 // --- DATA DEFINITIONS FOR LEVEL 9 (SHOULD) ---
 const subjectOptions: StepOption[] = [
@@ -226,6 +227,10 @@ const Level9Page = () => {
             </div>
           </div>
           <div className="mt-8 flex flex-col items-center gap-4">
+          <ShareButton
+  title="Un buen consejo: ¡Prueba FluentBlocks!"
+  text="Aprendiendo a dar recomendaciones y consejos con 'should'. ¡Deberías probarlo!"
+/>
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
               <span>Volver al Mapa</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>

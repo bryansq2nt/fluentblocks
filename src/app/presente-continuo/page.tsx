@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../components/game/ShareButton';
 
 // --- DATA DEFINITIONS FOR LEVEL 1 (EXPANDED & MORE USEFUL) ---
 const subjectOptions: StepOption[] = [
@@ -274,6 +275,10 @@ const Level1Page = () => {
             </div>
           </div>
           <div className="mt-8 flex flex-col items-center gap-4">
+          <ShareButton
+  title="¿Qué estoy haciendo? ¡Aprendiendo inglés!"
+  text="Practicando el Presente Continuo en FluentBlocks para hablar de lo que pasa ahora mismo."
+/>
             <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
               <span>Siguiente Ejercicio</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
