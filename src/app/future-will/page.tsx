@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useRouter } from 'next/navigation';
@@ -7,6 +6,7 @@ import { useState } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../components/game/ShareButton';
+import { AudioPlayer } from '../../components/game/AudioPlayer';
 
 // --- DATA DEFINITIONS FOR LEVEL 4 (RESTRUCTURED AND EXPANDED) ---
 const subjectOptions: StepOption[] = [
@@ -279,6 +279,7 @@ const Level4Page = () => {
                 partialSentence={partialSentence}
                 fullSentenceEs={fullSentenceEs}
                 isComplete={isComplete}
+                audioPlayer={isComplete ? <AudioPlayer sentence={partialSentence} /> : null}
               />
             </div>
             
@@ -319,9 +320,27 @@ const Level4Page = () => {
               </div>
 
               {/* Translation Area */}
-              <motion.div className="rounded-2xl p-7 text-center border mb-8" style={{ background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255, 255, 255, 0.3)', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.5) inset' }} animate={isComplete ? { scale: [1, 1.02, 1] } : {}} transition={{ duration: 0.6 }}>
-                {isComplete ? ( <div> <div className="text-3xl font-bold text-gray-900 mb-2 tracking-tight"> {fullSentenceEs} </div> <div className="text-lg text-gray-500 font-medium italic"> ({partialSentence}) </div> </div> ) : ( <div className="text-gray-400 text-lg font-medium"> Completa los 4 pasos para crear una oración </div> )}
-              </motion.div>
+              <motion.div 
+  className="relative rounded-2xl p-7 text-center border mb-8" 
+  style={{ background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(20px)', borderColor: 'rgba(255, 255, 255, 0.3)', boxShadow: '0 10px 25px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255, 255, 255, 0.5) inset' }} 
+  animate={isComplete ? { scale: [1, 1.02, 1] } : {}} 
+  transition={{ duration: 0.6 }}
+>
+  {isComplete ? (
+    <div>
+      {/* El texto permanece centrado */}
+      <div className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">{fullSentenceEs}</div>
+      <div className="text-lg text-gray-500 font-medium italic">({partialSentence})</div>
+      
+      {/* El AudioPlayer se posiciona a la derecha */}
+      <div className="absolute top-1/2 right-4 -translate-y-1/2">
+        <AudioPlayer sentence={partialSentence} />
+      </div>
+    </div>
+  ) : (
+    <div className="text-gray-400 text-lg font-medium">Completa los 3 pasos para crear una oración</div>
+  )}
+</motion.div>
 
               {/* Word Columns */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { ShareButton } from '../../components/game/ShareButton';
-
+import { AudioPlayer } from '../../components/game/AudioPlayer'; // Nuevo nombre
 // --- DATA STRUCTURES FOR THIS LEVEL ---
 interface IngOption {
   text: string;
@@ -154,14 +154,35 @@ const Level10Page = () => {
             </div>
             
             <AnimatePresence>
-            {feedback && (
-              <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }}
-                className={`p-3 my-4 rounded-md text-center font-medium text-sm shadow ${ selectedOption?.isCorrect ? 'bg-green-100 text-green-700 border-green-300' : 'bg-red-100 text-red-700 border-red-300' }`}>
-                {feedback}
-                 {selectedOption?.isCorrect && currentProblem.example_sentence && (<p className="text-xs italic mt-1">Ej: &quot;{currentProblem.example_sentence}&quot;</p>)}
-              </motion.div>
-            )}
-            </AnimatePresence>
+  {feedback && (
+    <motion.div 
+      initial={{ opacity: 0, y: 5 }} 
+      animate={{ opacity: 1, y: 0 }}
+    >
+      {/* 1. Muestra el feedback (Correcto/Incorrecto) */}
+      <div
+        className={`p-3 rounded-md text-center font-medium text-sm shadow ${
+          selectedOption?.isCorrect 
+            ? 'bg-green-100 text-green-700 border-green-300' 
+            : 'bg-red-100 text-red-700 border-red-300' 
+        }`}
+      >
+        {feedback}
+      </div>
+
+      {/* 2. Muestra SIEMPRE la oración de ejemplo (si existe) después de un intento */}
+      {currentProblem.example_sentence && (
+        <div className="flex items-center justify-center gap-2 mt-3 p-2 bg-gray-100 rounded-md">
+          <p className="text-sm italic text-gray-700">
+            Ej: &quot;{currentProblem.example_sentence}&quot;
+          </p>
+          {/* Aquí es donde se usa el nuevo componente */}
+          <AudioPlayer sentence={currentProblem.example_sentence} />
+        </div>
+      )}
+    </motion.div>
+  )}
+</AnimatePresence>
             
             {/* --- BLOQUE DE BOTONES CORREGIDO --- */}
             <div className="mt-6 space-y-3">

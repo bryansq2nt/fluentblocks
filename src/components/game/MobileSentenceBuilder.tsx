@@ -36,6 +36,7 @@ interface MobileBuilderProps {
   partialSentence: string;
   fullSentenceEs: string | null;
   isComplete: boolean;
+  audioPlayer?: React.ReactNode;
 }
 
 interface AccordionStepProps extends StepConfig {
@@ -92,7 +93,7 @@ const AccordionStep: React.FC<AccordionStepProps> = ({
 
 // --- Componente Principal Genérico ---
 export const MobileSentenceBuilder: React.FC<MobileBuilderProps> = ({
-  steps, partialSentence, fullSentenceEs, isComplete
+  steps, partialSentence, fullSentenceEs, isComplete, audioPlayer
 }) => {
   const [activeStep, setActiveStep] = useState(1);
 
@@ -111,16 +112,24 @@ export const MobileSentenceBuilder: React.FC<MobileBuilderProps> = ({
             ))}
           </div>
         </div>
-        <div className="min-h-[60px] flex flex-col justify-center">
-          {partialSentence ? (
-            <AnimatePresence>
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-                <p className="text-xl font-bold text-gray-900 text-center">{partialSentence}</p>
-                {isComplete && fullSentenceEs && <p className="text-sm text-gray-600 text-center italic mt-1">({fullSentenceEs})</p>}
-              </motion.div>
-            </AnimatePresence>
-          ) : <p className="text-gray-400 text-center">Completa los pasos...</p>}
-        </div>
+        <div className="relative min-h-[60px] flex flex-col justify-center pr-12"> {/* Añadido 'relative' y padding a la derecha */}
+  {partialSentence ? (
+    <AnimatePresence>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <p className="text-xl font-bold text-gray-900 text-center">{partialSentence}</p>
+        {isComplete && fullSentenceEs && <p className="text-sm text-gray-600 text-center italic mt-1">({fullSentenceEs})</p>}
+      </motion.div>
+    </AnimatePresence>
+  ) : <p className="text-gray-400 text-center">Completa los pasos...</p>}
+
+  {isComplete && audioPlayer && (
+    <div className="absolute top-1/2 right-0 -translate-y-1/2">
+      {audioPlayer}
+    </div>
+  )}
+  {/* --- FIN DEL CÓDIGO AÑADIDO --- */}
+</div>
+
       </motion.div>
 
       {/* Acordeón de Pasos */}
