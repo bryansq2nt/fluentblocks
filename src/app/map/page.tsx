@@ -26,8 +26,8 @@ const levels: Level[] = [
   { id: 1, title: "The '-ing' Form", pattern: "Reglas de ortografía para el gerundio", icon: "⚙️", pageId: "ing" },
   { id: 4, title: "Present Perfect", pattern: "Sujeto + have/has + participio + extra + tiempo", icon: "🔗", pageId: "presente-perfecto" },
   { id: 2, title: "Present Continuous", pattern: "Sujeto + am/is/are + verbo-ing + extra", icon: "⚡️" , pageId: "presente-continuo"},
-  { id: 5, title: "Future Simple (Will)", pattern: "Sujeto + will + verbo + objeto + tiempo", icon: "🔮", pageId: "futuro-will" },
-  { id: 6, title: "Future 'Going to'", pattern: "Sujeto + am/is/are + going to + verbo + extra", icon: "📅", pageId: "futuro-going-to" },
+  { id: 5, title: "Future Simple (Will)", pattern: "Sujeto + will + verbo + objeto + tiempo", icon: "🔮", pageId: "future-will" },
+  { id: 6, title: "Future 'Going to'", pattern: "Sujeto + am/is/are + going to + verbo + extra", icon: "📅", pageId: "future-going-to" },
 
   { id: 3, title: "Simple Past", pattern: "Sujeto + verbo en pasado + complemento + tiempo", icon: "🕰️", pageId: "pasado-simple" },
   { id: 7, title: "Modal 'Can'", pattern: "Sujeto + can + verbo + extra", icon: "💪", pageId: "modal-can" },
@@ -37,9 +37,9 @@ const levels: Level[] = [
 ];
 
 const navSections: NavSection[] = [
-  { id: 'basic', label: 'Fundamentos', icon: '🌱', startLevel: 1 },
-  { id: 'intermediate', label: 'Tiempos', icon: '🏔️', startLevel: 3 },
-  { id: 'advanced', label: 'Modales', icon: '🔥', startLevel: 7 },
+  { id: 'basic', label: 'Basico', icon: '🌱', startLevel: 1 },
+  { id: 'intermediate', label: 'Intermedio', icon: '🏔️', startLevel: 3 },
+  { id: 'advanced', label: 'Avanzado', icon: '🔥', startLevel: 7 },
 ];
 
 // Components
@@ -110,12 +110,12 @@ const NavItem = ({
       whileHover={!isLocked ? { y: -3 } : {}}
       whileTap={!isLocked ? { y: 0 } : {}}
       onClick={isLocked ? () => {} : onClick}
-      className={`relative w-[120px] h-[140px] overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClasses()} transition-all duration-300 ${isActive ? 'text-white shadow-lg scale-105' : 'text-white/80'} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
+      className={`relative w-[90px] h-[100px] overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClasses()} transition-all duration-300 ${isActive ? 'text-white shadow-lg scale-105' : 'text-white/80'} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
     >
       {isLocked && (<div className="absolute top-2 right-2 text-white/80"><Lock className="w-4 h-4" /></div>)}
-      <div className="relative z-10 flex flex-col items-center gap-2 pt-4">
+      <div className="relative z-10 flex flex-col items-center gap-1 pt-4">
         <span className="text-3xl">{section.icon}</span>
-        <span className="text-xs font-semibold uppercase tracking-wider">{section.label}</span>
+        <span className="text-xs font-bold uppercase tracking-wider">{section.label}</span>
       </div>
     </motion.button>
   );
@@ -166,7 +166,7 @@ export default function MapPage() {
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => router.push('/home')}
-          className="w-[50px] h-[50px] bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
+          className="w-[70px] h-[50px] bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300"
         >
           <span className="text-xl">🏠</span>
         </motion.button>
