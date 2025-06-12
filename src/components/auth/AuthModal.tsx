@@ -21,6 +21,20 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
+  const handleFacebookPopup = () => {
+    const origin = window.location.origin
+    const fbSignInUrl = `${origin}/api/auth/signin/facebook?` +
+      `callbackUrl=${encodeURIComponent(origin + "/home")}`
+  
+    window.open(
+      fbSignInUrl,
+      "fbLogin",
+      "width=500,height=600,toolbar=0,status=0"
+    )
+  }
+  
+  
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -58,7 +72,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <span className="font-medium" style={{ color: 'black' }}>Continuar con Google</span>
               </button>
               <button
-                onClick={() => signIn('facebook', { callbackUrl: '/home' })}
+                onClick={handleFacebookPopup}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
                 disabled={!acceptedTerms}
               >
