@@ -4,11 +4,10 @@ import { base } from '@/lib/airtable';
 const usersTable = base('Users');
 
 export async function POST(request: Request) {
-  let { email, name, image } = await request.json();
-  if (!email) return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
+  const { name, image, email: rawEmail } = await request.json();
+  if (!rawEmail) return NextResponse.json({ error: 'Email requerido' }, { status: 400 });
 
-  // Normaliza el email
-  email = email.trim().toLowerCase();
+  const email = rawEmail.trim().toLowerCase();
 
   // Busca si ya existe el usuario
   const records = await usersTable.select({ filterByFormula: `{email} = '${email}'` }).all();
