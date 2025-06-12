@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 // Types
 interface Level {
@@ -42,90 +43,38 @@ const navSections: NavSection[] = [
   { id: 'advanced', label: 'Avanzado', icon: '🔥', startLevel: 7 },
 ];
 
-// Components
-const LevelNode = ({ level, index, onSelect }: { level: Level; index: number; onSelect: (level: Level) => void }) => {
-  const handleClick = () => {
-    onSelect(level);
-  };
-
-  const getColorClass = (levelId: number) => {
-    if (levelId <= 2) return 'green'; // Fundamentos
-    if (levelId <= 6) return 'blue';  // Tiempos y Futuro
-    return 'purple'; // Modales
-  };
-
-  return (
-    <>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.1 }}
-        onClick={handleClick}
-        className={`level-3d ${getColorClass(level.id)} no-border relative w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-200 mb-16`}
-        style={{
-          marginLeft: index % 2 === 0 ? '5rem' : '0',
-          marginRight: index % 2 !== 0 ? '5rem' : '0',
-        }}
-      >
-        <span className="text-3xl relative z-20 drop-shadow-lg text-white">{level.icon}</span>
-        
-        <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-white/90 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-700 whitespace-nowrap shadow-sm">
-          Nivel {level.id}: {level.title}
-        </div>
-      </motion.div>
-
-      {index < levels.length - 1 && (
-        <div className="relative w-1 h-16 mx-auto">
-          <div className={`absolute inset-0 border-l-4 border-dashed border-${getColorClass(level.id + 1)}-300 animate-pulse`} />
-        </div>
-      )}
-    </>
-  );
-};
-
-const NavItem = ({ 
-  section, 
-  isActive, 
-  onClick, 
-  isLocked = false 
-}: { 
-  section: NavSection; 
-  isActive: boolean; 
-  onClick: () => void;
-  isLocked?: boolean;
-}) => {
-  const getGradientClasses = () => {
-    if (isLocked) return 'from-gray-400 to-gray-500';
-    
-    switch (section.id) {
-      case 'basic': return isActive ? 'from-green-500 to-green-600' : 'from-green-400 to-green-500';
-      case 'intermediate': return isActive ? 'from-blue-500 to-blue-600' : 'from-blue-400 to-blue-500';
-      case 'advanced': return isActive ? 'from-purple-500 to-purple-600' : 'from-purple-400 to-purple-500';
-      default: return 'from-gray-400 to-gray-500';
-    }
-  };
-
-  return (
-    <motion.button
-      whileHover={!isLocked ? { y: -3 } : {}}
-      whileTap={!isLocked ? { y: 0 } : {}}
-      onClick={isLocked ? () => {} : onClick}
-      className={`relative w-[90px] h-[100px] overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClasses()} transition-all duration-300 ${isActive ? 'text-white shadow-lg scale-105' : 'text-white/80'} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
-    >
-      {isLocked && (<div className="absolute top-2 right-2 text-white/80"><Lock className="w-4 h-4" /></div>)}
-      <div className="relative z-10 flex flex-col items-center gap-1 pt-4">
-        <span className="text-3xl">{section.icon}</span>
-        <span className="text-xs font-bold uppercase tracking-wider">{section.label}</span>
-      </div>
-    </motion.button>
-  );
-};
-
 export default function MapPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const [userProgress, setUserProgress] = useState<{ levelId: string; completed: boolean }[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('basic');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [prevLevelName, setPrevLevelName] = useState('');
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!session) return;
+      setLoading(true);
+      try {
+        const res = await fetch('/api/progress');
+        const data = await res.json();
+        setUserProgress(data.progress || []);
+      } catch (e) {
+        console.error('Error al obtener el progreso:', e);
+        setUserProgress([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (session) fetchProgress();
+  }, [session]);
+
+  // Helper: get completed levelIds
+  const completedLevels = userProgress.filter(p => p.completed).map(p => p.levelId);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -144,6 +93,95 @@ export default function MapPage() {
     if (selectedLevel) {
       router.push(`/${selectedLevel.pageId}`);
     }
+  };
+
+  const handleLockedClick = (prevLevelTitle: string) => {
+    setPrevLevelName(prevLevelTitle);
+    setModalOpen(true);
+  };
+
+  const LevelNode = ({ level, index, onSelect, locked, prevLevelTitle }: { level: Level; index: number; onSelect: (level: Level) => void; locked: boolean; prevLevelTitle?: string }) => {
+    const handleClick = () => {
+      if (locked) {
+        handleLockedClick(prevLevelTitle || '');
+      } else {
+        onSelect(level);
+      }
+    };
+
+    const getColorClass = (levelId: number) => {
+      if (locked) return 'gray';
+      if (levelId <= 2) return 'green'; // Fundamentos
+      if (levelId <= 6) return 'blue';  // Tiempos y Futuro
+      return 'purple'; // Modales
+    };
+
+    return (
+      <>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
+          onClick={handleClick}
+          className={`level-3d ${getColorClass(level.id)} no-border relative w-24 h-24 rounded-full flex flex-col items-center justify-center cursor-pointer transition-all duration-200 mb-16 ${locked ? 'opacity-70 grayscale' : ''}`}
+          style={{
+            marginLeft: index % 2 === 0 ? '5rem' : '0',
+            marginRight: index % 2 !== 0 ? '5rem' : '0',
+            filter: locked ? 'grayscale(1) brightness(0.85)' : undefined,
+          }}
+        >
+          <span className="text-3xl relative z-20 drop-shadow-lg text-white">{level.icon}</span>
+          {locked && <span className="absolute top-2 right-2 text-white/80"><Lock className="w-6 h-6" /></span>}
+          <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 bg-white/90 px-3 py-1.5 rounded-lg text-sm font-bold text-gray-700 whitespace-nowrap shadow-sm">
+            Nivel {level.id}: {level.title}
+          </div>
+        </motion.div>
+
+        {index < levels.length - 1 && (
+          <div className="relative w-1 h-16 mx-auto">
+            <div className={`absolute inset-0 border-l-4 border-dashed border-${getColorClass(level.id + 1)}-300 animate-pulse`} />
+          </div>
+        )}
+      </>
+    );
+  };
+
+  const NavItem = ({ 
+    section, 
+    isActive, 
+    onClick, 
+    isLocked = false 
+  }: { 
+    section: NavSection; 
+    isActive: boolean; 
+    onClick: () => void;
+    isLocked?: boolean;
+  }) => {
+    const getGradientClasses = () => {
+      if (isLocked) return 'from-gray-400 to-gray-500';
+      
+      switch (section.id) {
+        case 'basic': return isActive ? 'from-green-500 to-green-600' : 'from-green-400 to-green-500';
+        case 'intermediate': return isActive ? 'from-blue-500 to-blue-600' : 'from-blue-400 to-blue-500';
+        case 'advanced': return isActive ? 'from-purple-500 to-purple-600' : 'from-purple-400 to-purple-500';
+        default: return 'from-gray-400 to-gray-500';
+      }
+    };
+
+    return (
+      <motion.button
+        whileHover={!isLocked ? { y: -3 } : {}}
+        whileTap={!isLocked ? { y: 0 } : {}}
+        onClick={isLocked ? () => {} : onClick}
+        className={`relative w-[90px] h-[100px] overflow-hidden rounded-2xl bg-gradient-to-br ${getGradientClasses()} transition-all duration-300 ${isActive ? 'text-white shadow-lg scale-105' : 'text-white/80'} ${isLocked ? 'cursor-not-allowed opacity-60' : ''}`}
+      >
+        {isLocked && (<div className="absolute top-2 right-2 text-white/80"><Lock className="w-4 h-4" /></div>)}
+        <div className="relative z-10 flex flex-col items-center gap-1 pt-4">
+          <span className="text-3xl">{section.icon}</span>
+          <span className="text-xs font-bold uppercase tracking-wider">{section.label}</span>
+        </div>
+      </motion.button>
+    );
   };
 
   return (
@@ -189,17 +227,30 @@ export default function MapPage() {
               />
             ))}
           </div>
-
-          <div className="relative flex flex-col-reverse items-center py-8">
-            {levels.map((level, index) => (
-              <LevelNode 
-                key={`level-${level.id}`} 
-                level={level} 
-                index={index} 
-                onSelect={handleLevelSelect}
-              />
-            ))}
-          </div>
+          <AnimatePresence initial={false}>
+            <div className="relative flex flex-col-reverse items-center py-8">
+              {levels.map((level, index) => {
+                let locked = false;
+                let prevLevelTitle = '';
+                if (index === 0) locked = false;
+                else {
+                  const prevLevel = levels[index - 1];
+                  locked = !completedLevels.includes(prevLevel.pageId);
+                  prevLevelTitle = prevLevel.title;
+                }
+                return (
+                  <LevelNode
+                    key={`level-${level.id}`}
+                    level={level}
+                    index={index}
+                    onSelect={handleLevelSelect}
+                    locked={locked}
+                    prevLevelTitle={prevLevelTitle}
+                  />
+                );
+              })}
+            </div>
+          </AnimatePresence>
         </div>
       </div>
 
@@ -263,6 +314,32 @@ export default function MapPage() {
                   </button>
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+        {modalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+            onClick={() => setModalOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl p-6 max-w-sm w-full text-center"
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 className="text-xl font-bold mb-4 text-gray-900">Nivel Bloqueado</h2>
+              <p className="text-gray-700 mb-6">Para desbloquear este nivel, primero debes completar el nivel <span className="font-semibold text-blue-600">{prevLevelName}</span>.</p>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="mt-2 px-6 py-2 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition"
+              >
+                Entendido
+              </button>
             </motion.div>
           </motion.div>
         )}

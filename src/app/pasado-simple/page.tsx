@@ -9,6 +9,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../components/game/ShareButton';
 import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useSession } from 'next-auth/react';
 
 // --- DATA DEFINITIONS FOR LEVEL 3 ---
 // --- AHORA CON ESTRUCTURA DE COMPLEMENTOS ANIDADA ---
@@ -79,6 +80,8 @@ const timeOptions: StepOption[] = [
 const Level3Page = () => {
   const router = useRouter();
   const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
+  const { data: session } = useSession();
+  const [saving, setSaving] = useState(false);
 
   // State - Añadimos estado para el complemento
   const [selectedSubject, setSelectedSubject] = useState<StepOption | null>(null);
@@ -95,9 +98,31 @@ const Level3Page = () => {
   const handleComplementSelect = (option: StepOption) => setSelectedComplement(option); // NUEVO HANDLER
   const handleTimeSelect = (option: StepOption) => setSelectedTime(option);
   
-  const handleNextLevel = () => {
-    trackLevelCompletion(6);
-    router.push('/modal-can');
+  const handleNextLevel = async () => {
+    if (!session?.user) {
+      router.push('/');
+      return;
+    }
+    setSaving(true);
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: 'pasado-simple',
+          completed: true,
+          score: 100,
+          attempts: 1
+        })
+      });
+      trackLevelCompletion(6);
+      router.push('/modal-can');
+    } catch (e) {
+      console.error('Error guardando el progreso:', e);
+      alert('Error guardando el progreso');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Smart translation logic - Ahora mucho más potente
@@ -335,8 +360,8 @@ const Level3Page = () => {
   title="¡Recordando el pasado en FluentBlocks!"
   text="Estoy aprendiendo a contar historias en Pasado Simple. ¡Mira cómo se forman las oraciones!"
 />
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-              <span>Siguiente Ejercicio</span>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} disabled={saving} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
+              <span>{saving ? 'Guardando...' : 'Siguiente Ejercicio'}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </motion.button>
             {!hasShownFeedback && (

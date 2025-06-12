@@ -7,6 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../components/game/ShareButton';
 import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useSession } from 'next-auth/react';
 
 // --- DATA DEFINITIONS FOR LEVEL 1 (EXPANDED & MORE USEFUL) ---
 const subjectOptions: StepOption[] = [
@@ -94,6 +95,7 @@ const verbOptions: VerbWithExtra[] = [
 // --- LEVEL 1 COMPONENT ---
 const PresenteContinuo = () => {
   const router = useRouter();
+  const { data: session } = useSession();
   const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
 
   // State
@@ -101,6 +103,7 @@ const PresenteContinuo = () => {
   const [selectedVerb, setSelectedVerb] = useState<VerbWithExtra | null>(null);
   const [selectedExtra, setSelectedExtra] = useState<StepOption | null>(null);
   const [availableExtras, setAvailableExtras] = useState<StepOption[]>([]);
+  const [saving, setSaving] = useState(false);
 
   // Handlers
   const handleSubjectSelect = (option: StepOption) => {
@@ -114,9 +117,31 @@ const PresenteContinuo = () => {
   const handleExtraSelect = (option: StepOption) => {
     setSelectedExtra(option);
   };
-  const handleNextLevel = () => {
-    trackLevelCompletion(2);
-    router.push('/presente-perfecto');
+  const handleNextLevel = async () => {
+    if (!session?.user) {
+      router.push('/');
+      return;
+    }
+    setSaving(true);
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: 'presente-continuo',
+          completed: true,
+          score: 100,
+          attempts: 1
+        })
+      });
+      trackLevelCompletion(2);
+      setTimeout(() => router.push('/presente-perfecto'), 1200);
+    } catch (e) {
+      console.error('Error guardando el progreso:', e);
+      alert('Error guardando el progreso');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Preview Logic
@@ -298,8 +323,8 @@ const PresenteContinuo = () => {
   title="¿Qué estoy haciendo? ¡Aprendiendo inglés!"
   text="Practicando el Presente Continuo en FluentBlocks para hablar de lo que pasa ahora mismo."
 />
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-              <span>Siguiente Ejercicio</span>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3" disabled={saving}>
+              <span>{saving ? 'Guardando...' : 'Siguiente Ejercicio'}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </motion.button>
             {!hasShownFeedback && (

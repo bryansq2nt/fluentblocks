@@ -7,6 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../components/game/ShareButton';
 import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useSession } from 'next-auth/react';
 
 // --- DATA DEFINITIONS FOR LEVEL 7 (COULD) ---
 const subjectOptions: StepOption[] = [
@@ -67,6 +68,8 @@ const verbOptions: VerbWithExtra[] = [
 const Level7Page = () => {
   const router = useRouter();
   const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
+  const { data: session } = useSession();
+  const [saving, setSaving] = useState(false);
 
   const [selectedSubject, setSelectedSubject] = useState<StepOption | null>(null);
   const [selectedVerb, setSelectedVerb] = useState<VerbWithExtra | null>(null);
@@ -83,9 +86,31 @@ const Level7Page = () => {
 
   const handleExtraSelect = (option: StepOption) => setSelectedExtra(option);
 
-  const handleNextLevel = () => {
-    trackLevelCompletion(8);
-    router.push('/modal-would'); 
+  const handleNextLevel = async () => {
+    if (!session?.user) {
+      router.push('/');
+      return;
+    }
+    setSaving(true);
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: 'modal-could',
+          completed: true,
+          score: 100,
+          attempts: 1
+        })
+      });
+      trackLevelCompletion(8);
+      router.push('/modal-would'); 
+    } catch (e) {
+      console.error('Error guardando el progreso:', e);
+      alert('Error guardando el progreso');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getSmartTranslation = () => {
@@ -236,8 +261,8 @@ const Level7Page = () => {
   title="¡Todo es posible con FluentBlocks!"
   text="Explorando posibilidades y habilidades pasadas con el verbo modal 'could'."
 />
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-              <span>Siguiente Ejercicio</span>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} disabled={saving} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
+              <span>{saving ? 'Guardando...' : 'Siguiente Ejercicio'}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </motion.button>
             {!hasShownFeedback && (
