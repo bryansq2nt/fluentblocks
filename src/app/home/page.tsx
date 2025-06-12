@@ -5,6 +5,7 @@ import { ArrowLeft,User, HelpCircle, Trophy, PuzzleIcon, Lock } from 'lucide-rea
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 // Menu card component
 const MenuCard = ({ 
@@ -78,6 +79,15 @@ const MenuCard = ({
 
 export default function HomePage() {
   const router = useRouter();
+  const { status } = useSession();
+
+  // Redirigir si no hay sesión
+  if (status === 'unauthenticated') {
+    if (typeof window !== 'undefined') {
+      router.replace('/');
+    }
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 p-4 sm:p-6 lg:p-8">

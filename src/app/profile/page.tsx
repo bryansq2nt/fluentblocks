@@ -21,10 +21,12 @@ export default function ProfilePage() {
   const router = useRouter();
   const [progress, setProgress] = useState<UserProgress[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/');
+      router.replace('/');
     }
   }, [status, router]);
 
@@ -46,6 +48,24 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: '/' });
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!session?.user?.email) return;
+    setDeleting(true);
+    try {
+      await fetch('/api/user', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: session.user.email }),
+      });
+      await signOut({ callbackUrl: '/' });
+    } catch (e) {
+        console.error('Error deleting account:', e);
+      alert('Error deleting account');
+    } finally {
+      setDeleting(false);
+    }
   };
 
   if (status === 'loading' || loading) {
@@ -141,9 +161,42 @@ export default function ProfilePage() {
                 <span>Cerrar Sesión</span>
               </button>
             </div>
+
+            <div className="border-t border-gray-200 pt-6">
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="mt-6 w-full py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition"
+              >
+                Eliminar Cuenta
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full text-center">
+            <h2 className="text-xl font-bold mb-4 text-gray-900">¿Eliminar cuenta?</h2>
+            <p className="mb-6 text-gray-700">¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.</p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+                disabled={deleting}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                className="px-6 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition"
+                disabled={deleting}
+              >
+                {deleting ? 'Eliminando...' : 'Eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 } 
