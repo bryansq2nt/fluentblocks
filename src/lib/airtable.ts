@@ -72,5 +72,26 @@ export const userProgressApi = {
       console.error('Error updating level progress:', error);
       throw error;
     }
+  },
+
+  // Borrar todos los progresos de un usuario por userId (email)
+  async deleteUserProgress(userId: string) {
+    try {
+      const records = await userProgressTable.select({
+        filterByFormula: `{userId} = '${userId}'`,
+      }).all();
+      const ids = records.map(r => r.id);
+      if (ids.length > 0) {
+        // Airtable solo permite borrar hasta 10 registros por petición
+        const chunkSize = 10;
+        for (let i = 0; i < ids.length; i += chunkSize) {
+          await userProgressTable.destroy(ids.slice(i, i + chunkSize));
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Error deleting user progress:', error);
+      return false;
+    }
   }
 }; 
