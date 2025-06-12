@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
@@ -49,7 +49,7 @@ export async function GET() {
     const session = await getServerSession(authOptions);
     console.log('Session:', session);
     
-    if (!session?.user) {
+    if (!session?.user?.email) {
       console.log('No autorizado');
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }

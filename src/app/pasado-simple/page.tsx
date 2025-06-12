@@ -118,6 +118,7 @@ const Level3Page = () => {
       trackLevelCompletion(6);
       router.push('/modal-can');
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

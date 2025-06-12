@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 onClick={handleGoogleLogin}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
               >
-                <img src="/google.svg" alt="Google" className="w-6 h-6" />
+                <Image src="/google.svg" alt="Google" width={24} height={24} />
                 <span className="font-medium" style={{ color: 'black' }}>Continuar con Google</span>
               </button>
               

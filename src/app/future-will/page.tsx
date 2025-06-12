@@ -140,6 +140,7 @@ const Level4Page = () => {
       trackLevelCompletion(4);
       router.push('/future-going-to');
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

@@ -95,7 +95,7 @@ const verbOptions: VerbWithExtra[] = [
 // --- LEVEL 1 COMPONENT ---
 const PresenteContinuo = () => {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
 
   // State
@@ -137,6 +137,7 @@ const PresenteContinuo = () => {
       trackLevelCompletion(2);
       setTimeout(() => router.push('/presente-perfecto'), 1200);
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

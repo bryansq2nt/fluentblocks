@@ -12,7 +12,7 @@ const handler = NextAuth({
     signIn: '/', // Usaremos la landing page como página de inicio de sesión
   },
   callbacks: {
-    async redirect({ url, baseUrl }) {
+    async redirect({baseUrl }) {
       // Después de un login exitoso, redirigir a /home
       return `${baseUrl}/home`;
     },

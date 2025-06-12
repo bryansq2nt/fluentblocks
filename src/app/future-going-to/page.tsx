@@ -112,6 +112,7 @@ const Level6Page = () => {
       trackLevelCompletion(5);
       router.push('/pasado-simple'); 
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

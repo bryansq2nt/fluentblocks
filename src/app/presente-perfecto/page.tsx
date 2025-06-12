@@ -156,6 +156,7 @@ const Level2Page = () => {
       trackLevelCompletion(3);
       router.push('/future-will');
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

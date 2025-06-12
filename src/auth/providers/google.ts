@@ -6,6 +6,7 @@ export const googleConfig = {
   };
   
   // src/auth/components/AuthButton.tsx
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface AuthButtonProps {
     provider: 'google' | 'facebook' | 'github' | 'apple';
     variant?: 'primary' | 'secondary';
@@ -13,6 +14,14 @@ export const googleConfig = {
   }
   
   // src/auth/hooks/useAuth.ts
+  type User = {
+    id: string;
+    name: string;
+    email: string;
+    image?: string;
+  };
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   interface AuthState {
     user: User | null;
     isLoading: boolean;

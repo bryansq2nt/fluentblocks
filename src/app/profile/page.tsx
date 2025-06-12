@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LogOut } from 'lucide-react';
+import Image from 'next/image';
 
 interface UserProgress {
   id: string;
@@ -77,17 +78,17 @@ export default function ProfilePage() {
           className="bg-white rounded-2xl shadow-xl p-8"
         >
           <div className="flex items-center space-x-6 mb-8">
-            {session?.user?.image ? (
-              <img
-                src={session.user.image}
-                alt="Profile"
-                className="w-24 h-24 rounded-full border-4 border-blue-100"
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-3xl">👤</span>
-              </div>
-            )}
+            <div className="flex flex-col items-center gap-2 mb-4">
+              {session?.user?.image && (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name || 'Avatar'}
+                  width={64}
+                  height={64}
+                  className="rounded-full border-2 border-white shadow-md"
+                />
+              )}
+            </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
                 {session?.user?.name || 'Usuario'}

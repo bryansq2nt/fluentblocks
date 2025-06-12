@@ -47,6 +47,7 @@ export default function MapPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const [userProgress, setUserProgress] = useState<{ levelId: string; completed: boolean }[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('basic');
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
@@ -63,6 +64,7 @@ export default function MapPage() {
         const data = await res.json();
         setUserProgress(data.progress || []);
       } catch (e) {
+        console.error('Error al obtener el progreso:', e);
         setUserProgress([]);
       } finally {
         setLoading(false);

@@ -106,6 +106,7 @@ const Level7Page = () => {
       trackLevelCompletion(8);
       router.push('/modal-would'); 
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

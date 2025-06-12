@@ -31,6 +31,7 @@ export default function AirtableTestPage() {
         }
         const json = await res.json();
         setData(json.progress || []);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         setError(e.message);
       } finally {

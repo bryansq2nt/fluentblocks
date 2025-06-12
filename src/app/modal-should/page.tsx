@@ -128,6 +128,7 @@ const Level9Page = () => {
       trackLevelCompletion(10);
       router.push('/map'); 
     } catch (e) {
+      console.error('Error guardando el progreso:', e);
       alert('Error guardando el progreso');
     } finally {
       setSaving(false);

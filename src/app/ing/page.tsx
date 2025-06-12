@@ -55,6 +55,7 @@ const Level10Page = () => {
   const [isAttemptMade, setIsAttemptMade] = useState(false);
   const [isLevelFinished, setIsLevelFinished] = useState(false);
   const { data: session, status } = useSession();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [score, setScore] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
