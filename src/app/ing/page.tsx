@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { ShareButton } from '../../components/game/ShareButton';
-import { AudioPlayer } from '../../components/game/AudioPlayer'; // Nuevo nombre
+import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { PronunciationAssessment } from '../../components/game/PronunciationAssessment';
 // --- DATA STRUCTURES FOR THIS LEVEL ---
 interface IngOption {
   text: string;
@@ -178,6 +179,7 @@ const Level10Page = () => {
           </p>
           {/* Aquí es donde se usa el nuevo componente */}
           <AudioPlayer sentence={currentProblem.example_sentence} />
+          <PronunciationAssessment targetSentence={currentProblem.example_sentence} />
         </div>
       )}
     </motion.div>
