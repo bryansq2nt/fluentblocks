@@ -108,25 +108,11 @@ const Level10Page = () => {
     }
   };
   
-  const handleNextLevel = () => {
-    // Según tu mapa, este es el Nivel 1, y el siguiente es el 2 (Present Continuous)
-    trackLevelCompletion(1);
-    router.push('/presente-continuo');
-  };
-
-  const handleRestartLevel = () => {
-    setIsLevelFinished(false);
-    setCurrentProblemIndex(0);
-  };
-
-  const handleLevelComplete = async () => {
-    setIsLevelFinished(true);
-    setAttempts(prev => prev + 1);
+  const handleNextLevel = async () => {
     
     // Calcular puntuación basada en respuestas correctas
     const finalScore = Math.round((correctAnswers / totalProblems) * 100);
     setScore(finalScore);
-
     // Guardar progreso en Airtable
     if (session?.user) {
       try {
@@ -146,11 +132,23 @@ const Level10Page = () => {
         console.error('Error saving progress:', error);
       }
     }
+    // Según tu mapa, este es el Nivel 1, y el siguiente es el 2 (Present Continuous)
+    trackLevelCompletion(1);
+    router.push('/presente-continuo');
+  };
 
-    // Mostrar mensaje de éxito
-    setTimeout(() => {
-      router.push('/map');
-    }, 2000);
+  const handleRestartLevel = () => {
+    setIsLevelFinished(false);
+    setCurrentProblemIndex(0);
+  };
+
+  const handleLevelComplete =  () => {
+    setIsLevelFinished(true);
+    setAttempts(prev => prev + 1);
+    
+
+
+    
   };
 
   if (status === 'loading') {
