@@ -7,6 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../components/game/ShareButton';
 import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useSession } from 'next-auth/react';
 
 // --- DATA DEFINITIONS FOR LEVEL 9 (SHOULD) ---
 const subjectOptions: StepOption[] = [
@@ -84,6 +85,8 @@ const verbOptions: VerbWithExtra[] = [
 const Level9Page = () => {
   const router = useRouter();
   const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
+  const { data: session } = useSession();
+  const [saving, setSaving] = useState(false);
 
   const [selectedSubject, setSelectedSubject] = useState<StepOption | null>(null);
   const [selectedVerb, setSelectedVerb] = useState<VerbWithExtra | null>(null);
@@ -105,9 +108,30 @@ const Level9Page = () => {
 
   const handleExtraSelect = (option: StepOption) => setSelectedExtra(option);
 
-  const handleNextLevel = () => {
-    trackLevelCompletion(10);
-    router.push('/map'); 
+  const handleNextLevel = async () => {
+    if (!session?.user) {
+      router.push('/');
+      return;
+    }
+    setSaving(true);
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: 'modal-should',
+          completed: true,
+          score: 100,
+          attempts: 1
+        })
+      });
+      trackLevelCompletion(10);
+      router.push('/map'); 
+    } catch (e) {
+      alert('Error guardando el progreso');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const getSmartTranslation = () => {
@@ -269,8 +293,8 @@ const Level9Page = () => {
   title="Un buen consejo: ¡Prueba FluentBlocks!"
   text="Aprendiendo a dar recomendaciones y consejos con 'should'. ¡Deberías probarlo!"
 />
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-              <span>Volver al Mapa</span>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} disabled={saving} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
+              <span>{saving ? 'Guardando...' : 'Siguiente Ejercicio'}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </motion.button>
             {!hasShownFeedback && (

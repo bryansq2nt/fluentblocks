@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useFeedback } from '../../components/game/FeedbackProvider';
 import { ShareButton } from '../../components/game/ShareButton';
 import { AudioPlayer } from '../../components/game/AudioPlayer'; // Nuevo nombre
+import { useSession } from 'next-auth/react';
 // --- DATA STRUCTURES FOR THIS LEVEL ---
 interface IngOption {
   text: string;
@@ -49,16 +50,21 @@ const Level10Page = () => {
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [currentProblem, setCurrentProblem] = useState<VerbIngProblem>(verbProblemsBank[0]);
   
-  const [selectedOption, setSelectedOption] = useState<IngOption | null>(null);
+  const [selectedOptions, setSelectedOptions] = useState<IngOption[]>([]);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isAttemptMade, setIsAttemptMade] = useState(false);
   const [isLevelFinished, setIsLevelFinished] = useState(false);
+  const { data: session, status } = useSession();
+  const [score, setScore] = useState(0);
+  const [attempts, setAttempts] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const totalProblems = verbProblemsBank.length;
 
   const initializeProblem = useCallback(() => {
     const problemData = {...verbProblemsBank[currentProblemIndex]};
     problemData.options = shuffleArray([...problemData.options]);
     setCurrentProblem(problemData);
-    setSelectedOption(null);
+    setSelectedOptions([]);
     setFeedback(null);
     setIsAttemptMade(false);
   }, [currentProblemIndex]);
@@ -67,13 +73,20 @@ const Level10Page = () => {
     initializeProblem();
   }, [initializeProblem]);
 
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/');
+    }
+  }, [status, router]);
+
   const handleOptionSelect = (option: IngOption) => {
     if (isAttemptMade) return;
 
-    setSelectedOption(option);
+    setSelectedOptions(prev => [...prev, option]);
     setIsAttemptMade(true);
     if (option.isCorrect) {
       setFeedback('¡Correcto! 👍');
+      setCorrectAnswers(prev => prev + 1);
       if (currentProblemIndex === verbProblemsBank.length - 1) {
         setIsLevelFinished(true);
         trackLevelCompletion(1); // Track completion on the last correct answer
@@ -86,7 +99,11 @@ const Level10Page = () => {
 
   const handleNextProblem = () => {
     if (currentProblemIndex < verbProblemsBank.length - 1) {
-      setCurrentProblemIndex(prevIndex => prevIndex + 1);
+      setCurrentProblemIndex(prev => prev + 1);
+      initializeProblem();
+    } else {
+      // Si es el último problema, guardar progreso y redirigir
+      handleLevelComplete();
     }
   };
   
@@ -100,6 +117,48 @@ const Level10Page = () => {
     setIsLevelFinished(false);
     setCurrentProblemIndex(0);
   };
+
+  const handleLevelComplete = async () => {
+    setIsLevelFinished(true);
+    setAttempts(prev => prev + 1);
+    
+    // Calcular puntuación basada en respuestas correctas
+    const finalScore = Math.round((correctAnswers / totalProblems) * 100);
+    setScore(finalScore);
+
+    // Guardar progreso en Airtable
+    if (session?.user) {
+      try {
+        await fetch('/api/progress', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            levelId: 'ing',
+            completed: true,
+            score: finalScore,
+            attempts: attempts + 1
+          }),
+        });
+      } catch (error) {
+        console.error('Error saving progress:', error);
+      }
+    }
+
+    // Mostrar mensaje de éxito
+    setTimeout(() => {
+      router.push('/map');
+    }, 2000);
+  };
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #ecfccb 0%, #d9f99d 100%)' }}>
@@ -148,7 +207,7 @@ const Level10Page = () => {
                         whileTap={!isAttemptMade ? { scale: 0.98 } : {}}
                         onClick={() => handleOptionSelect(option)}
                         disabled={isAttemptMade}
-                        className={`w-full p-4 rounded-lg border-2 text-lg font-medium transition-all duration-200 ease-in-out text-center ${isAttemptMade && option.isCorrect ? 'bg-green-500 border-green-600 text-white transform scale-105 shadow-xl' : ''} ${isAttemptMade && selectedOption?.text === option.text && !option.isCorrect ? 'bg-red-500 border-red-600 text-white shadow-md' : ''} ${!isAttemptMade ? 'bg-white border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-500' : ''} ${isAttemptMade && selectedOption?.text !== option.text && !option.isCorrect ? 'bg-slate-100 border-slate-300 text-slate-500 opacity-70' : ''}`}
+                        className={`w-full p-4 rounded-lg border-2 text-lg font-medium transition-all duration-200 ease-in-out text-center ${isAttemptMade && option.isCorrect ? 'bg-green-500 border-green-600 text-white transform scale-105 shadow-xl' : ''} ${isAttemptMade && selectedOptions.includes(option) && !option.isCorrect ? 'bg-red-500 border-red-600 text-white shadow-md' : ''} ${!isAttemptMade ? 'bg-white border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-500' : ''} ${isAttemptMade && !selectedOptions.includes(option) && !option.isCorrect ? 'bg-slate-100 border-slate-300 text-slate-500 opacity-70' : ''}`}
                     >{option.text}</motion.button>
                 ))}
             </div>
@@ -162,7 +221,7 @@ const Level10Page = () => {
       {/* 1. Muestra el feedback (Correcto/Incorrecto) */}
       <div
         className={`p-3 rounded-md text-center font-medium text-sm shadow ${
-          selectedOption?.isCorrect 
+          selectedOptions.some(opt => opt.isCorrect) 
             ? 'bg-green-100 text-green-700 border-green-300' 
             : 'bg-red-100 text-red-700 border-red-300' 
         }`}
@@ -208,12 +267,7 @@ const Level10Page = () => {
   title="¡Estoy aprendiendo en FluentBlocks!"
   text="Dominando las reglas del '-ing' en inglés. ¡Es más fácil de lo que parece!"
 />
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-            <span>Siguiente Ejercicio</span>
-    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-    </svg>
-            </motion.button>
+          
             {!hasShownFeedback && (
               <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => setShowFeedbackModal(true)} className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white text-base font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center gap-2">
                 <span>Enviar Feedback</span>

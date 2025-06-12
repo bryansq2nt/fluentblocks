@@ -151,7 +151,7 @@ export default function HomePage() {
             subtitle="Progreso y estadísticas"
             href="/profile"
             color="green"
-            isLocked={true}
+            isLocked={false}
           />
           
           <MenuCard

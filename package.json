@@ -9,12 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@auth/core": "^0.34.2",
+    "@prisma/client": "^6.9.0",
     "@vercel/blob": "^1.1.1",
+    "airtable": "^0.12.2",
     "dotenv": "^16.5.0",
     "framer-motion": "^12.15.0",
     "lucide-react": "^0.511.0",
     "next": "15.3.3",
+    "next-auth": "^4.24.11",
     "node-fetch": "^3.3.2",
+    "prisma": "^6.9.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

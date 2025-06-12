@@ -7,6 +7,7 @@ import { useFeedback } from '../../components/game/FeedbackProvider';
 import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../components/game/ShareButton';
 import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useSession } from 'next-auth/react';
 
 // --- DATA DEFINITIONS FOR LEVEL 2 (EXPANDED & MORE USEFUL) ---
 const subjectOptions: StepOption[] = [
@@ -105,6 +106,8 @@ const timeOptions: StepOption[] = [
 const Level2Page = () => {
   const router = useRouter();
   const { trackLevelCompletion, setShowFeedbackModal, hasShownFeedback } = useFeedback();
+  const { data: session } = useSession();
+  const [saving, setSaving] = useState(false);
 
   // State
   const [selectedSubject, setSelectedSubject] = useState<StepOption | null>(null);
@@ -133,9 +136,30 @@ const Level2Page = () => {
     setSelectedTime(option);
   };
 
-  const handleNextLevel = () => {
-    trackLevelCompletion(3);
-    router.push('/future-will');
+  const handleNextLevel = async () => {
+    if (!session?.user) {
+      router.push('/');
+      return;
+    }
+    setSaving(true);
+    try {
+      await fetch('/api/progress', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          levelId: 'presente-perfecto',
+          completed: true,
+          score: 100,
+          attempts: 1
+        })
+      });
+      trackLevelCompletion(3);
+      router.push('/future-will');
+    } catch (e) {
+      alert('Error guardando el progreso');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Preview Logic
@@ -341,8 +365,8 @@ const Level2Page = () => {
   title="¡He aprendido algo nuevo!"
   text="Dominando el Presente Perfecto en FluentBlocks para hablar de mis experiencias."
 />
-            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
-              <span>Siguiente Ejercicio</span>
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={handleNextLevel} disabled={saving} className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-3">
+              <span>{saving ? 'Guardando...' : 'Siguiente Ejercicio'}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </motion.button>
             {!hasShownFeedback && (
