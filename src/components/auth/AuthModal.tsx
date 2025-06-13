@@ -21,17 +21,17 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
-  const handleFacebookPopup = () => {
-    const origin = window.location.origin
-    const fbSignInUrl = `${origin}/api/auth/signin/facebook?` +
-      `callbackUrl=${encodeURIComponent(origin + "/home")}`
+  // const handleFacebookPopup = () => {
+  //   const origin = window.location.origin
+  //   const fbSignInUrl = `${origin}/api/auth/signin/facebook?` +
+  //     `callbackUrl=${encodeURIComponent(origin + "/home")}`
   
-    window.open(
-      fbSignInUrl,
-      "fbLogin",
-      "width=500,height=600,toolbar=0,status=0"
-    )
-  }
+  //   window.open(
+  //     fbSignInUrl,
+  //     "fbLogin",
+  //     "width=500,height=600,toolbar=0,status=0"
+  //   )
+  // }
   
   
 
