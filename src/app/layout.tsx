@@ -5,6 +5,7 @@ import "./globals.css";
 import { FeedbackProvider } from "../components/game/FeedbackProvider";
 import SessionProvider from "@/components/providers/SessionProvider";
 import UserSyncer from '@/components/auth/UserSyncer';
+import { Analytics } from "@vercel/analytics/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
             {children}
           </FeedbackProvider>
         </SessionProvider>
+        <Analytics />
       </body>
     </html>
   );
