@@ -71,14 +71,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <Image src="/google.svg" alt="Google" width={24} height={24} />
                 <span className="font-medium" style={{ color: 'black' }}>Continuar con Google</span>
               </button>
-              <button
+              {/* <button
                 onClick={handleFacebookPopup}
                 className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
                 disabled={!acceptedTerms}
               >
                 <Image src="/facebook.svg" alt="Facebook" width={24} height={24} />
                 <span className="font-medium" style={{ color: 'black' }}>Continuar con Facebook</span>
-              </button>
+              </button> */}
               
               {/* Aquí se pueden agregar más botones de login en el futuro */}
             </div>
