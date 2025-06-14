@@ -14,10 +14,10 @@ export default function LandingPage() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
-    if (session) {
+    if (status === 'authenticated') {
       router.push('/home');
     }
-  }, [session, router]);
+  }, [status, router]);
 
   const handleStartClick = (e: React.MouseEvent) => {
     e.preventDefault();
