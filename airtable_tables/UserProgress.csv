@@ -1,6 +1,0 @@
-userId,levelId,completed,score,lastAttempt,attempts
-user_1,ing,true,90,2024-06-10T12:00:00Z,1
-user_2,ing,false,60,2024-06-09T15:30:00Z,2
-user_1,presente-perfecto,true,80,2024-06-08T18:45:00Z,1
-user_3,ing,true,100,2024-06-07T10:20:00Z,1
-user_2,presente-continuo,false,50,2024-06-06T09:00:00Z,3 
