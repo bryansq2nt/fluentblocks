@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { useFeedback } from '../../components/game/FeedbackProvider';
-import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
-import { ShareButton } from '../../components/game/ShareButton';
-import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useFeedback } from '../../../components/game/FeedbackProvider';
+import { MobileSentenceBuilder, StepConfig, StepOption } from '../../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../../components/game/ShareButton';
+import { AudioPlayer } from '../../../components/game/AudioPlayer';
 
 // --- DATA DEFINITIONS FOR LEVEL 8 (WOULD) - FINAL & CORRECTED ---
 const subjectOptions: StepOption[] = [
@@ -125,7 +125,7 @@ const Level8Page = () => {
 
   const handleNextLevel = () => {
     trackLevelCompletion(9);
-    router.push('/modal-should'); 
+    router.push('/exercises/modal-should'); 
   };
 
   const getSmartTranslation = () => {

@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CheckCircle, XCircle, Lightbulb, ArrowRight, Loader2, BookOpen, RefreshCw } from 'lucide-react';
-import { useFeedback } from '../../components/game/FeedbackProvider';
-import { AudioPlayer } from '../../components/game/AudioPlayer';
-import { LessonIntro } from '../../components/game/LessonIntro'; 
-import { adjectivePlacementQuestions } from '../../data/exercises/adjective-placement';
-import { adjectivePlacementExamples } from '../../data/services/exercise.service';
+import { useFeedback } from '../../../components/game/FeedbackProvider';
+import { AudioPlayer } from '../../../components/game/AudioPlayer';
+import { LessonIntro } from '../../../components/game/LessonIntro'; 
+import { adjectivePlacementQuestions } from '../../../data/exercises/adjective-placement';
+import { adjectivePlacementExamples } from '../../../data/services/exercise.service';
 import { Sparkles } from 'lucide-react';
 import useSound from 'use-sound';
 
@@ -21,10 +21,10 @@ const introContent = {
           text: '¡Hola! Hoy vas a ver cómo describir cosas en <english>inglés</english> de <strong>forma muy sencilla</strong>.'
         },
         {
-          text: 'La palabra <spanish>“roja”</spanish> te dice cómo es la casa:',
+          text: 'La palabra <spanish>"roja"</spanish> te dice cómo es la casa:',
           list: [
-            '<spanish>“roja”</spanish> = color o descripción',
-            '<spanish>“casa”</spanish> = la cosa que describimos'
+            '<spanish>"roja"</spanish> = color o descripción',
+            '<spanish>"casa"</spanish> = la cosa que describimos'
           ]
         },
         {
@@ -34,7 +34,7 @@ const introContent = {
           text: 'Primero pones la descripción (<english>red</english> = <spanish>rojo</spanish>) y luego la cosa (<english>house</english> = <spanish>casa</spanish>).'
         },
         {
-          text: '¡Cuidado con el <mistake>“false friend”</mistake>! Aquí no aplica.'
+          text: '¡Cuidado con el <mistake>"false friend"</mistake>! Aquí no aplica.'
         },
         {
           text: '¡Vamos a <strong>practicar</strong> para que te quede grabado!'
@@ -356,10 +356,10 @@ const AdjectivePlacementPage = () => {
                       </p>
                       <div className="flex flex-col sm:flex-row justify-center gap-4">
                         <button
-                          onClick={() => router.push('/map')}
+                          onClick={() => router.push('/exercises/ing')}
                           className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition"
                         >
-                          Volver al Mapa <ArrowRight className="w-5 h-5" />
+                          Siguiente Ejercicio <ArrowRight className="w-5 h-5" />
                         </button>
                         <button
                           onClick={handlePracticeAgain}

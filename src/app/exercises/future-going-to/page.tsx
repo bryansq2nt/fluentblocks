@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useFeedback } from '../../components/game/FeedbackProvider';
-import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
-import { ShareButton } from '../../components/game/ShareButton';
-import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useFeedback } from '../../../components/game/FeedbackProvider';
+import { MobileSentenceBuilder, StepConfig, StepOption } from '../../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../../components/game/ShareButton';
+import { AudioPlayer } from '../../../components/game/AudioPlayer';
 
 // --- DATA DEFINITIONS FOR LEVEL 6 (EXPANDED & MORE USEFUL) ---
 const subjectOptions: StepOption[] = [
@@ -91,7 +91,7 @@ const Level6Page = () => {
 
   const handleNextLevel = () => {
     trackLevelCompletion(5);
-    router.push('/pasado-simple'); 
+    router.push('/exercises/pasado-simple'); 
   };
 
   const getSmartTranslation = () => {

@@ -3,10 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useFeedback } from '../../components/game/FeedbackProvider';
-import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
-import { ShareButton } from '../../components/game/ShareButton';
-import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useFeedback } from '../../../components/game/FeedbackProvider';
+import { MobileSentenceBuilder, StepConfig, StepOption } from '../../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../../components/game/ShareButton';
+import { AudioPlayer } from '../../../components/game/AudioPlayer';
 
 // --- DATA DEFINITIONS FOR LEVEL 1 (EXPANDED & MORE USEFUL) ---
 const subjectOptions: StepOption[] = [
@@ -116,7 +116,7 @@ const PresenteContinuo = () => {
   };
   const handleNextLevel = () => {
     trackLevelCompletion(2);
-    router.push('/presente-perfecto');
+    router.push('/exercises/presente-perfecto');
   };
 
   // Preview Logic

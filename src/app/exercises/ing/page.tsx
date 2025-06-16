@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
-import { useFeedback } from '../../components/game/FeedbackProvider';
-import { ShareButton } from '../../components/game/ShareButton';
-import { AudioPlayer } from '../../components/game/AudioPlayer'; // Nuevo nombre
+import { useFeedback } from '../../../components/game/FeedbackProvider';
+import { ShareButton } from '../../../components/game/ShareButton';
+import { AudioPlayer } from '../../../components/game/AudioPlayer';
 // --- DATA STRUCTURES FOR THIS LEVEL ---
 interface IngOption {
   text: string;
@@ -93,7 +93,7 @@ const Level10Page = () => {
   const handleNextLevel = () => {
     // Según tu mapa, este es el Nivel 1, y el siguiente es el 2 (Present Continuous)
     trackLevelCompletion(1);
-    router.push('/presente-continuo');
+    router.push('/exercises/presente-continuo');
   };
 
   const handleRestartLevel = () => {

@@ -5,10 +5,10 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useFeedback } from '../../components/game/FeedbackProvider';
-import { MobileSentenceBuilder, StepConfig, StepOption } from '../../components/game/MobileSentenceBuilder';
-import { ShareButton } from '../../components/game/ShareButton';
-import { AudioPlayer } from '../../components/game/AudioPlayer';
+import { useFeedback } from '../../../components/game/FeedbackProvider';
+import { MobileSentenceBuilder } from '../../../components/game/MobileSentenceBuilder';
+import { ShareButton } from '../../../components/game/ShareButton';
+import { AudioPlayer } from '../../../components/game/AudioPlayer';
 
 // --- DATA DEFINITIONS FOR LEVEL 3 ---
 // --- AHORA CON ESTRUCTURA DE COMPLEMENTOS ANIDADA ---
@@ -97,7 +97,7 @@ const Level3Page = () => {
   
   const handleNextLevel = () => {
     trackLevelCompletion(6);
-    router.push('/modal-can');
+    router.push('/exercises/modal-can');
   };
 
   // Smart translation logic - Ahora mucho más potente
