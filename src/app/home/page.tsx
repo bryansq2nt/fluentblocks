@@ -86,7 +86,7 @@ export default function HomePage() {
         <div className="flex items-center justify-between">
           <button
             type="button"
-            onClick={() => router.back()}
+            onClick={() => router.push('/')}
             className="p-2 hover:bg-white/50 rounded-full transition-colors"
           >
             <ArrowLeft className="w-6 h-6 text-gray-600" />

@@ -104,3 +104,14 @@ body {
     border: none !important;
   }
 }
+
+/* Estilos para react-masonry-css */
+.my-masonry-grid {
+  display: flex;
+  margin-left: -32px; /* ajusta el valor del gap (negativo) */
+  width: auto;
+}
+.my-masonry-grid_column {
+  padding-left: 32px; /* espaciado entre columnas (debe ser igual al margen negativo) */
+  background-clip: padding-box;
+}

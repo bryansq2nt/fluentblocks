@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import Blocky from './Blocky';
 import WordBlock from './WordBlock';
 import DropZone from './DropZone';
 import type { Word } from '@/types/game';
@@ -37,10 +36,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
       {/* Blocky Character */}
       <div className="absolute top-4 right-4">
-        <Blocky
-          emotion="happy"
-          message="¡Arrastra las palabras para formar la oración!"
-        />
+       
       </div>
 
       {/* Drop Zones */}

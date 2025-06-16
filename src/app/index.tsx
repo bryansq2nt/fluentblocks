@@ -1,35 +1,12 @@
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import SentenceBuilder from '@/components/landing/SentenceBuilder';
-import ActionModal from '@/components/downtime/ActionModal';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function LandingPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const router = useRouter(); // Hook para la navegación
-
-  // 2. Definimos las funciones que se ejecutarán desde el modal
-  const handleTestApp = () => {
-    // Aquí puedes redirigir a una página de prueba específica o la principal
-    router.push('/home'); 
-  };
-
-  const handleViewCommunity = () => {
-    // Redirige a la página que contiene el mural de la comunidad
-    router.push('/community'); // Asumiendo que tienes una página /community
-  };
-
-  const handleShareCommunity = () => {
-    // Podría redirigir a la página de la comunidad y abrir un modal para compartir
-    // o simplemente redirigir
-    router.push('/community?action=share'); 
-  };
-  
   return (
-    <>
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute inset-0 overflow-hidden">
@@ -96,18 +73,18 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            <button
-                onClick={() => setIsModalOpen(true)}
-                className="group inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            <Link 
+              href="/home"
+              className="group inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Empezar Ahora
+              <motion.span
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
               >
-                Empezar Ahora
-                <motion.span
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                >
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </motion.span>
-              </button>
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </motion.span>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -226,30 +203,21 @@ export default function LandingPage() {
               ¿Listo para pensar en inglés?
             </h2>
             
-            <button
-              onClick={() => setIsModalOpen(true)}
+            <Link 
+              href="/home"
               className="group inline-flex items-center px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
             >
               Empezar Ahora
-              <motion.span animate={{ x: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}>
+              <motion.span
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
+              >
                 <ArrowRight className="ml-2 h-5 w-5" />
               </motion.span>
-            </button>
+            </Link>
           </motion.div>
         </div>
       </section>
     </main>
-    <AnimatePresence>
-    {isModalOpen && (
-      <ActionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onTest={handleTestApp}
-        onViewCommunity={handleViewCommunity}
-        onShareCommunity={handleShareCommunity}
-      />
-    )}
-  </AnimatePresence>
-   </>
   );
 }
