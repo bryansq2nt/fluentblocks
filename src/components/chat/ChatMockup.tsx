@@ -12,14 +12,35 @@ const initialMessages: Message[] = [
     id: 1, 
     type: 'text', 
     sender: 'agent', 
-    content: '¡Hola! Soy Profe Flow USA. ¿Listo pa\' darle al inglés?', 
+    content: '¡Hola! Soy FluentBlocks AI. ¿Listo para aprender inglés de una manera distinta?', 
     timestamp: new Date().toISOString() 
   },
   { 
     id: 2, 
     type: 'text', 
     sender: 'agent', 
-    content: 'Tírame una frase o palabra y te explico cómo se usa en la calle. 🤙', 
+    content: 'Puedes preguntarme sobre cualquier tema de inglés. ¿Qué te gustaría aprender hoy?', 
+    timestamp: new Date().toISOString() 
+  },
+  { 
+    id: 3, 
+    type: 'text', 
+    sender: 'agent', 
+    content: 'Por ejemplo, puedes preguntarme cual es la diferencia entre "There" y "Here".', 
+    timestamp: new Date().toISOString() 
+  },
+  { 
+    id: 4, 
+    type: 'text', 
+    sender: 'agent', 
+    content: 'Como usar "In", "At", "On" de manera correcta ?', 
+    timestamp: new Date().toISOString() 
+  },
+  { 
+    id: 5, 
+    type: 'text', 
+    sender: 'agent', 
+    content: 'Basicamente puedes preguntarme cualquier cosa sobre el inglés', 
     timestamp: new Date().toISOString() 
   },
 ];
@@ -105,15 +126,15 @@ export default function ChatMockup() {
   };
 
   return (
-    <div className="w-full flex-1 min-h-0 bg-white flex flex-col md:max-w-3xl md:h-[80vh] md:rounded-2xl md:shadow-2xl md:border md:border-gray-200/50">
-      <ChatHeader />
-      
-      {/* MessageList se expandirá y hará scroll correctamente */}
-      <MessageList messages={messages} isAgentTyping={isAgentTyping} />
-      
-      <div ref={chatEndRef} /> 
-
-      <ChatInput onSendMessage={handleSendMessage} isAgentTyping={isAgentTyping} />
-    </div>
+    <div 
+    className="
+        w-full h-full bg-white flex flex-col md:max-w-3xl md:h-[85vh] md:rounded-2xl md:shadow-2xl md:border md:border-gray-200/50
+    "
+>
+    <ChatHeader />
+    <MessageList messages={messages} isAgentTyping={isAgentTyping} />
+    <div ref={chatEndRef} /> 
+    <ChatInput onSendMessage={handleSendMessage} isAgentTyping={isAgentTyping} />
+</div>
   );
 }
