@@ -6,13 +6,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AgentAvatar } from './AgentAvatar';
 import { ChatBubble } from './ChatBubble';
 import { TypingIndicator } from './TypingIndicator';
-import { ExamplesCard } from './ExamplesCard';
+import { InteractiveExampleCard } from './InteractiveExampleCard';
 
-// El tipo de dato Message ahora requiere un timestamp
+// --- TIPO DE MENSAJE ACTUALIZADO ---
 export type Message = {
   id: number;
   sender: 'user' | 'agent';
-  timestamp: string; // Timestamp en formato ISO string
+  timestamp: string;
 } & (
   {
     type: 'text';
@@ -21,7 +21,11 @@ export type Message = {
     type: 'examples';
     content: {
       pattern: string;
-      examples: { english: string; spanish:string; note: string }[];
+      examples: {
+        blocks: { text: string; es: string; type: string }[];
+        spanish_translation: string;
+        note: string;
+      }[];
       challenge: string;
     };
   }
@@ -50,7 +54,6 @@ function getFormattedDate(timestamp: string): string {
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
-
 // El componente principal de la lista
 export function MessageList({ messages, isAgentTyping }: { messages: Message[], isAgentTyping: boolean }) {
   return (
@@ -58,7 +61,6 @@ export function MessageList({ messages, isAgentTyping }: { messages: Message[], 
       {messages.map((msg, index) => {
         const prevMsg = messages[index - 1];
         
-        // --- Lógica para agrupación y separadores ---
         const showAvatar = msg.sender === 'agent' && (prevMsg?.sender !== 'agent' || !prevMsg);
         const isFirstInGroup = prevMsg?.sender !== msg.sender || !prevMsg;
         const showDateSeparator = !prevMsg || new Date(msg.timestamp).toDateString() !== new Date(prevMsg.timestamp).toDateString();
@@ -85,8 +87,9 @@ export function MessageList({ messages, isAgentTyping }: { messages: Message[], 
                   isFirstInGroup={isFirstInGroup}
                 />
               )}
-              {msg.type === 'examples' && (
-                <ExamplesCard data={msg.content} />
+              
+              {msg.type === 'examples' && msg.sender === 'agent' && (
+                <InteractiveExampleCard data={msg.content} />
               )}
             </motion.div>
           </React.Fragment>
