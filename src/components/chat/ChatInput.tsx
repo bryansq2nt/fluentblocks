@@ -27,7 +27,7 @@ export function ChatInput({ onSendMessage, isAgentTyping }: ChatInputProps) {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Escribe una frase en español..."
-          className="flex-1 w-full px-4 py-2 bg-gray-100 rounded-full border border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
+          className="text-black flex-1 w-full px-4 py-2 bg-gray-100 rounded-full border border-transparent focus:ring-2 focus:ring-blue-500 focus:outline-none transition"
           disabled={isAgentTyping}
         />
         <button
