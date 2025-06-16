@@ -1,15 +1,27 @@
 // components/ChatMockup.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MessageList, Message } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatHeader } from './ChatHeader';
 
-// Mensajes iniciales (sin cambios)
-const initialAgentMessages: Omit<Message, 'id' | 'sender'>[] = [
-  { text: '¡Hola! Bienvenido a FluentBlocks.' },
-  { text: 'Puedes pedirme cosas como "enséñame a pedir café en inglés" o "cómo se dice \'tengo una reunión\'".' },
+// Mensajes de bienvenida, ahora con la estructura completa del tipo Message
+const initialMessages: Message[] = [
+  { 
+    id: 1, 
+    type: 'text', 
+    sender: 'agent', 
+    content: '¡Hola! Soy Profe Flow USA. ¿Listo pa\' darle al inglés?', 
+    timestamp: new Date().toISOString() 
+  },
+  { 
+    id: 2, 
+    type: 'text', 
+    sender: 'agent', 
+    content: 'Tírame una frase o palabra y te explico cómo se usa en la calle. 🤙', 
+    timestamp: new Date().toISOString() 
+  },
 ];
 
 export default function ChatMockup() {
@@ -17,80 +29,79 @@ export default function ChatMockup() {
   const [isAgentTyping, setIsAgentTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // useEffect para mensajes iniciales (sin cambios)
+  // Carga los mensajes de bienvenida al inicio
   useEffect(() => {
-    // ...
+    setMessages(initialMessages);
   }, []);
-  const processAgentResponse = async (currentMessages: Message[]) => {
+  
+  // Mantiene el scroll al final de la conversación
+  useEffect(() => {
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }, [messages, isAgentTyping]);
+
+  // Maneja el envío de mensajes del usuario
+  const handleSendMessage = async (text: string) => {
+    if (!text.trim() || isAgentTyping) return;
+
+    // 1. Añade el mensaje del usuario con su timestamp
+    const userMessage: Message = { 
+      id: Date.now(), 
+      type: 'text', 
+      sender: 'user', 
+      content: text, 
+      timestamp: new Date().toISOString() 
+    };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
     setIsAgentTyping(true);
+
     try {
+      // 2. Llama a la API con el historial
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: currentMessages.map(({ text, sender }) => ({
-            role: sender === 'user' ? 'user' : 'assistant',
-            content: text,
-          })),
+          messages: newMessages
+            .filter(m => m.type === 'text')
+            .map(({ sender, content }) => ({
+              role: sender === 'user' ? 'user' : 'assistant',
+              content: content,
+            })),
         }),
       });
 
-      if (!response.ok) throw new Error('Respuesta del servidor no fue exitosa');
+      if (!response.ok) throw new Error(await response.text());
       
       const data = await response.json();
       
-      // Añade los mensajes de la respuesta secuencialmente
-      for (let i = 0; i < data.messages.length; i++) {
-        // Pausa entre mensajes para un efecto natural
-        await new Promise(resolve => setTimeout(resolve, 1200)); 
-        const agentMessage: Message = {
-          id: Date.now() + i,
-          text: data.messages[i],
-          sender: 'agent',
-        };
-        setMessages(prev => [...prev, agentMessage]);
-      }
+      if (data.error) throw new Error(data.error);
+
+      // 3. Crea el mensaje del agente con su timestamp
+      const agentResponse: Message = {
+        id: Date.now() + 1,
+        type: 'examples',
+        sender: 'agent',
+        content: data,
+        timestamp: new Date().toISOString()
+      };
       
-      // Si el modelo indica que necesita seguir explicando, volvemos a llamar a la función
-      if (data.requiresMoreContext) {
-        // Necesitamos obtener el estado más reciente de los mensajes para la siguiente llamada
-        setMessages(prev => {
-          processAgentResponse(prev); // Llamada recursiva con el historial actualizado
-          return prev;
-        });
-      } else {
-        // Si ya terminó, desactivamos el "escribiendo..." y el usuario puede responder.
-        setIsAgentTyping(false);
-      }
+      setMessages(prev => [...prev, agentResponse]);
 
     } catch (error) {
       console.error('Error al contactar la API de chat:', error);
       const errorResponse: Message = {
         id: Date.now() + 1,
-        text: 'Lo siento, hubo un problema. Por favor, intenta de nuevo. 🛠️',
+        type: 'text',
         sender: 'agent',
+        content: 'Lo siento, my G. Se me cruzaron los cables. Intenta de nuevo. 🛠️',
+        timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsAgentTyping(false);
     }
-  };
-  
-  // useEffect para scroll (sin cambios)
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isAgentTyping]);
-
-  const handleSendMessage = async (text: string) => {
-    if (!text.trim() || isAgentTyping) return;
-
-    const userMessage: Message = { id: Date.now(), text, sender: 'user' };
-    
-    // Actualiza la UI con el mensaje del usuario y luego llama al procesador
-    setMessages(prev => {
-      const newMessages = [...prev, userMessage];
-      processAgentResponse(newMessages); // Inicia el ciclo de respuesta de la IA
-      return newMessages;
-    });
   };
 
   return (
