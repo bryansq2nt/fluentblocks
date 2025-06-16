@@ -34,6 +34,7 @@ const levels: Level[] = [
   { id: 8, title: "Modal 'Could'", pattern: "Sujeto + could + verbo + extra", icon: "🤔", pageId: "modal-could" },
   { id: 9, title: "Modal 'Would'", pattern: "Sujeto + would + verbo + extra", icon: "💭", pageId: "modal-would" },
   { id: 10, title: "Modal 'Should'", pattern: "Sujeto + should + verbo + extra", icon: "🦉", pageId: "modal-should" },
+  { id: 11, title: "Adjective Placement", pattern: "Adjetivo + sustantivo", icon: "🔍", pageId: "adjective-placement" },
 ];
 
 const navSections: NavSection[] = [
