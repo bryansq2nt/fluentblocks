@@ -105,10 +105,14 @@ export default function ChatMockup() {
   };
 
   return (
-    <div className="w-full h-full bg-white flex flex-col md:max-w-3xl md:h-[80vh] md:rounded-2xl md:shadow-2xl md:border md:border-gray-200/50">
+    <div className="w-full flex-1 min-h-0 bg-white flex flex-col md:max-w-3xl md:h-[80vh] md:rounded-2xl md:shadow-2xl md:border md:border-gray-200/50">
       <ChatHeader />
+      
+      {/* MessageList se expandirá y hará scroll correctamente */}
       <MessageList messages={messages} isAgentTyping={isAgentTyping} />
+      
       <div ref={chatEndRef} /> 
+
       <ChatInput onSendMessage={handleSendMessage} isAgentTyping={isAgentTyping} />
     </div>
   );

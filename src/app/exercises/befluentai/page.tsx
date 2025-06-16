@@ -10,7 +10,7 @@ export default function ChatPage() {
         // `min-h-screen` asegura que ocupe toda la altura.
         // `flex items-center justify-center` centra el contenido.
         // El fondo se mueve aquí para que cubra toda la pantalla.
-        <main className="min-h-screen w-full flex items-center justify-center bg-gray-50 md:p-4">
+        <main className="h-screen w-full flex flex-col md:min-h-screen md:flex-row md:items-center md:justify-center md:bg-gray-50 md:p-4">
             <ChatMockup />
         </main>
     );
