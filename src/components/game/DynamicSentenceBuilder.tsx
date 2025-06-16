@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle } from 'lucide-react';
 import useSound from 'use-sound';
 import { AudioPlayer } from './AudioPlayer';
-
+import AudioHint from './AudioHint';
 // --- Tipos de Datos ---
 interface Question {
   spanish: string;
@@ -154,6 +154,9 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
           <div>
             <h3 className="text-lg font-semibold text-gray-700">Construye la oración:</h3>
             <p className="mt-2 text-3xl font-bold text-blue-600">&quot;{currentQuestionData.spanish}&quot;</p>
+            <AudioHint
+              sentence={currentQuestionData.englishCorrect.join(' ')}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4 items-center">
