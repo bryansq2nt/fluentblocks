@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
+import SocialProof from '@/components/downtime/SocialProof';
 
 // Importa el componente Masonry
 import Masonry from 'react-masonry-css';
@@ -125,6 +126,9 @@ function CommunityPageContent() {
           <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
             Estas son las palabras y reacciones de las personas que, como tú, están construyendo este sueño con nosotros.
           </p>
+          <div className="mt-8">
+            <SocialProof />
+          </div>
         </motion.header>
 
         <div>
