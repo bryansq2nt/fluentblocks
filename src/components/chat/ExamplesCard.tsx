@@ -29,7 +29,7 @@ export function ExamplesCard({ data }: { data: ExamplesData }) {
               <Languages className="w-4 h-4 text-gray-500" /> 
               <code className="bg-blue-100 px-1 rounded">{ex.english}</code>
             </p>
-            <p className="text-sm text-gray-600 ml-6">"{ex.spanish}"</p>
+            <p className="text-sm text-gray-600 ml-6">&quot;{ex.spanish}&quot;</p>
             <p className="text-xs text-blue-800/80 mt-1 ml-6 flex items-center gap-1.5">
               <Sparkles className="w-3 h-3" /> 
               <em>{ex.note}</em>

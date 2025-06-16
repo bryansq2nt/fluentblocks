@@ -9,52 +9,71 @@ import { ChatHeader } from './ChatHeader';
 // Mensajes de bienvenida, ahora con la estructura completa del tipo Message
 const initialMessages: Message[] = [
   { 
-    id: 1, 
-    type: 'text', 
-    sender: 'agent', 
-    content: '¡Hola! Soy FluentBlocks AI. ¿Listo para aprender inglés de una manera distinta?', 
-    timestamp: new Date().toISOString() 
+    id: 1, type: 'text', sender: 'agent', content: '¡Bienvenido a FluentBlocks AI! Soy su compañero virtual de inglés y juntos haremos cada lección práctica y divertida.', 
+    timestamp: new Date(Date.now() + 1000).toISOString() // Timestamps ligeramente diferentes
   },
   { 
-    id: 2, 
-    type: 'text', 
-    sender: 'agent', 
-    content: 'Puedes preguntarme sobre cualquier tema de inglés. ¿Qué te gustaría aprender hoy?', 
-    timestamp: new Date().toISOString() 
+    id: 2, type: 'text', sender: 'agent', content: '¿Tiene un objetivo en mente? Por ejemplo, “pedir un café en Nueva York” o “presentarse en una entrevista de trabajo”. ¡Yo le ayudo a conseguirlo!', 
+    timestamp: new Date(Date.now() + 2000).toISOString()
   },
   { 
-    id: 3, 
-    type: 'text', 
-    sender: 'agent', 
-    content: 'Por ejemplo, puedes preguntarme cual es la diferencia entre "There" y "Here".', 
-    timestamp: new Date().toISOString() 
+    id: 3, type: 'text', sender: 'agent', content: 'Usted decide el ritmo y el tema: desde vocabulario básico hasta expresiones coloquiales reales de la calle.', 
+    timestamp: new Date(Date.now() + 3000).toISOString()
   },
   { 
-    id: 4, 
-    type: 'text', 
-    sender: 'agent', 
-    content: 'Como usar "In", "At", "On" de manera correcta ?', 
-    timestamp: new Date().toISOString() 
+    id: 4, type: 'text', sender: 'agent', content: 'Por ejemplo, podemos explorar la diferencia entre “there” y “here”, o ver cómo usar “in”, “at” y “on” sin confusiones.', 
+    timestamp: new Date(Date.now() + 4000).toISOString()
   },
   { 
-    id: 5, 
-    type: 'text', 
-    sender: 'agent', 
-    content: 'Basicamente puedes preguntarme cualquier cosa sobre el inglés', 
-    timestamp: new Date().toISOString() 
+    id: 5, type: 'text', sender: 'agent', content: 'Cuando esté listo, simplemente pregunte o elija un tema, y empezaré con ejemplos interactivos que usted podrá practicar al instante.', 
+    timestamp: new Date(Date.now() + 5000).toISOString()
   },
 ];
+
+
 
 export default function ChatMockup() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAgentTyping, setIsAgentTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Carga los mensajes de bienvenida al inicio
-  useEffect(() => {
-    setMessages(initialMessages);
-  }, []);
-  
+  const effectRan = useRef(false);
+
+ // --- CAMBIO CLAVE: useEffect para mensajes de bienvenida secuenciales ---
+ useEffect(() => {
+  // Si el efecto ya se ejecutó, no hacer nada.
+  // En modo estricto, effectRan.current será `true` en el segundo montaje.
+  if (effectRan.current === true) {
+    return;
+  }
+
+  const introduceAgent = async () => {
+    // No necesitamos la comprobación de `messages.length` gracias al cerrojo
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    for (let i = 0; i < initialMessages.length; i++) {
+      setIsAgentTyping(true);
+      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 500));
+      
+      setIsAgentTyping(false);
+      setMessages(prev => [...prev, initialMessages[i]]);
+
+      // No esperamos después del último mensaje
+      if (i < initialMessages.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+  };
+
+  introduceAgent();
+
+  // --- CAMBIO CLAVE 2: Marcar que el efecto se ha ejecutado ---
+  // La función de limpieza se ejecuta en el desmontaje.
+  // Aquí es donde activamos el "cerrojo" para el siguiente montaje.
+  return () => {
+    effectRan.current = true;
+  };
+}, []); 
   // Mantiene el scroll al final de la conversación
   useEffect(() => {
     setTimeout(() => {

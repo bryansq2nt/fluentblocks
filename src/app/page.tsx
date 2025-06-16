@@ -6,16 +6,13 @@ import SentenceBuilder from '@/components/landing/SentenceBuilder';
 import ActionModal from '@/components/downtime/ActionModal';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AIPromoCard from '@/components/landing/AIPromoCard';
 
 export default function LandingPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter(); // Hook para la navegación
 
-  // 2. Definimos las funciones que se ejecutarán desde el modal
-  const handleTestApp = () => {
-    // Aquí puedes redirigir a una página de prueba específica o la principal
-    router.push('/home'); 
-  };
+  
 
   const handleViewCommunity = () => {
     // Redirige a la página que contiene el mural de la comunidad
@@ -26,6 +23,10 @@ export default function LandingPage() {
     // Podría redirigir a la página de la comunidad y abrir un modal para compartir
     // o simplemente redirigir
     router.push('/community?action=share'); 
+  };
+
+  const handleChatAI = () => {
+    router.push('/exercises/befluentai'); 
   };
   
   return (
@@ -111,6 +112,10 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      <section className="py-12 px-4 sm:px-6 lg:px-8 relative z-10">
+            <AIPromoCard />
+        </section>
 
       {/* Problem Section */}
       <section className="py-20 bg-white">
@@ -244,7 +249,7 @@ export default function LandingPage() {
       <ActionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onTest={handleTestApp}
+        onTest={handleChatAI}
         onViewCommunity={handleViewCommunity}
         onShareCommunity={handleShareCommunity}
       />

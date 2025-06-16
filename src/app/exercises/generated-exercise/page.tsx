@@ -58,6 +58,7 @@ function PracticePageContent() {
 
             const data = await response.json();
             setExerciseData(data);
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (e: any) {
             setError(e.message);
           } finally {
@@ -68,6 +69,7 @@ function PracticePageContent() {
         generateExercise();
 
       } catch (e) {
+        console.log(e);
         setError("Los datos de la lección son inválidos o están corruptos.");
         setIsLoading(false);
       }

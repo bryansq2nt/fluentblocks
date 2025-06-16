@@ -1,6 +1,6 @@
 // lib/openai/consultation.ts
 import OpenAI from 'openai';
-
+import { exerciseGeneratorSystemPrompt } from './prompts';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // --- SCHEMA ACTUALIZADO: LOS BLOQUES AHORA TIENEN SU PROPIA TRADUCCIÓN ---
@@ -82,6 +82,7 @@ export async function performConsultation(params: {
 }
 
 // --- NUEVA FUNCIÓN PARA GENERAR EJERCICIOS ---
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateExerciseFromLesson(lessonData: any) {
     // Define el schema JSON que queremos que la IA genere
     const exerciseFunctionSchema = {
@@ -127,7 +128,7 @@ export async function generateExerciseFromLesson(lessonData: any) {
       const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: require('@/lib/openai/prompts').exerciseGeneratorSystemPrompt },
+          { role: "system", content: exerciseGeneratorSystemPrompt },
           // Le damos a la IA la lección del chat como contexto principal
           { role: "user", content: `Aquí está la lección que el usuario quiere practicar. Por favor, crea un ejercicio basado en ella: ${JSON.stringify(lessonData)}` }
         ],

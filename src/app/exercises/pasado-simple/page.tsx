@@ -1,12 +1,10 @@
-// --- START OF FILE page.tsx ---
-
 'use client';
 
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { useFeedback } from '../../../components/game/FeedbackProvider';
-import { MobileSentenceBuilder } from '../../../components/game/MobileSentenceBuilder';
+import { MobileSentenceBuilder, StepConfig, StepOption } from '../../../components/game/MobileSentenceBuilder';
 import { ShareButton } from '../../../components/game/ShareButton';
 import { AudioPlayer } from '../../../components/game/AudioPlayer';
 

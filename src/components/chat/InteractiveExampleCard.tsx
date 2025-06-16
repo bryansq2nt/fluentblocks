@@ -86,7 +86,7 @@ export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) 
 
         {/* Reproductor y Traducción Completa */}
         <div className="flex items-center justify-between gap-4 p-2">
-          <p className="text-base text-gray-700 italic text-left">"{currentExample.spanish_translation}"</p>
+          <p className="text-base text-gray-700 italic text-left">&quot;{currentExample.spanish_translation}&quot;</p>
           <AudioPlayer sentence={fullSentence} />
         </div>
         
