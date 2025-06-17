@@ -39,7 +39,7 @@ export function DynamicSentenceBuilderView({
           <div className="text-center">
             <h3 className="text-lg font-semibold text-gray-700 mb-2">Construye la oración:</h3>
             <p className="text-2xl font-bold text-blue-600">
-              "{currentQuestion.spanish}"
+            &quot;{currentQuestion.spanish}&quot;
             </p>
             <AudioHint
               sentence={currentQuestion.englishCorrect.join(' ')}
