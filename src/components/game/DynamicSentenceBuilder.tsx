@@ -1,10 +1,10 @@
 // components/game/DynamicSentenceBuilder.tsx
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useSound from 'use-sound';
-import { AudioPlayer } from './AudioPlayer';
+import { AudioPlayer, PlayerHandle } from './AudioPlayer';
 import { useExerciseTracking } from '../../context/ExerciseTrackingContext';
 import { ProgressBar } from './components/ProgressBar';
 import { SentencePrompt } from './components/SentencePrompt';
@@ -39,17 +39,20 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   // --- Estados del Juego ---
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState<WordOption[]>([]);
+  // Este estado ya no se usa para renderizar, pero sí para el reset inicial en useEffect.
   const [wordBankOptions, setWordBankOptions] = useState<WordOption[]>([]);
   const [feedback, setFeedback] = useState<{ status: FeedbackStatus; message: string }>({ status: 'idle', message: '' });
   const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [mistakeCount, setMistakeCount] = useState(0);
-  const [isAudioHintVisible, setIsAudioHintVisible] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   
+  const autoAudioPlayerRef = useRef<PlayerHandle>(null);
+
   const [playSuccess] = useSound('/sounds/success.mp3', { volume: 0.5 });
   const [playError]   = useSound('/sounds/error.mp3',   { volume: 0.5 });
   const { trackInteraction, getSessionStats } = useExerciseTracking();
 
+  
   // --- Lógica del Juego ---
   const currentQuestionData = useMemo(() => {
     if (!questions || questions.length === 0) return null;
@@ -65,7 +68,13 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
       setWordBankOptions(currentQuestionData.options);
       setUserAnswer([]);
       setFeedback({ status: 'idle', message: '' });
-      setMistakeCount(0); // Resetea el contador de errores con cada nueva pregunta
+      setMistakeCount(0);
+
+      const timer = setTimeout(() => {
+        autoAudioPlayerRef.current?.play();
+      }, 500);
+
+      return () => clearTimeout(timer);
     }
   }, [currentQuestionData]);
 
@@ -76,7 +85,6 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
 
   const handleWordBankTap = (wordOption: WordOption) => {
     setUserAnswer([...userAnswer, wordOption]);
-    setWordBankOptions(wordBankOptions.filter(opt => opt.id !== wordOption.id));
     setFeedback({ status: 'idle', message: '' });
     if (currentQuestionData) {
       trackInteraction({
@@ -93,12 +101,11 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   };
 
   const handleAnswerTap = (wordOption: WordOption) => {
-    setWordBankOptions(shuffleArray([...wordBankOptions, wordOption]));
     setUserAnswer(userAnswer.filter(opt => opt.id !== wordOption.id));
   };
 
   const handleCheckAnswer = () => {
-    if (!currentQuestionData) return; // Chequeo defensivo
+    if (!currentQuestionData) return;
     const userAnswerString = userAnswer.map(opt => opt.word).join(' ').replace(/\s*\.\s*$/, '').trim();
     const correctAnswerString = currentQuestionData.englishCorrect.join(' ').replace(/\s*\.\s*$/, '').trim();
     
@@ -145,18 +152,18 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-    const stats = getSessionStats();
-    trackInteraction({
-      type: 'SESSION_COMPLETE',
-      timestamp: Date.now(),
-      data: {
-        totalTime: stats.totalTime,
-        correctAnswers: stats.correctAnswers,
-        incorrectAnswers: stats.incorrectAnswers,
-        hintsUsed: stats.hintsUsed,
-        retries: stats.retries
-      }
-    });
+      const stats = getSessionStats();
+      trackInteraction({
+        type: 'SESSION_COMPLETE',
+        timestamp: Date.now(),
+        data: {
+          totalTime: stats.totalTime,
+          correctAnswers: stats.correctAnswers,
+          incorrectAnswers: stats.incorrectAnswers,
+          hintsUsed: stats.hintsUsed,
+          retries: stats.retries
+        }
+      });
       setIsSessionComplete(true);
     }
   };
@@ -181,14 +188,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
 
   const progressPercentage = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
   
- 
-
-  const toggleAudioHint = () => {
-    setIsAudioHintVisible(!isAudioHintVisible);
-  };
-
   if (isSessionComplete) {
-   
     return <CompletionScreen onSessionComplete={onSessionComplete} />;
   }
 
@@ -196,57 +196,76 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
     return <div>Cargando pregunta...</div>;
   }
 
+  const isAnswerChecked = feedback.status !== 'idle';
+
+  const handleReorder = (newOrder: WordOption[]) => {
+    setUserAnswer(newOrder);
+    
+    // Opcional: Registrar la interacción si es relevante para tus métricas.
+    // if (currentQuestionData) {
+    //   trackInteraction({
+    //     type: 'WORDS_REORDERED',
+    //     timestamp: Date.now(),
+    //     data: {
+    //       englishSentence: currentQuestionData.englishCorrect.join(' '),
+    //       spanishSentence: currentQuestionData.spanish,
+    //       newAnswerOrder: newOrder.map(opt => opt.word).join(' ')
+    //     }
+    //   });
+    
+  };
   // --- Renderizado del Ejercicio Principal ---
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
+      <div className="hidden">
+        <AudioPlayer 
+          ref={autoAudioPlayerRef} 
+          sentence={currentQuestionData.englishCorrect.join(' ')} 
+        />
+      </div>
+
       <ProgressBar progress={progressPercentage} />
 
       <main className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-8 space-y-6">
           <div>
-            <SentencePrompt
-              question={currentQuestionData}
-              isAudioHintVisible={isAudioHintVisible}
-              onToggleAudioHint={toggleAudioHint}
-            />
+            <SentencePrompt question={currentQuestionData} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4 items-center">
-            <AnswerArea
+          <AnswerArea
               answer={userAnswer}
               onRemove={handleAnswerTap}
+              onReorder={handleReorder}
+              status={feedback.status}
             />
-            <div className="flex justify-center md:justify-start">
-              {feedback.status === 'correct' && (
-                <motion.div initial={{ scale: 0.6 }} animate={{ scale: 1 }}>
-                  <AudioPlayer sentence={userAnswer.map(w => w.word).join(' ')} />
-                </motion.div>
-              )}
-            </div>
           </div>
 
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
             <p className="text-sm text-gray-600 mb-3">Toca las palabras en el orden correcto:</p>
             <WordBank
-            options={currentQuestionData.options}
-            selectedOptions={userAnswer}
-            onSelect={handleWordBankTap}
-          />
+              options={currentQuestionData.options}
+              selectedOptions={userAnswer}
+              onSelect={handleWordBankTap}
+              isDisabled={isAnswerChecked}
+            />
           </div>
 
-          {userAnswer.length > 0 && feedback.status === 'idle' && (
-            <motion.button
-              key="check-button" // Añadir una clave es buena práctica cuando se renderiza condicionalmente
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.2 }}
-              onClick={handleCheckAnswer}
-              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl shadow-lg"
-            >
-              Revisar
-            </motion.button>
-          )}
+          <AnimatePresence>
+            {userAnswer.length > 0 && feedback.status === 'idle' && (
+              <motion.button
+                key="check-button"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                onClick={handleCheckAnswer}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl shadow-lg"
+              >
+                Revisar
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </main>
 
