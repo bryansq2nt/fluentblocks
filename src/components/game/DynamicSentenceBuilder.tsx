@@ -3,11 +3,15 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle } from 'lucide-react';
 import useSound from 'use-sound';
 import { AudioPlayer } from './AudioPlayer';
-import AudioHint from './AudioHint';
 import { useExerciseTracking } from '../../context/ExerciseTrackingContext';
+import { ProgressBar } from './components/ProgressBar';
+import { SentencePrompt } from './components/SentencePrompt';
+import { AnswerArea } from './components/AnswerArea';
+import { WordBank } from './components/WordBank';
+import { FeedbackToast } from './components/FeedbackToast';
+import { CompletionScreen } from './components/CompletionScreen';
 
 // --- Tipos de Datos ---
 interface Question {
@@ -167,37 +171,14 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   const progressPercentage = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
   
  
-  const wordButtonClasses = "px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200 font-medium text-gray-800 text-center min-w-[80px] transition-colors duration-150";
 
   const toggleAudioHint = () => {
     setIsAudioHintVisible(!isAudioHintVisible);
   };
 
   if (isSessionComplete) {
-    return (
-       <div className="p-8 text-center flex flex-col items-center justify-center h-full min-h-[60vh]">
-          
-           <motion.div
-               className="flex flex-col items-center" 
-               initial={{ scale: 0.6, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-           >
-               <CheckCircle className="w-24 h-24 text-green-500 mb-4" /> 
-               <h2 className="text-3xl font-bold text-gray-800 mb-2">¡Lección Completada!</h2>
-               <p className="text-gray-600 text-lg mb-6">Has practicado este patrón con éxito.</p>
-               <motion.button 
-                   onClick={onSessionComplete}
-                   whileHover={{ scale: 1.05 }}
-                   whileTap={{ scale: 0.95 }}
-                   className="flex items-center justify-center gap-2 px-8 py-3 bg-blue-600 text-white font-bold rounded-xl shadow-lg hover:bg-blue-700 transition"
-               >
-                   Volver
-               </motion.button>
-           </motion.div>
-       </div>
-    )
- }
+    return <CompletionScreen onSessionComplete={onSessionComplete} />;
+  }
 
   if (!currentQuestionData) {
     return <div>Cargando pregunta...</div>;
@@ -206,37 +187,23 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   // --- Renderizado del Ejercicio Principal ---
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
-      <div className="h-3 w-full bg-gray-200 rounded-full overflow-hidden">
-        <motion.div className="h-full bg-green-500" initial={{ width: 0 }} animate={{ width: `${progressPercentage}%` }} />
-      </div>
+      <ProgressBar progress={progressPercentage} />
 
       <main className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-8 space-y-6">
           <div>
-            <h3 className="text-lg font-semibold text-gray-700">Construye la oración:</h3>
-            <p className="mt-2 text-3xl font-bold text-blue-600">&quot;{currentQuestionData.spanish}&quot;</p>
-            <AudioHint
-              sentence={currentQuestionData.englishCorrect.join(' ')}
-              isVisible={isAudioHintVisible}
-              onToggle={toggleAudioHint}
+            <SentencePrompt
+              question={currentQuestionData}
+              isAudioHintVisible={isAudioHintVisible}
+              onToggleAudioHint={toggleAudioHint}
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4 items-center">
-            <motion.div className="min-h-[76px] p-4 bg-blue-50 border-2 border-dashed border-blue-200 rounded-xl flex flex-wrap gap-2 items-center">
-              <AnimatePresence>
-                {userAnswer.map(opt => (
-                  <motion.button
-                    key={opt.id}
-                    layoutId={`word-${opt.id}`}
-                    onClick={() => handleAnswerTap(opt)}
-                    className={wordButtonClasses} // Usamos la clase base
-                  >
-                    {opt.word}
-                  </motion.button>
-                ))}
-              </AnimatePresence>
-            </motion.div>
+            <AnswerArea
+              answer={userAnswer}
+              onRemove={handleAnswerTap}
+            />
             <div className="flex justify-center md:justify-start">
               {feedback.status === 'correct' && (
                 <motion.div initial={{ scale: 0.6 }} animate={{ scale: 1 }}>
@@ -248,22 +215,10 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
 
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
             <p className="text-sm text-gray-600 mb-3">Toca las palabras en el orden correcto:</p>
-            <div className="flex flex-wrap gap-3">
-              <AnimatePresence>
-                {wordBankOptions.map(opt => (
-                  <motion.button
-                    key={opt.id}
-                    layoutId={`word-${opt.id}`}
-                    onClick={() => handleWordBankTap(opt)}
-                    className={wordButtonClasses} // Usamos la clase base
-                    whileHover={{ y: -2, boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    {opt.word}
-                  </motion.button>
-                ))}
-              </AnimatePresence>
-            </div>
+            <WordBank
+              options={wordBankOptions}
+              onSelect={handleWordBankTap}
+            />
           </div>
 
           {wordBankOptions.length === 0 && feedback.status === 'idle' && (
@@ -275,33 +230,13 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
       </main>
 
       <AnimatePresence>
-        {feedback.status !== 'idle' && (
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            className={`fixed inset-x-4 bottom-6 p-4 rounded-xl shadow-lg border ${feedback.status === 'correct' ? 'bg-green-100 border-green-200' : 'bg-red-100 border-red-200'}`}
-          >
-            <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                {feedback.status === 'correct' ? <CheckCircle className="w-8 h-8 text-green-600" /> : <XCircle className="w-8 h-8 text-red-600" />}
-                <p className={`font-semibold ${feedback.status === 'correct' ? 'text-green-800' : 'text-red-800'}`}>
-                  {feedback.message}
-                </p>
-              </div>
-              <div className="flex-shrink-0 flex items-center gap-3">
-                {feedback.status === 'incorrect' && mistakeCount < 3 && (
-                  <button onClick={handleRetry} className="px-5 py-2 rounded-lg font-bold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">
-                    Reintentar
-                  </button>
-                )}
-                <button onClick={handleNextQuestion} className={`px-5 py-2 rounded-lg font-bold text-white transition-all shadow-md hover:shadow-lg ${feedback.status === 'correct' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}>
-                  Continuar
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        <FeedbackToast
+          status={feedback.status}
+          message={feedback.message}
+          onNext={handleNextQuestion}
+          onRetry={handleRetry}
+          canRetry={feedback.status === 'incorrect' && mistakeCount < 3}
+        />
       </AnimatePresence>
     </div>
   );

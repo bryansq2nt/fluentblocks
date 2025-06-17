@@ -7,8 +7,7 @@ import { Sparkles } from 'lucide-react';
 
 export default function AIPromoCard() {
   return (
-    // Usamos Link con `passHref` y `legacyBehavior` para envolver un componente de Framer Motion
-    <Link href="/exercises/befluentai" passHref legacyBehavior>
+    <Link href="/chat">
       <motion.a
         // Animaciones de entrada y hover
         initial={{ opacity: 0, y: 20 }}
