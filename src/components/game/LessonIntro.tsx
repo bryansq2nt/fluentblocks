@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState} from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react'; // CAMBIO: Importar el ícono de Check
 import parse, { HTMLReactParserOptions } from 'html-react-parser';
+import { useExerciseTracking } from '../../context/ExerciseTrackingContext';
 
 
 interface Message {
@@ -20,13 +21,41 @@ interface LessonIntroProps {
 
 export const LessonIntro: React.FC<LessonIntroProps> = ({ icon, title, messages, onComplete }) => {
   const [messageIndex, setMessageIndex] = useState(0);
+  const { trackInteraction } = useExerciseTracking();
+
+
 
   const handleNext = () => {
     if (messageIndex < messages.length - 1) {
       setMessageIndex(prev => prev + 1);
     } else {
+      trackInteraction({
+        type: 'INTRO_COMPLETE',
+        timestamp: Date.now(),
+        data: {
+          title,
+          totalMessages: messages.length,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          timeSpent: Date.now() - (window as any).__introStartTime
+        }
+      });
       onComplete();
     }
+  };
+
+  const handleSkip = () => {
+    trackInteraction({
+      type: 'INTRO_SKIPPED',
+      timestamp: Date.now(),
+      data: {
+        title,
+        currentMessageIndex: messageIndex,
+        totalMessages: messages.length,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        timeSpent: Date.now() - (window as any).__introStartTime
+      }
+    });
+    onComplete();
   };
 
   const isLastMessage = messageIndex === messages.length - 1;
@@ -74,7 +103,7 @@ function RenderText({ text }: { text: string }) {
       >
         {/* CAMBIO: Botón para saltar la introducción */}
         <button
-          onClick={onComplete} // Llama directamente a onComplete para saltar todo
+          onClick={handleSkip}
           className="absolute top-3 right-3 text-sm text-slate-400 hover:text-slate-600 transition-colors px-2 py-1 rounded"
           aria-label="Saltar introducción"
         >

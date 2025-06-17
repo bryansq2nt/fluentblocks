@@ -7,6 +7,8 @@ import { CheckCircle, XCircle } from 'lucide-react';
 import useSound from 'use-sound';
 import { AudioPlayer } from './AudioPlayer';
 import AudioHint from './AudioHint';
+import { useExerciseTracking } from '../../context/ExerciseTrackingContext';
+
 // --- Tipos de Datos ---
 interface Question {
   spanish: string;
@@ -38,9 +40,11 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [mistakeCount, setMistakeCount] = useState(0);
   const [isAudioHintVisible, setIsAudioHintVisible] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   
   const [playSuccess] = useSound('/sounds/success.mp3', { volume: 0.5 });
   const [playError]   = useSound('/sounds/error.mp3',   { volume: 0.5 });
+  const { trackInteraction } = useExerciseTracking();
 
   // --- Lógica del Juego ---
   const currentQuestionData = useMemo(() => {
@@ -70,6 +74,18 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
     setUserAnswer([...userAnswer, wordOption]);
     setWordBankOptions(wordBankOptions.filter(opt => opt.id !== wordOption.id));
     setFeedback({ status: 'idle', message: '' });
+    if (currentQuestionData) {
+      trackInteraction({
+        type: 'WORD_SELECTED',
+        timestamp: Date.now(),
+        data: {
+          word: wordOption.word,
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          currentAnswer: [...userAnswer, wordOption].map(opt => opt.word).join(' ')
+        }
+      });
+    }
   };
 
   const handleAnswerTap = (wordOption: WordOption) => {
@@ -78,19 +94,50 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   };
 
   const handleCheckAnswer = () => {
+    if (!currentQuestionData) return; // Chequeo defensivo
     const userAnswerString = userAnswer.map(opt => opt.word).join(' ').replace(/\s*\.\s*$/, '').trim();
-    const correctAnswerString = currentQuestionData?.englishCorrect.join(' ').replace(/\s*\.\s*$/, '').trim();
+    const correctAnswerString = currentQuestionData.englishCorrect.join(' ').replace(/\s*\.\s*$/, '').trim();
     
     if (userAnswerString === correctAnswerString) {
       setFeedback({ status: 'correct', message: '¡Perfecto!' });
+      trackInteraction({
+        type: 'ANSWER_CORRECT',
+        timestamp: Date.now(),
+        data: {
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          userAnswer: userAnswerString,
+        }
+      });
     } else {
       setMistakeCount(prev => prev + 1);
       const feedbackMessage = `¡Casi! La respuesta correcta es: "${correctAnswerString}"`;
       setFeedback({ status: 'incorrect', message: feedbackMessage });
+      trackInteraction({
+        type: 'ANSWER_INCORRECT',
+        timestamp: Date.now(),
+        data: {
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          userAnswer: userAnswerString,
+        }
+      });
     }
   };
 
   const handleNextQuestion = () => {
+    if (feedback.status === 'incorrect' && currentQuestionData) {
+      trackInteraction({
+        type: 'EXERCISE_SKIPPED',
+        timestamp: Date.now(),
+        data: {
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          userAnswer: userAnswer.map(opt => opt.word).join(' '),
+          skippedAfterMistake: true
+        }
+      });
+    }
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
@@ -100,16 +147,26 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   
   const handleRetry = () => {
     if (currentQuestionData) {
-        setUserAnswer([]);
-        setWordBankOptions(currentQuestionData.options);
-        setFeedback({ status: 'idle', message: '' });
+      trackInteraction({
+        type: 'RETRY_ATTEMPT',
+        timestamp: Date.now(),
+        data: {
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          userAnswer: userAnswer.map(opt => opt.word).join(' '),
+          attemptNumber: retryCount + 1
+        }
+      });
+      setRetryCount(retryCount + 1);
+      setUserAnswer([]);
+      setWordBankOptions(currentQuestionData.options);
+      setFeedback({ status: 'idle', message: '' });
     }
   };
 
   const progressPercentage = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
   
-  // --- Definición de la clase base para los botones de palabras ---
-  // Esta es la clave para evitar la deformación en la animación.
+ 
   const wordButtonClasses = "px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200 font-medium text-gray-800 text-center min-w-[80px] transition-colors duration-150";
 
   const toggleAudioHint = () => {
@@ -119,14 +176,13 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   if (isSessionComplete) {
     return (
        <div className="p-8 text-center flex flex-col items-center justify-center h-full min-h-[60vh]">
-           {/* 👇 AÑADE LAS CLASES AQUÍ 👇 */}
+          
            <motion.div
-               className="flex flex-col items-center" // <-- SOLUCIÓN
+               className="flex flex-col items-center" 
                initial={{ scale: 0.6, opacity: 0 }}
                animate={{ scale: 1, opacity: 1 }}
                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
            >
-               {/* Opcional: Ahora puedes quitar "mx-auto" del ícono, ya no es necesario */}
                <CheckCircle className="w-24 h-24 text-green-500 mb-4" /> 
                <h2 className="text-3xl font-bold text-gray-800 mb-2">¡Lección Completada!</h2>
                <p className="text-gray-600 text-lg mb-6">Has practicado este patrón con éxito.</p>
@@ -234,7 +290,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
                 </p>
               </div>
               <div className="flex-shrink-0 flex items-center gap-3">
-                {feedback.status === 'incorrect' && mistakeCount < 2 && (
+                {feedback.status === 'incorrect' && mistakeCount < 3 && (
                   <button onClick={handleRetry} className="px-5 py-2 rounded-lg font-bold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition-colors">
                     Reintentar
                   </button>

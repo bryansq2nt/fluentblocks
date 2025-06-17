@@ -8,6 +8,7 @@ import { LessonIntro } from '@/components/game/LessonIntro'; // Asegúrate de qu
 import { AnimatePresence } from 'framer-motion';
 import DynamicSentenceBuilder from '@/components/game/DynamicSentenceBuilder'; // Importa el nuevo constructor
 import MainHeader from '@/components/game/MainHeader';
+import { GeneratedExerciseUserInteractions } from '@/components/game/GeneratedExerciseUserInteractions';
 // --- Tipos de datos que esperamos de la API ---
 interface Question {
   spanish: string;
@@ -31,6 +32,7 @@ function PracticePageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [introCompleted, setIntroCompleted] = useState(false);
+  const [sessionCompleted, setSessionCompleted] = useState(false);
 
   // Efecto que se ejecuta una vez para obtener los datos del ejercicio
   useEffect(() => {
@@ -86,10 +88,9 @@ function PracticePageContent() {
 
   // Esta función se pasa al componente DynamicSentenceBuilder
   const handleSessionComplete = () => {
-    
-    router.push('/chat'); 
+    setSessionCompleted(true);
+    router.push('/chat');
   };
-
 
   // --- Renderizado Condicional de la Página ---
 
@@ -113,26 +114,33 @@ function PracticePageContent() {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4 pt-24">
+    <GeneratedExerciseUserInteractions onSessionComplete={() => {
+      // Solo redirigir si la sesión se ha completado
+      if (sessionCompleted) {
+        router.push('/chat');
+      }
+    }}>
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4 pt-24">
         <MainHeader />
         <AnimatePresence>
-            {!introCompleted && (
-                <LessonIntro 
-                    icon={<span>{exerciseData.intro.icon}</span>}
-                    title={exerciseData.intro.title}
-                    messages={exerciseData.intro.messages}
-                    onComplete={handleIntroComplete}
-                />
-            )}
+          {!introCompleted && (
+            <LessonIntro 
+              icon={<span>{exerciseData.intro.icon}</span>}
+              title={exerciseData.intro.title}
+              messages={exerciseData.intro.messages}
+              onComplete={handleIntroComplete}
+            />
+          )}
         </AnimatePresence>
 
         {introCompleted && (
-            <DynamicSentenceBuilder 
-                questions={exerciseData.questions}
-                onSessionComplete={handleSessionComplete}
-            />
+          <DynamicSentenceBuilder 
+            questions={exerciseData.questions}
+            onSessionComplete={handleSessionComplete}
+          />
         )}
-    </div>
+      </div>
+    </GeneratedExerciseUserInteractions>
   );
 }
 

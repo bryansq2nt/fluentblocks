@@ -6,6 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lightbulb } from 'lucide-react';
 import { AudioPlayer } from './AudioPlayer';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside'; // Asegúrate de que la ruta sea correcta
+import { useExerciseTracking } from '../../context/ExerciseTrackingContext';
+
 
 interface AudioHintProps {
   sentence: string;
@@ -15,11 +17,19 @@ interface AudioHintProps {
 
 export default function AudioHint({ sentence, isVisible, onToggle }: AudioHintProps) {
   const popoverRef = useRef<HTMLDivElement>(null);
+  const { trackInteraction } = useExerciseTracking();
 
   // Usa el hook para cerrar el popover si se hace clic fuera
   // Solo se cierra si está visible
   useOnClickOutside(popoverRef, () => {
     if (isVisible) {
+      trackInteraction({
+        type: 'AUDIO_HINT_USED',
+        timestamp: Date.now(),
+        data: {
+          sentence: sentence
+        }
+      });
       onToggle();
     }
   });
