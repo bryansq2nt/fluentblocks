@@ -68,8 +68,16 @@ interface SessionCancelledData {
   goingTo: string;
 }
 
+interface SessionCompleteData {
+  totalTime: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  hintsUsed: number;
+  retries: number;
+}
+
 export type UserInteraction = BaseInteraction & {
-  data?: IntroStartedData | IntroCompleteData | IntroSkippedData | AudioHintUsedData | AnswerData | RetryAttemptData | ExerciseSkippedData | WordSelectedData | SessionCancelledData;
+  data?: IntroStartedData | IntroCompleteData | IntroSkippedData | AudioHintUsedData | AnswerData | RetryAttemptData | ExerciseSkippedData | WordSelectedData | SessionCancelledData | SessionCompleteData;
 };
 
 export interface SessionStats {

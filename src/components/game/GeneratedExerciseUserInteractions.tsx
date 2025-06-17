@@ -25,6 +25,7 @@ export const GeneratedExerciseUserInteractions: React.FC<GeneratedExerciseUserIn
         onSessionComplete();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Solo se ejecuta al montar y desmontar
 
   return <>{children}</>;

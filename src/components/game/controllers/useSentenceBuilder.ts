@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import useSound from 'use-sound';
 import { useExerciseTracking } from '../../../context/ExerciseTrackingContext';
 import { Question, WordOption, FeedbackStatus } from '../types';

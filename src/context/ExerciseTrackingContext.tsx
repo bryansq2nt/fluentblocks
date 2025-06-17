@@ -28,23 +28,6 @@ export function ExerciseTrackingProvider({ children }: { children: React.ReactNo
     await storageProvider.saveInteraction(interaction);
   }, [storageProvider]);
 
-  const startSession = useCallback(() => {
-    const startTime = Date.now();
-    setSessionStartTime(startTime);
-    trackInteraction({
-      type: 'SESSION_STARTED',
-      timestamp: startTime
-    });
-  }, [trackInteraction]);
-
-  const endSession = useCallback(async () => {
-    if (!sessionStartTime) return;
-    
-    const stats = getSessionStats();
-    ExerciseLogger.logSessionStats(stats);
-    await storageProvider.saveSessionStats(stats);
-  }, [sessionStartTime, storageProvider]);
-
   const getSessionStats = useCallback((): SessionStats => {
     if (!sessionStartTime) {
       throw new Error('Session not started');
@@ -64,6 +47,23 @@ export function ExerciseTrackingProvider({ children }: { children: React.ReactNo
       retries: interactions.filter(i => i.type === 'RETRY_ATTEMPT').length
     };
   }, [sessionStartTime, interactions]);
+
+  const startSession = useCallback(() => {
+    const startTime = Date.now();
+    setSessionStartTime(startTime);
+    trackInteraction({
+      type: 'SESSION_STARTED',
+      timestamp: startTime
+    });
+  }, [trackInteraction]);
+
+  const endSession = useCallback(async () => {
+    if (!sessionStartTime) return;
+    
+    const stats = getSessionStats();
+    ExerciseLogger.logSessionStats(stats);
+    await storageProvider.saveSessionStats(stats);
+  }, [sessionStartTime, storageProvider, getSessionStats]);
 
   const getStoredInteractions = useCallback(() => {
     return storageProvider.getInteractions();

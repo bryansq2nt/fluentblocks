@@ -48,7 +48,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   
   const [playSuccess] = useSound('/sounds/success.mp3', { volume: 0.5 });
   const [playError]   = useSound('/sounds/error.mp3',   { volume: 0.5 });
-  const { trackInteraction } = useExerciseTracking();
+  const { trackInteraction, getSessionStats } = useExerciseTracking();
 
   // --- Lógica del Juego ---
   const currentQuestionData = useMemo(() => {
@@ -145,6 +145,18 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
+    const stats = getSessionStats();
+    trackInteraction({
+      type: 'SESSION_COMPLETE',
+      timestamp: Date.now(),
+      data: {
+        totalTime: stats.totalTime,
+        correctAnswers: stats.correctAnswers,
+        incorrectAnswers: stats.incorrectAnswers,
+        hintsUsed: stats.hintsUsed,
+        retries: stats.retries
+      }
+    });
       setIsSessionComplete(true);
     }
   };
@@ -177,6 +189,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   };
 
   if (isSessionComplete) {
+   
     return <CompletionScreen onSessionComplete={onSessionComplete} />;
   }
 
