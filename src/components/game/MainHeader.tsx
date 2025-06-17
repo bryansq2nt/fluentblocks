@@ -6,18 +6,27 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home, Map, MessageSquare, Menu, X } from 'lucide-react';
+import { useExerciseTracking } from '@/context/ExerciseTrackingContext';
 
 const navItems = [
   { href: '/home', icon: <Home className="w-5 h-5" />, label: 'Home' },
   { href: '/map', icon: <Map className="w-5 h-5" />, label: 'Mapa' },
-  { href: '/exercises/befluentai', icon: <MessageSquare className="w-5 h-5" />, label: 'Chat AI' },
+  { href: '/chat', icon: <MessageSquare className="w-5 h-5" />, label: 'Chat AI' },
 ];
 
 export default function MainHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
+  const { trackInteraction } = useExerciseTracking();
 
   const handleNav = (href: string) => {
+    trackInteraction({
+      type: 'SESSION_CANCELLED',
+      timestamp: Date.now(),
+      data: {
+        goingTo: href
+      }
+    });
     setIsMobileMenuOpen(false);
     router.push(href);
   };

@@ -8,7 +8,8 @@ export type InteractionType =
   | 'ANSWER_INCORRECT'
   | 'RETRY_ATTEMPT'
   | 'EXERCISE_SKIPPED'
-  | 'SESSION_COMPLETE';
+  | 'SESSION_COMPLETE'
+  | 'SESSION_CANCELLED';
 
 interface BaseInteraction {
   type: InteractionType;
@@ -63,8 +64,12 @@ interface WordSelectedData {
   currentAnswer: string;
 }
 
+interface SessionCancelledData {
+  goingTo: string;
+}
+
 export type UserInteraction = BaseInteraction & {
-  data?: IntroStartedData | IntroCompleteData | IntroSkippedData | AudioHintUsedData | AnswerData | RetryAttemptData | ExerciseSkippedData | WordSelectedData;
+  data?: IntroStartedData | IntroCompleteData | IntroSkippedData | AudioHintUsedData | AnswerData | RetryAttemptData | ExerciseSkippedData | WordSelectedData | SessionCancelledData;
 };
 
 export interface SessionStats {
