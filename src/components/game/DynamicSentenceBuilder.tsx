@@ -37,6 +37,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   const [feedback, setFeedback] = useState<{ status: FeedbackStatus; message: string }>({ status: 'idle', message: '' });
   const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [mistakeCount, setMistakeCount] = useState(0);
+  const [isAudioHintVisible, setIsAudioHintVisible] = useState(false);
   
   const [playSuccess] = useSound('/sounds/success.mp3', { volume: 0.5 });
   const [playError]   = useSound('/sounds/error.mp3',   { volume: 0.5 });
@@ -111,6 +112,10 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   // Esta es la clave para evitar la deformación en la animación.
   const wordButtonClasses = "px-4 py-2 bg-white rounded-lg shadow-sm border border-gray-200 font-medium text-gray-800 text-center min-w-[80px] transition-colors duration-150";
 
+  const toggleAudioHint = () => {
+    setIsAudioHintVisible(!isAudioHintVisible);
+  };
+
   if (isSessionComplete) {
     return (
        <div className="p-8 text-center flex flex-col items-center justify-center h-full min-h-[60vh]">
@@ -156,6 +161,8 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
             <p className="mt-2 text-3xl font-bold text-blue-600">&quot;{currentQuestionData.spanish}&quot;</p>
             <AudioHint
               sentence={currentQuestionData.englishCorrect.join(' ')}
+              isVisible={isAudioHintVisible}
+              onToggle={toggleAudioHint}
             />
           </div>
 
