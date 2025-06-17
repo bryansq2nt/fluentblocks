@@ -175,7 +175,6 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
       });
       setRetryCount(retryCount + 1);
       setUserAnswer([]);
-      setWordBankOptions(currentQuestionData.options);
       setFeedback({ status: 'idle', message: '' });
     }
   };
@@ -229,13 +228,22 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
             <p className="text-sm text-gray-600 mb-3">Toca las palabras en el orden correcto:</p>
             <WordBank
-              options={wordBankOptions}
-              onSelect={handleWordBankTap}
-            />
+            options={currentQuestionData.options}
+            selectedOptions={userAnswer}
+            onSelect={handleWordBankTap}
+          />
           </div>
 
-          {wordBankOptions.length === 0 && feedback.status === 'idle' && (
-            <motion.button onClick={handleCheckAnswer} className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl shadow-lg">
+          {userAnswer.length > 0 && feedback.status === 'idle' && (
+            <motion.button
+              key="check-button" // Añadir una clave es buena práctica cuando se renderiza condicionalmente
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.2 }}
+              onClick={handleCheckAnswer}
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl shadow-lg"
+            >
               Revisar
             </motion.button>
           )}
