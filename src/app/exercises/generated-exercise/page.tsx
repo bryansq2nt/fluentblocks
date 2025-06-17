@@ -86,9 +86,8 @@ function PracticePageContent() {
 
   // Esta función se pasa al componente DynamicSentenceBuilder
   const handleSessionComplete = () => {
-    // Cuando el ejercicio termina, puedes mostrar un mensaje y redirigir
-    alert("¡Felicidades! Has completado la práctica de este patrón.");
-    router.push('/exercises/befluentai'); // Vuelve al chat o a la página que prefieras
+    
+    router.push('/chat'); 
   };
 
 

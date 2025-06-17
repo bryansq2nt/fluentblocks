@@ -26,7 +26,7 @@ export default function LandingPage() {
   };
 
   const handleChatAI = () => {
-    router.push('/exercises/befluentai'); 
+    router.push('/chat'); 
   };
   
   return (

@@ -33,7 +33,7 @@ export default function NotFound() {
         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
           {/* Tarjeta para el Tutor AI */}
           <Link
-            href="/exercises/befluentai"
+            href="/chat"
             className="group rounded-xl p-4 transition-all duration-200 hover:bg-blue-50 hover:shadow-lg border border-transparent hover:border-blue-200"
           >
             <div className="flex items-center gap-3">

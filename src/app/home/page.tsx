@@ -117,7 +117,7 @@ export default function HomePage() {
               icon={Sparkles}
               title="FluentBlocks AI"
               subtitle="Habla con tu tutor personal y practica cualquier tema"
-              href="/exercises/befluentai"
+              href="/chat"
               color="special"
             />
           </div>

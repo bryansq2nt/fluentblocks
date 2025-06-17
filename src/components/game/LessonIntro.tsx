@@ -93,19 +93,17 @@ function RenderText({ text }: { text: string }) {
     exit={{ y: -20, opacity: 0 }}
     transition={{ duration: 0.3 }}
   >
-    <p className="text-lg">
     <p className="text-xl text-slate-700">
-    <RenderText text={currentMessage.text} />
-  </p>
-
-  {currentMessage.list && (
-    <ul className="mt-2 list-disc list-inside text-slate-600">
-      {currentMessage.list.map((item, idx) => (
-        <li key={idx}><RenderText text={item} /></li>
-      ))}
-    </ul>
-  )}
+      <RenderText text={currentMessage.text} />
     </p>
+
+    {currentMessage.list && (
+      <ul className="mt-2 list-disc list-inside text-slate-600">
+        {currentMessage.list.map((item, idx) => (
+          <li key={idx}><RenderText text={item} /></li>
+        ))}
+      </ul>
+    )}
   </motion.div>
 </AnimatePresence>
 
