@@ -12,7 +12,7 @@ import { AnswerArea } from './components/AnswerArea';
 import { WordBank } from './components/WordBank';
 import { FeedbackToast } from './components/FeedbackToast';
 import { CompletionScreen } from './components/CompletionScreen';
-
+import Confetti from 'react-confetti';
 // --- Tipos de Datos ---
 interface Question {
   spanish: string;
@@ -39,7 +39,9 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
   // --- Estados del Juego ---
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState<WordOption[]>([]);
-  // Este estado ya no se usa para renderizar, pero sí para el reset inicial en useEffect.
+
+  const [showConfetti, setShowConfetti] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [wordBankOptions, setWordBankOptions] = useState<WordOption[]>([]);
   const [feedback, setFeedback] = useState<{ status: FeedbackStatus; message: string }>({ status: 'idle', message: '' });
   const [isSessionComplete, setIsSessionComplete] = useState(false);
@@ -111,6 +113,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
     
     if (userAnswerString === correctAnswerString) {
       setFeedback({ status: 'correct', message: '¡Perfecto!' });
+      setShowConfetti(true);
       trackInteraction({
         type: 'ANSWER_CORRECT',
         timestamp: Date.now(),
@@ -198,22 +201,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
 
   const isAnswerChecked = feedback.status !== 'idle';
 
-  const handleReorder = (newOrder: WordOption[]) => {
-    setUserAnswer(newOrder);
-    
-    // Opcional: Registrar la interacción si es relevante para tus métricas.
-    // if (currentQuestionData) {
-    //   trackInteraction({
-    //     type: 'WORDS_REORDERED',
-    //     timestamp: Date.now(),
-    //     data: {
-    //       englishSentence: currentQuestionData.englishCorrect.join(' '),
-    //       spanishSentence: currentQuestionData.spanish,
-    //       newAnswerOrder: newOrder.map(opt => opt.word).join(' ')
-    //     }
-    //   });
-    
-  };
+  
   // --- Renderizado del Ejercicio Principal ---
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
@@ -231,12 +219,25 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
           <div>
             <SentencePrompt question={currentQuestionData} />
           </div>
-
+          {showConfetti && (
+        <Confetti
+          // Ajusta el número de piezas para una buena explosión.
+          numberOfPieces={400}
+          // `recycle={false}` hace que sea una explosión de un solo uso.
+          recycle={false}
+          // `gravity` le da una caída realista a las piezas.
+          gravity={0.15}
+          // Una vez que la animación termina, llamamos a setShowConfetti(false) para limpiar el componente.
+          // ¡Esto es mucho más limpio que usar un setTimeout!
+          onConfettiComplete={() => setShowConfetti(false)}
+          // Lo hacemos un poco transparente para que no tape completamente la UI.
+          style={{ opacity: 0.8 }}
+        />
+      )}
           <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4 items-center">
           <AnswerArea
               answer={userAnswer}
               onRemove={handleAnswerTap}
-              onReorder={handleReorder}
               status={feedback.status}
             />
           </div>

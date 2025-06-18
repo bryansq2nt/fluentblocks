@@ -19,7 +19,7 @@ export function SentencePrompt({ question }: SentencePromptProps) {
     <div className="text-center mb-6">
       <h3 className="text-lg font-semibold text-gray-700 mb-2">Construye la oración:</h3>
       <p className="text-2xl font-bold text-blue-600">
-        "{question.spanish}"
+      &quot;{question.spanish}&quot;
       </p>
       
       {/* CAMBIO: La llamada a AudioHint ahora es mucho más limpia y directa. */}
