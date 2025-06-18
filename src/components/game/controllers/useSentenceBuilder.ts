@@ -1,98 +1,128 @@
-import { useState, useEffect } from 'react';
+// hooks/useSentenceBuilder.ts
+'use client';
+
+import { useState, useEffect, useMemo, useRef } from 'react';
 import useSound from 'use-sound';
+import { PlayerHandle } from '../AudioPlayer'; 
 import { useExerciseTracking } from '../../../context/ExerciseTrackingContext';
-import { Question, WordOption, FeedbackStatus } from '../types';
 import shuffleArray from '../utils/shuffleArray';
 
-interface UseSentenceBuilderProps {
-  questions: Question[];
-  onComplete: () => void;
+// --- Tipos de Datos (centralizados en el hook) ---
+interface Question {
+  spanish: string;
+  englishCorrect: string[];
 }
+type WordOption = { id: number; word: string };
+type FeedbackStatus = 'idle' | 'correct' | 'incorrect';
 
-export function useSentenceBuilder({ questions, onComplete }: UseSentenceBuilderProps) {
+// --- El Custom Hook que contiene toda la lógica del juego ---
+export function useSentenceBuilder(questions: Question[], onSessionComplete: () => void) {
+  // --- Estados del Juego ---
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [wordBankOptions, setWordBankOptions] = useState<WordOption[]>([]);
   const [userAnswer, setUserAnswer] = useState<WordOption[]>([]);
-  const [feedback, setFeedback] = useState<FeedbackStatus>('idle');
-  const [isAudioHintVisible, setIsAudioHintVisible] = useState(false);
+  const [feedback, setFeedback] = useState<{ status: FeedbackStatus; message: string }>({ status: 'idle', message: '' });
+  const [isSessionComplete, setIsSessionComplete] = useState(false);
+  const [mistakeCount, setMistakeCount] = useState(0);
   const [retryCount, setRetryCount] = useState(0);
-  const { trackInteraction } = useExerciseTracking();
+  const [showConfetti, setShowConfetti] = useState(false);
+  
+  const autoAudioPlayerRef = useRef<PlayerHandle>(null);
+
   const [playSuccess] = useSound('/sounds/success.mp3', { volume: 0.5 });
   const [playError]   = useSound('/sounds/error.mp3',   { volume: 0.5 });
+  const { trackInteraction, getSessionStats } = useExerciseTracking();
 
-  const currentQuestion = questions[currentQuestionIndex];
-  const progress = (currentQuestionIndex / questions.length) * 100;
+  // --- Lógica del Juego ---
+  const currentQuestionData = useMemo(() => {
+    if (!questions || questions.length === 0) return null;
+    const question = questions[currentQuestionIndex];
+    return {
+      ...question,
+      options: shuffleArray(question.englishCorrect.map((word, index) => ({ id: index, word }))),
+    };
+  }, [currentQuestionIndex, questions]);
 
   useEffect(() => {
-    if (currentQuestion) {
-      const options = currentQuestion.englishCorrect.map((word, index) => ({ id: index, word }));
-      setWordBankOptions(shuffleArray(options));
+    if (currentQuestionData) {
       setUserAnswer([]);
-      setFeedback('idle');
-      setIsAudioHintVisible(false); 
+      setFeedback({ status: 'idle', message: '' });
+      setMistakeCount(0);
+
+      const timer = setTimeout(() => {
+        autoAudioPlayerRef.current?.play();
+      }, 500);
+
+      return () => clearTimeout(timer);
     }
-  }, [currentQuestion]);
+  }, [currentQuestionData]);
 
   useEffect(() => {
-    if (feedback === 'correct') playSuccess();
-    if (feedback === 'incorrect') playError();
-  }, [feedback, playSuccess, playError]);
+    if (feedback.status === 'correct') playSuccess();
+    if (feedback.status === 'incorrect') playError();
+  }, [feedback.status, playSuccess, playError]);
 
-  const handleWordBankTap = (wordOption: { id: number; word: string }) => {
-    setUserAnswer([...userAnswer, wordOption]);
-    setWordBankOptions(wordBankOptions.filter(opt => opt.id !== wordOption.id));
-    setFeedback('idle');
-    if (currentQuestion) {
+  const handleWordBankTap = (wordOption: WordOption) => {
+    setUserAnswer(prev => [...prev, wordOption]);
+    setFeedback({ status: 'idle', message: '' });
+    if (currentQuestionData) {
       trackInteraction({
         type: 'WORD_SELECTED',
         timestamp: Date.now(),
         data: {
           word: wordOption.word,
-          englishSentence: currentQuestion.englishCorrect.join(' '),
-          spanishSentence: currentQuestion.spanish,
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
           currentAnswer: [...userAnswer, wordOption].map(opt => opt.word).join(' ')
         }
       });
     }
   };
 
+  const handleAnswerTap = (wordOption: WordOption) => {
+    setUserAnswer(prev => prev.filter(opt => opt.id !== wordOption.id));
+  };
+
   const handleCheckAnswer = () => {
-    if (!currentQuestion) return;
+    if (!currentQuestionData) return;
     const userAnswerString = userAnswer.map(opt => opt.word).join(' ').replace(/\s*\.\s*$/, '').trim();
-    const correctAnswerString = currentQuestion.englishCorrect.join(' ').replace(/\s*\.\s*$/, '').trim();
+    const correctAnswerString = currentQuestionData.englishCorrect.join(' ').replace(/\s*\.\s*$/, '').trim();
+    
     if (userAnswerString === correctAnswerString) {
-      setFeedback('correct');
+      setFeedback({ status: 'correct', message: '¡Perfecto!' });
+      setShowConfetti(true);
       trackInteraction({
         type: 'ANSWER_CORRECT',
         timestamp: Date.now(),
         data: {
-          englishSentence: currentQuestion.englishCorrect.join(' '),
-          spanishSentence: currentQuestion.spanish,
-          userAnswer: userAnswerString
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          userAnswer: userAnswerString,
         }
       });
     } else {
-      setFeedback('incorrect');
+      setMistakeCount(prev => prev + 1);
+      const feedbackMessage = `¡Casi! La respuesta correcta es: "${correctAnswerString}"`;
+      setFeedback({ status: 'incorrect', message: feedbackMessage });
       trackInteraction({
         type: 'ANSWER_INCORRECT',
         timestamp: Date.now(),
         data: {
-          englishSentence: currentQuestion.englishCorrect.join(' '),
-          spanishSentence: currentQuestion.spanish,
-          userAnswer: userAnswerString
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
+          userAnswer: userAnswerString,
         }
       });
     }
   };
 
   const handleNextQuestion = () => {
-    if (feedback === 'incorrect' && currentQuestion) {
+    if (feedback.status === 'incorrect' && currentQuestionData) {
       trackInteraction({
         type: 'EXERCISE_SKIPPED',
         timestamp: Date.now(),
         data: {
-          englishSentence: currentQuestion.englishCorrect.join(' '),
-          spanishSentence: currentQuestion.spanish,
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
           userAnswer: userAnswer.map(opt => opt.word).join(' '),
           skippedAfterMistake: true
         }
@@ -100,47 +130,62 @@ export function useSentenceBuilder({ questions, onComplete }: UseSentenceBuilder
     }
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setIsAudioHintVisible(false);
     } else {
-      onComplete();
+      const stats = getSessionStats();
+      trackInteraction({
+        type: 'SESSION_COMPLETE',
+        timestamp: Date.now(),
+        data: {
+          totalTime: stats.totalTime,
+          correctAnswers: stats.correctAnswers,
+          incorrectAnswers: stats.incorrectAnswers,
+          hintsUsed: stats.hintsUsed,
+          retries: stats.retries
+        }
+      });
+      setIsSessionComplete(true);
+      onSessionComplete();
     }
   };
-
+  
   const handleRetry = () => {
-    if (currentQuestion) {
+    if (currentQuestionData) {
       trackInteraction({
         type: 'RETRY_ATTEMPT',
         timestamp: Date.now(),
         data: {
-          englishSentence: currentQuestion.englishCorrect.join(' '),
-          spanishSentence: currentQuestion.spanish,
+          englishSentence: currentQuestionData.englishCorrect.join(' '),
+          spanishSentence: currentQuestionData.spanish,
           userAnswer: userAnswer.map(opt => opt.word).join(' '),
           attemptNumber: retryCount + 1
         }
       });
-      setRetryCount(retryCount + 1);
+      setRetryCount(prev => prev + 1);
       setUserAnswer([]);
-      setWordBankOptions(shuffleArray(currentQuestion.englishCorrect.map((word, index) => ({ id: index, word }))));
-      setFeedback('idle');
+      setFeedback({ status: 'idle', message: '' });
     }
   };
 
-  const toggleAudioHint = () => {
-    setIsAudioHintVisible(prev => !prev);
-  };
+  const progressPercentage = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
+  const isAnswerChecked = feedback.status !== 'idle';
 
+  // Devolvemos todos los estados y funciones que la UI necesitará.
   return {
-    currentQuestion,
-    wordBankOptions,
+    currentQuestionData,
     userAnswer,
     feedback,
-    progress,
-    isAudioHintVisible, 
+    isSessionComplete,
+    mistakeCount,
     retryCount,
+    showConfetti,
+    progressPercentage,
+    isAnswerChecked,
+    autoAudioPlayerRef,
     handleWordBankTap,
+    handleAnswerTap,
     handleCheckAnswer,
     handleNextQuestion,
     handleRetry,
-    toggleAudioHint, 
+    setShowConfetti,
   };
-} 
+}

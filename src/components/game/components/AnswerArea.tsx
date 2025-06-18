@@ -47,7 +47,8 @@ export function AnswerArea({ answer, onRemove, status }: AnswerAreaProps) {
   }[status];
 
   return (
-    <motion.div
+    <div className="grid grid-cols-1 md:grid-cols-[1fr,auto] gap-4 items-center">
+      <motion.div
       variants={containerVariants}
       initial="idle"
       animate={status}
@@ -78,5 +79,7 @@ export function AnswerArea({ answer, onRemove, status }: AnswerAreaProps) {
         })}
       </AnimatePresence>
     </motion.div>
+  </div>
+  
   );
 }

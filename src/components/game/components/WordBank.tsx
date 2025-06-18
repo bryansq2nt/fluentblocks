@@ -20,7 +20,9 @@ export function WordBank({ options, selectedOptions, onSelect, isDisabled }: Wor
   );
 
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl">
+            <p className="text-sm text-gray-600 mb-3">Toca las palabras en el orden correcto:</p>
+            <div className="flex flex-wrap gap-3">
       {options.map(opt => {
         const isSelected = selectedIds.has(opt.id);
 
@@ -50,5 +52,8 @@ export function WordBank({ options, selectedOptions, onSelect, isDisabled }: Wor
         );
       })}
     </div>
+          </div>
+
+    
   );
 }
