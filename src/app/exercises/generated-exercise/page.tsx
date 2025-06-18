@@ -1,4 +1,3 @@
-// app/practice/page.tsx
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -9,6 +8,7 @@ import { AnimatePresence } from 'framer-motion';
 import DynamicSentenceBuilder from '@/components/game/DynamicSentenceBuilder'; // Importa el nuevo constructor
 import MainHeader from '@/components/game/MainHeader';
 import { GeneratedExerciseUserInteractions } from '@/components/game/GeneratedExerciseUserInteractions';
+import { EngagingLoadingScreen } from '@/components/game/components/EngagingLoadingScreen';
 // --- Tipos de datos que esperamos de la API ---
 interface Question {
   spanish: string;
@@ -95,12 +95,7 @@ function PracticePageContent() {
   // --- Renderizado Condicional de la Página ---
 
   if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-        <Loader2 className="w-16 h-16 text-blue-600 animate-spin mb-4" />
-        <p className="text-gray-600 text-lg font-semibold">Creando tu lección personalizada...</p>
-      </div>
-    );
+    return  <EngagingLoadingScreen category="loading" />;
   }
 
   if (error || !exerciseData) {
