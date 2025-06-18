@@ -9,10 +9,9 @@ export const runtime = 'nodejs';
 // Esta función manejará peticiones como GET /api/lottie/loading
 export async function GET(
   request: Request,
-  { params }: { params: { category: string } }
+  context: { params: Promise<{ category: string }> }
 ) {
-  // CORREGIDO: Awaitar params primero, luego acceder a category
-  const { category } = await params;
+  const { category } = await context.params;
 
   if (!category) {
     return NextResponse.json({ error: 'Categoría no especificada.' }, { status: 400 });

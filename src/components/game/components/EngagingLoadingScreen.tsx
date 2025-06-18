@@ -23,6 +23,7 @@ interface EngagingLoadingScreenProps {
 }
 
 export function EngagingLoadingScreen({ category }: EngagingLoadingScreenProps) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [animationData, setAnimationData] = useState<any>(null);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
 
