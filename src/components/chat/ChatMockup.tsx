@@ -16,7 +16,6 @@ export default function ChatMockup() {
   const [inputValue, setInputValue] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const effectRan = useRef(false);
 
   const { isLoading, isTutorialActive, currentStep, nextStep } = useTutorial();
   

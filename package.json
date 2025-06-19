@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-popover": "^1.1.14",
     "@vercel/blob": "^1.1.1",
     "dotenv": "^16.5.0",
     "framer-motion": "^12.18.1",

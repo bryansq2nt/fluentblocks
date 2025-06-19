@@ -1,7 +1,6 @@
 // components/chat/ChatInput.tsx
 'use client';
 
-import { useState } from 'react';
 import { Send } from 'lucide-react';
 
 type ChatInputProps = {

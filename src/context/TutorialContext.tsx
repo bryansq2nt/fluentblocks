@@ -42,7 +42,13 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
   }, [pathname, activeTutorial]);
 
   const startTutorial = (tutorialId: string) => {
-    // Lógica para iniciar un tutorial manualmente si es necesario
+    const tutorialToStart = allTutorials.find(t => t.id === tutorialId);
+    if (tutorialToStart) {
+      setActiveTutorial(tutorialToStart);
+      setCurrentStepIndex(0);
+    } else {
+      console.warn(`Tutorial with id "${tutorialId}" not found.`);
+    }
   };
 
   const completeTutorial = () => {
