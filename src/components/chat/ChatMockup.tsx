@@ -19,6 +19,28 @@ export default function ChatMockup() {
   const effectRan = useRef(false);
 
   const { isLoading, isTutorialActive, currentStep, nextStep } = useTutorial();
+  
+  // --- NUEVO useEffect PARA DETECTAR LA RESPUESTA DE LA IA ---
+  // Este es el cambio clave.
+  useEffect(() => {
+    // Si el tutorial no está activo, no hacemos nada.
+    if (!isTutorialActive) return;
+
+    const lastMessage = messages[messages.length - 1];
+
+    // Comprobamos si el tutorial está esperando la respuesta Y
+    // si el último mensaje es del agente Y es de tipo 'examples'.
+    if (
+      currentStep?.action?.type === 'WAIT_FOR_AI_RESPONSE' &&
+      lastMessage?.sender === 'agent' &&
+      lastMessage?.type === 'examples'
+    ) {
+      // ¡Condiciones cumplidas! Es hora de avanzar al siguiente paso.
+      nextStep();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, currentStep]); // Se ejecuta cada vez que 'messages' o 'currentStep' cambian.
+
   // --- LÓGICA DE INICIO: TUTORIAL O SALUDO NORMAL ---
   useEffect(() => {
     if (isLoading) {
@@ -78,8 +100,7 @@ export default function ChatMockup() {
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isAgentTyping) return;
 
-    // 2. Si el tutorial está activo, avanza al siguiente paso
-    if (isTutorialActive) {
+   if (isTutorialActive && currentStep?.action?.type === 'PREFILL_INPUT') {
       nextStep();
     }
     // 1. Añade el mensaje del usuario con su timestamp
@@ -125,9 +146,7 @@ export default function ChatMockup() {
       };
       
       setMessages(prev => [...prev, agentResponse]);
-      if (isTutorialActive && currentStep?.action?.type === 'WAIT_FOR_AI_RESPONSE') {
-        nextStep();
-      }
+    
 
     } catch (error) {
       console.error('Error al contactar la API de chat:', error);
@@ -135,14 +154,15 @@ export default function ChatMockup() {
         id: Date.now() + 1,
         type: 'text',
         sender: 'agent',
-        content: 'Lo siento, my G. Se me cruzaron los cables. Intenta de nuevo. 🛠️',
+        content: 'Lo siento, hubo algun error. Intenta de nuevo.',
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorResponse]);
     } finally {
       setIsAgentTyping(false);
+      setInputValue('');
     }
-    setInputValue('');
+    
   };
 
   return (

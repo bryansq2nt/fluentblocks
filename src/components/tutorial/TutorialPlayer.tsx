@@ -8,7 +8,7 @@ import { TutorialPopover } from './TutorialPopover';
 
 export function TutorialPlayer() {
   // 1. LLAMA A TODOS LOS HOOKS INCONDICIONALMENTE EN LA CIMA
-  const { isTutorialActive, currentStep, nextStep, skipTutorial } = useTutorial();
+  const { isTutorialActive, activeTutorial, currentStep, currentStepIndex, nextStep, skipTutorial } = useTutorial();
 
   // El useEffect también se llama siempre. Su lógica interna puede ser condicional.
   useEffect(() => {
@@ -20,7 +20,8 @@ export function TutorialPlayer() {
   }, [isTutorialActive, currentStep, nextStep]);
 
   // 2. AHORA, PUEDES TENER UN RETURN TEMPRANO DESPUÉS DE LLAMAR A TODOS LOS HOOKS
-  if (!isTutorialActive || !currentStep) {
+
+  if (!isTutorialActive || !currentStep || !activeTutorial) { 
     return null;
   }
 
@@ -29,16 +30,17 @@ export function TutorialPlayer() {
   || currentStep.type === 'action';
   return (
     <AnimatePresence>
-      {isVisibleStep && (
-        <motion.div>
-          {/* Este popover solo se mostrará para los pasos que tienen UI */}
-          <TutorialPopover
-            step={currentStep}
-            onNext={nextStep}
-            onSkip={skipTutorial}
-          />
-        </motion.div>
-      )}
-    </AnimatePresence>
+    {isVisibleStep && (
+      <motion.div>
+        <TutorialPopover
+          step={currentStep}
+          stepIndex={currentStepIndex} 
+          totalSteps={activeTutorial.steps.length} 
+          onNext={nextStep}
+          onSkip={skipTutorial}
+        />
+      </motion.div>
+    )}
+  </AnimatePresence>
   );
 }

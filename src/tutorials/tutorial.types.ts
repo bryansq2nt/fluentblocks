@@ -5,8 +5,11 @@ export interface TutorialStep {
     targetElement?: string; // Opcional para acciones que no apuntan a nada
     title: string;
     content: string;
+    isBlocking?: boolean; 
+    
+    isSkippable?: boolean;
     action?: {
-      type: 'PREFILL_INPUT' | 'WAIT_FOR_AI_RESPONSE' | 'WAIT_FOR_USER_ACTION';
+      type: 'PREFILL_INPUT' | 'WAIT_FOR_AI_RESPONSE';
       payload?: any;
     };
   }

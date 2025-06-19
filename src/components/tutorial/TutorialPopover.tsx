@@ -9,6 +9,8 @@ import { TutorialStep } from '@/tutorials/tutorial.types';
 // --- PROPS ---
 interface TutorialPopoverProps {
   step: TutorialStep;
+  stepIndex: number; 
+  totalSteps: number;
   onNext: () => void;
   onSkip: () => void;
 }
@@ -55,7 +57,7 @@ function useElementRect(elementSelector: string | undefined) {
 
 
 // --- COMPONENTE PRINCIPAL ---
-export function TutorialPopover({ step, onNext, onSkip }: TutorialPopoverProps) {
+export function TutorialPopover({ step, stepIndex, totalSteps, onNext, onSkip }: TutorialPopoverProps) {
   const targetRect = useElementRect(step.targetElement);
 
   if (!targetRect) {
@@ -71,12 +73,13 @@ export function TutorialPopover({ step, onNext, onSkip }: TutorialPopoverProps) 
     : targetRect.top - 12; // Arriba del elemento
   
   const popoverTransformOrigin = isTargetInUpperHalf ? 'top center' : 'bottom center';
-
+  const canSkip = step.isSkippable !== false;
+  const isLastStep = stepIndex === totalSteps - 1;
   return (
     // Portal para renderizar en la raíz del body y evitar problemas de z-index y overflow
     // En Next.js 13+ con App Router, esto se manejaría en el layout principal.
     // Por ahora, asumimos que está en un lugar alto del árbol DOM.
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-50 pointer-events-none">
       {/* 1. EL FONDO OSCURO QUE CUBRE TODO MENOS EL OBJETIVO */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -102,7 +105,7 @@ export function TutorialPopover({ step, onNext, onSkip }: TutorialPopoverProps) 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        className="absolute w-80 max-w-[90vw] bg-white rounded-lg shadow-2xl p-5 text-gray-800"
+        className="absolute w-80 max-w-[90vw] bg-white rounded-lg shadow-2xl p-5 text-gray-800 pointer-events-auto"
         style={{
           left: targetRect.left + targetRect.width / 2 - 160, // 160 es la mitad del ancho (320px)
           top: popoverVerticalPosition,
@@ -114,21 +117,26 @@ export function TutorialPopover({ step, onNext, onSkip }: TutorialPopoverProps) 
         aria-describedby="tutorial-content"
       >
         {/* Botón para cerrar/saltar el tutorial completo */}
-        <button onClick={onSkip} className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-800 transition-colors">
-          <X size={20} />
-        </button>
+        {canSkip && (
+          <button onClick={onSkip} className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-800 transition-colors">
+            <X size={20} />
+          </button>
+        )}
 
         <h3 id="tutorial-title" className="text-lg font-bold mb-2 text-blue-800">{step.title}</h3>
         <p id="tutorial-content" className="text-sm text-gray-600 mb-4">{step.content}</p>
         
-        <div className="flex justify-end">
-          <button 
-            onClick={onNext}
-            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Siguiente
-          </button>
-        </div>
+        {!step.isBlocking && (
+          <div className="flex justify-end">
+            <button 
+              onClick={onNext}
+              className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              {/* Cambia el texto del botón si es el último paso */}
+              {isLastStep ? 'Terminar' : 'Siguiente'}
+            </button>
+          </div>
+        )}
       </motion.div>
     </div>
   );

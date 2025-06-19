@@ -10,6 +10,7 @@ interface TutorialContextType {
   isTutorialActive: boolean;
   activeTutorial: Tutorial | null;
   currentStep: TutorialStep | null;
+  currentStepIndex: number;
   startTutorial: (tutorialId: string) => void;
   nextStep: () => void;
   skipTutorial: () => void;
@@ -71,6 +72,7 @@ export function TutorialProvider({ children }: { children: React.ReactNode }) {
     currentStep: activeTutorial ? activeTutorial.steps[currentStepIndex] : null,
     startTutorial,
     nextStep,
+    currentStepIndex,
     skipTutorial
   };
 
