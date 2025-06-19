@@ -5,24 +5,30 @@ import { useState } from 'react';
 import { Send } from 'lucide-react';
 
 type ChatInputProps = {
+  inputValue: string;
+  setInputValue: (value: string) => void;
   onSendMessage: (text: string) => void;
   isAgentTyping: boolean;
 };
 
-export function ChatInput({ onSendMessage, isAgentTyping }: ChatInputProps) {
-  const [inputValue, setInputValue] = useState('');
+export function ChatInput({ 
+  inputValue,
+  setInputValue, 
+  onSendMessage, 
+  isAgentTyping 
+}: ChatInputProps){
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isAgentTyping) return;
     onSendMessage(inputValue);
-    setInputValue('');
   };
 
   return (
-    <div className="p-4 border-t border-gray-200 bg-white rounded-b-2xl">
+    <div id="chat-input" className="p-4 border-t border-gray-200 bg-white rounded-b-2xl">
       <form onSubmit={handleSubmit} className="flex items-center space-x-3">
         <input
+        id="chat-input-field"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

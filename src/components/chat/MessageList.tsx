@@ -89,7 +89,9 @@ export function MessageList({ messages, isAgentTyping }: { messages: Message[], 
               )}
               
               {msg.type === 'examples' && msg.sender === 'agent' && (
-                <InteractiveExampleCard data={msg.content} />
+          <div className="interactive-card-wrapper">
+          <InteractiveExampleCard data={msg.content} />
+        </div>
               )}
             </motion.div>
           </React.Fragment>

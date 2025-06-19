@@ -5,75 +5,68 @@ import React, { useState, useEffect, useRef } from 'react';
 import { MessageList, Message } from './MessageList';
 import { ChatInput } from './ChatInput';
 import { ChatHeader } from './ChatHeader';
+import { useTutorial } from '@/context/TutorialContext';
 
-// Mensajes de bienvenida, ahora con la estructura completa del tipo Message
-const initialMessages: Message[] = [
-  { 
-    id: 1, type: 'text', sender: 'agent', content: '¡Bienvenido a FluentBlocks AI! Soy su compañero virtual de inglés y juntos haremos cada lección práctica y divertida.', 
-    timestamp: new Date(Date.now() + 1000).toISOString() // Timestamps ligeramente diferentes
-  },
-  { 
-    id: 2, type: 'text', sender: 'agent', content: '¿Tiene un objetivo en mente? Por ejemplo, “pedir un café en Nueva York” o “presentarse en una entrevista de trabajo”. ¡Yo le ayudo a conseguirlo!', 
-    timestamp: new Date(Date.now() + 2000).toISOString()
-  },
-  { 
-    id: 3, type: 'text', sender: 'agent', content: 'Usted decide el ritmo y el tema: desde vocabulario básico hasta expresiones coloquiales reales de la calle.', 
-    timestamp: new Date(Date.now() + 3000).toISOString()
-  },
-  { 
-    id: 4, type: 'text', sender: 'agent', content: 'Por ejemplo, podemos explorar la diferencia entre “there” y “here”, o ver cómo usar “in”, “at” y “on” sin confusiones.', 
-    timestamp: new Date(Date.now() + 4000).toISOString()
-  },
-  { 
-    id: 5, type: 'text', sender: 'agent', content: 'Cuando esté listo, simplemente pregunte o elija un tema, y empezaré con ejemplos interactivos que usted podrá practicar al instante.', 
-    timestamp: new Date(Date.now() + 5000).toISOString()
-  },
-];
 
 
 
 export default function ChatMockup() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isAgentTyping, setIsAgentTyping] = useState(false);
+  const [inputValue, setInputValue] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const effectRan = useRef(false);
 
- // --- CAMBIO CLAVE: useEffect para mensajes de bienvenida secuenciales ---
- useEffect(() => {
-  // Si el efecto ya se ejecutó, no hacer nada.
-  // En modo estricto, effectRan.current será `true` en el segundo montaje.
-  if (effectRan.current === true) {
-    return;
-  }
-
-  const introduceAgent = async () => {
-    // No necesitamos la comprobación de `messages.length` gracias al cerrojo
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    for (let i = 0; i < initialMessages.length; i++) {
-      setIsAgentTyping(true);
-      await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 500));
-      
-      setIsAgentTyping(false);
-      setMessages(prev => [...prev, initialMessages[i]]);
-
-      // No esperamos después del último mensaje
-      if (i < initialMessages.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+  const { isLoading, isTutorialActive, currentStep, nextStep } = useTutorial();
+  // --- LÓGICA DE INICIO: TUTORIAL O SALUDO NORMAL ---
+  useEffect(() => {
+    if (isLoading) {
+      return;
     }
-  };
+    const isChatEmpty = messages.length === 0;
 
-  introduceAgent();
+    
+    // Si NO hay tutorial activo y el chat está vacío, es un usuario recurrente.
+    if (!isTutorialActive && isChatEmpty) {
+      const fetchGreeting = async () => {
+        setIsAgentTyping(true);
+      
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const greetingMessage: Message = {
+          id: Date.now(),
+          type: 'text',
+          sender: 'agent',
+          content: '¡De vuelta a la acción! ¿Qué quieres aprender hoy?',
+          timestamp: new Date().toISOString()
+        };
+        setMessages([greetingMessage]);
+        setIsAgentTyping(false);
+      };
 
-  // --- CAMBIO CLAVE 2: Marcar que el efecto se ha ejecutado ---
-  // La función de limpieza se ejecuta en el desmontaje.
-  // Aquí es donde activamos el "cerrojo" para el siguiente montaje.
-  return () => {
-    effectRan.current = true;
-  };
-}, []); 
+      fetchGreeting();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, isTutorialActive, messages.length]);
+
+    // --- MANEJO DE PASOS DEL TUTORIAL ---
+    useEffect(() => {
+      if (!isTutorialActive || !currentStep) return;
+      if (currentStep.action?.type === 'PREFILL_INPUT') {
+        setInputValue(currentStep.action.payload.text); 
+      }
+    }, [isTutorialActive, currentStep]);
+
+    // Mantiene el scroll al final de la conversación
+  useEffect(() => {
+    setTimeout(() => {
+      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+  }, [messages, isAgentTyping]);
+
+
+
+
   // Mantiene el scroll al final de la conversación
   useEffect(() => {
     setTimeout(() => {
@@ -85,6 +78,10 @@ export default function ChatMockup() {
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isAgentTyping) return;
 
+    // 2. Si el tutorial está activo, avanza al siguiente paso
+    if (isTutorialActive) {
+      nextStep();
+    }
     // 1. Añade el mensaje del usuario con su timestamp
     const userMessage: Message = { 
       id: Date.now(), 
@@ -128,6 +125,9 @@ export default function ChatMockup() {
       };
       
       setMessages(prev => [...prev, agentResponse]);
+      if (isTutorialActive && currentStep?.action?.type === 'WAIT_FOR_AI_RESPONSE') {
+        nextStep();
+      }
 
     } catch (error) {
       console.error('Error al contactar la API de chat:', error);
@@ -142,6 +142,7 @@ export default function ChatMockup() {
     } finally {
       setIsAgentTyping(false);
     }
+    setInputValue('');
   };
 
   return (
@@ -153,7 +154,12 @@ export default function ChatMockup() {
     <ChatHeader />
     <MessageList messages={messages} isAgentTyping={isAgentTyping} />
     <div ref={chatEndRef} /> 
-    <ChatInput onSendMessage={handleSendMessage} isAgentTyping={isAgentTyping} />
+    <ChatInput 
+        inputValue={inputValue} 
+        setInputValue={setInputValue} 
+        onSendMessage={handleSendMessage} 
+        isAgentTyping={isAgentTyping}
+      />
 </div>
   );
 }
