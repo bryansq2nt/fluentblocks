@@ -17,7 +17,7 @@ export default function ChatMockup() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
 
-  const { isLoading, isTutorialActive, currentStep, nextStep } = useTutorial();
+  const { isLoading, isTutorialActive, currentStep, nextStep,skipTutorial  } = useTutorial();
   
   // --- NUEVO useEffect PARA DETECTAR LA RESPUESTA DE LA IA ---
   // Este es el cambio clave.
@@ -67,7 +67,6 @@ export default function ChatMockup() {
 
       fetchGreeting();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isTutorialActive, messages.length]);
 
     // --- MANEJO DE PASOS DEL TUTORIAL ---
@@ -113,7 +112,7 @@ export default function ChatMockup() {
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setIsAgentTyping(true);
-
+    setInputValue('');
     try {
       // 2. Llama a la API con el historial
       const response = await fetch('/api/chat', {
@@ -157,9 +156,12 @@ export default function ChatMockup() {
         timestamp: new Date().toISOString()
       };
       setMessages(prev => [...prev, errorResponse]);
+      if (isTutorialActive) {
+        skipTutorial();
+      }
     } finally {
       setIsAgentTyping(false);
-      setInputValue('');
+      
     }
     
   };

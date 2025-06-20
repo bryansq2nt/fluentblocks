@@ -74,7 +74,7 @@ export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) 
       
       <div className="space-y-3">
         {/* Oración Interactiva con Bloques */}
-        <div className="flex flex-wrap gap-x-1 items-center justify-center p-3 bg-white/60 rounded-lg min-h-[60px]">
+        <div id="interactive-blocks" className="flex flex-wrap gap-x-1 items-center justify-center p-3 bg-white/60 rounded-lg min-h-[60px]">
           {currentExample.blocks.map((block, i) => (
             <InteractiveBlock 
               key={i} 
@@ -85,7 +85,7 @@ export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) 
         </div>
 
         {/* Reproductor y Traducción Completa */}
-        <div className="flex items-center justify-between gap-4 p-2">
+        <div  className="flex items-center justify-between gap-4 p-2">
           <p className="text-base text-gray-700 italic text-left">&quot;{currentExample.spanish_translation}&quot;</p>
           <AudioPlayer sentence={fullSentence} />
         </div>
@@ -109,14 +109,14 @@ export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) 
             </button>
         </div>
       </div>
-       <div className="flex items-start gap-3 mt-2 pt-3 border-t border-blue-200/50">
+       {/* <div className="flex items-start gap-3 mt-2 pt-3 border-t border-blue-200/50">
         <div className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1 font-bold">?</div>
         <p className="text-gray-700 font-medium text-sm">{data.challenge}</p>
-      </div>
+      </div> */}
 
       {/* --- BOTÓN DE PRÁCTICA CORREGIDO --- */}
       {/* El Link ahora solo envuelve al botón sin añadirle estilos de layout */}
-      <div className="mt-4">
+      <div id="practice-button" className="mt-4">
         <Link href={`/exercises/generated-exercise?lesson=${lessonDataString}`} passHref legacyBehavior>
           <motion.a
             whileHover={{ scale: 1.02 }}

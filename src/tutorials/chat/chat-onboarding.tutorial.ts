@@ -39,12 +39,37 @@ export const chatOnboardingTutorial: Tutorial = {
       isSkippable: false,
       action: { type: 'WAIT_FOR_AI_RESPONSE' }
     },
-    {
+     // --- NUEVOS PASOS AQUÍ ---
+     {
       type: 'highlight',
-      targetElement: '.interactive-card-wrapper',
+      targetElement: '.interactive-card-wrapper', // Apunta a toda la tarjeta primero
       title: '¡Lección Lista!',
-      content: '¡Tarán! No es solo texto, es una lección interactiva. Explórala y luego dale a "Terminar" para empezar a practicar por tu cuenta.',
-      // Este último paso SÍ tiene botón
+      content: '¡Tarán! Esto no es solo texto, es una lección interactiva. Déjame mostrarte las partes clave.'
+    },
+    {
+      type: 'popover',
+      targetElement: '#interactive-blocks', // Apunta a los bloques
+      title: 'Bloques Inteligentes',
+      content: 'Pasa el cursor (o toca en el móvil) sobre cada bloque de color para ver su traducción y función. ¡Así entiendes el porqué de la oración!'
+    },
+    {
+      type: 'popover',
+      targetElement: '#audio-player-section', // Apunta a la sección del audio
+      title: 'Escucha y Repite',
+      content: 'Usa el botón de audio para escuchar la pronunciación correcta. ¡La práctica auditiva es fundamental!'
+    },
+    {
+      type: 'popover',
+      targetElement: '#audio-player-section-slow', // Apunta a la sección del audio
+      title: 'Mas Lento ?',
+      content: 'Este otro botón te ayudara a escuchar la oración mas lento, para que puedas entender mejor la pronunciación.'
+    },
+    {
+      type: 'popover',
+      targetElement: '#practice-button', // Apunta al botón de práctica
+      title: '¡Ahora te Toca a Ti!',
+      content: 'Cuando te sientas listo, presiona aquí para hacer ejercicios y poner a prueba lo que aprendiste. ¡Sin miedo!',
+      // Este es el último paso, el botón dirá "Terminar"
     }
   ]
 };

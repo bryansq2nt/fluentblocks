@@ -80,6 +80,7 @@ export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentenc
   return (
     <div className="flex items-center gap-2">
       {/* Botón de Reproducir Normal */}
+      <div id="audio-player-section">
       <motion.button 
         onClick={handleNormalPlay} 
         className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors disabled:opacity-50"
@@ -96,8 +97,10 @@ export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentenc
           <Volume2 size={24} />
         )}
       </motion.button>
-      
+      </div>
       {/* Botón de Reproducir Lento */}
+      <div id="audio-player-section-slow">
+
       <motion.button
         onClick={handleSlowPlay}
         disabled={status === 'loading'}
@@ -111,6 +114,7 @@ export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentenc
           {slowSpeeds[slowSpeedIndex]}x
         </span>
       </motion.button>
+      </div>
     </div>
   );
 });
