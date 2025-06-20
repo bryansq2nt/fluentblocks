@@ -3,53 +3,63 @@ import OpenAI from 'openai';
 import { exerciseGeneratorSystemPrompt } from './prompts';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-const functionSchema = [
-  {
-    name: "generateInteractiveExample",
-    description: "Genera una lección interactiva para un patrón de inglés.",
-    parameters: {
-      type: "object",
-      properties: {
-        pattern: {
-          type: "string",
-          description: "El nombre del patrón explicado. Ej: 'Uso de `would` para peticiones'."
-        },
-        examples: {
-          type: "array",
-          description: "Una lista de 2 a 3 ejemplos claros y distintos.",
-          items: {
-            type: "object",
-            properties: {
-              blocks: {
-                type: "array",
-                description: "La frase en inglés, desglosada en bloques lógicos.",
-                items: {
-                  type: "object",
-                  properties: {
-                    text: { type: "string", description: "El bloque de texto en inglés." },
-                    es: { type: "string", description: "La traducción al español de ESE bloque." },
-                    type: { type: "string", description: "Tipo de bloque: 'subject', 'modal', 'verb', 'extra', etc." }
-                  },
-                  required: ["text", "es", "type"]
+
+const singleLessonSchema = {
+  name: "generateSingleExampleLesson", // Coincide con el nombre en tu prompt
+  description: "Genera una mini-lección de inglés basada en un solo ejemplo práctico.",
+  parameters: {
+    type: "object",
+    properties: {
+      // 1. EL PATRÓN (pattern)
+      pattern: {
+        type: "string",
+        description: "El título de la lección, de 6-10 palabras, posiblemente con HTML."
+      },
+      // 2. EL EJEMPLO (example)
+      example: {
+        type: "object",
+        description: "El único ejemplo de la lección, desglosado.",
+        properties: {
+          // 3. EL DESGLOSE (blocks)
+          blocks: {
+            type: "array",
+            description: "La oración en inglés, dividida en 2-4 bloques lógicos.",
+            items: {
+              type: "object",
+              properties: {
+                text: { type: "string", description: "El bloque de texto en inglés." },
+                es: { type: "string", description: "La traducción al español de este bloque específico." },
+                type: { 
+                  type: "string", 
+                  description: "Tipo de bloque: subject, verb, modal, expression, preposition, object, context." 
                 }
               },
-              // La traducción completa de la IDEA, no literal.
-              spanish_translation: { type: "string", description: "La traducción natural y completa de la oración al español." },
-              note: { type: "string", description: "Una nota corta sobre el contexto." }
-            },
-            // 'spanish' se renombra a 'spanish_translation' para más claridad
-            required: ["blocks", "spanish_translation", "note"]
-          }
+              required: ["text", "es", "type"]
+            }
+          },
+          // 4. TRADUCCIÓN COMPLETA (spanish_translation)
+          spanish_translation: { 
+            type: "string", 
+            description: "La traducción natural de la idea completa al español." 
+          },
         },
-        challenge: {
-          type: "string",
-          description: "Una pregunta final abierta para invitar a la práctica."
-        }
+        required: ["blocks", "spanish_translation"]
       },
-      required: ["pattern", "examples", "challenge"]
-    }
+      // NOTA y CHALLENGE, que aunque no los pedimos explícitamente en el último prompt,
+      // son parte de la estructura de datos que nuestro componente espera. Los añadiremos al prompt.
+      note: { 
+        type: "string", 
+        description: "Una nota o 'tip' muy corto y útil (máx 15 palabras)." 
+      },
+      challenge: {
+        type: "string",
+        description: "Una pregunta o reto final para que el usuario practique."
+      }
+    },
+    // Todos los campos que nuestro componente necesita son requeridos.
+    required: ["pattern", "example", "note", "challenge"]
   }
-];
+};
 
 export async function performConsultation(params: {
   systemPrompt: string;
@@ -63,10 +73,10 @@ export async function performConsultation(params: {
         { role: "system", content: systemPrompt },
         ...userContext
       ],
-      functions: functionSchema,
-      function_call: { name: "generateInteractiveExample" },
+      functions: [singleLessonSchema],
+      function_call: { name: "generateSingleExampleLesson" },
       temperature: 0.6,
-      max_tokens: 800 
+      max_tokens: 600 
     });
 
     const functionCall = response.choices[0].message.function_call;

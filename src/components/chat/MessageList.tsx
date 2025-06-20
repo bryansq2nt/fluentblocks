@@ -90,7 +90,12 @@ export function MessageList({ messages, isAgentTyping }: { messages: Message[], 
               
               {msg.type === 'examples' && msg.sender === 'agent' && (
           <div className="interactive-card-wrapper">
-          <InteractiveExampleCard data={msg.content} />
+          <InteractiveExampleCard data={{
+            pattern: msg.content.pattern,
+            example: msg.content.examples[0], 
+            note: msg.content.examples[0]?.note || '',
+            challenge: msg.content.challenge
+          }} />
         </div>
               )}
             </motion.div>
