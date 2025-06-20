@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageList, Message } from './MessageList';
 import { ChatInput } from './ChatInput';
-import { ChatHeader } from './ChatHeader';
 import { useTutorial } from '@/context/TutorialContext';
 
 
@@ -172,7 +171,7 @@ export default function ChatMockup() {
         w-full h-full bg-white flex flex-col md:max-w-3xl md:h-[85vh] md:rounded-2xl md:shadow-2xl md:border md:border-gray-200/50
     "
 >
-    <ChatHeader />
+    {/* <ChatHeader /> */}
     <MessageList messages={messages} isAgentTyping={isAgentTyping} />
     <div ref={chatEndRef} /> 
     <ChatInput 

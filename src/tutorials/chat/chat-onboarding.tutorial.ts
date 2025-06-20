@@ -9,7 +9,7 @@ export const chatOnboardingTutorial: Tutorial = {
     // Pasos 1 y 2 no cambian
     {
       type: 'popover',
-      targetElement: '#chat-header',
+      targetElement: '#main-header',
       title: '¡Bienvenid@ a tu Zona de Práctica!',
       content: 'Soy FluentBlocks AI, tu compañero para dominar el inglés real. ¡Vamos a ver cómo funciona esto!'
     },

@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { BookOpen, ChevronLeft, ChevronRight, GraduationCap } from 'lucide-react';
+import { BookOpen, GraduationCap } from 'lucide-react';
 import { AudioPlayer } from '../game/AudioPlayer';
 
 // --- Tipos y Constantes (sin cambios) ---
@@ -54,13 +54,10 @@ function InteractiveBlock({ block, color }: { block: Block; color: string }) {
 
 // --- Componente Principal de la Tarjeta Interactiva ---
 export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const currentExample = data.examples[currentIndex];
+  const currentExample = data.examples[0];
   const fullSentence = currentExample.blocks.map(b => b.text).join(' ');
 
-  const goToNext = () => setCurrentIndex((i) => (i + 1) % data.examples.length);
-  const goToPrev = () => setCurrentIndex((i) => (i - 1 + data.examples.length) % data.examples.length);
-  
+
   // Prepara los datos para pasarlos en la URL
   const lessonDataString = encodeURIComponent(JSON.stringify(data));
 
@@ -89,14 +86,14 @@ export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) 
           <p className="text-base text-gray-700 italic text-left">&quot;{currentExample.spanish_translation}&quot;</p>
           <AudioPlayer sentence={fullSentence} />
         </div>
-        
+{/*         
         <p className="text-xs text-center text-blue-800/80 bg-blue-100/70 p-2 rounded-md">
           <strong>💡 Nota del Profe:</strong> {currentExample.note}
-        </p>
+        </p> */}
       </div>
 
       {/* Navegación y Reto */}
-      <div className="pt-3 border-t border-blue-200/60">
+      {/* <div className="pt-3 border-t border-blue-200/60">
         <div className="flex items-center justify-between">
             <button onClick={goToPrev} className="p-2 rounded-full hover:bg-black/10 transition-colors">
             <ChevronLeft className="w-5 h-5 text-gray-600" />
@@ -108,7 +105,7 @@ export function InteractiveExampleCard({ data }: { data: InteractiveCardData }) 
             <ChevronRight className="w-5 h-5 text-gray-600" />
             </button>
         </div>
-      </div>
+      </div> */}
        {/* <div className="flex items-start gap-3 mt-2 pt-3 border-t border-blue-200/50">
         <div className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1 font-bold">?</div>
         <p className="text-gray-700 font-medium text-sm">{data.challenge}</p>
