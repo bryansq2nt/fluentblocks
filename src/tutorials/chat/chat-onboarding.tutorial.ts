@@ -6,70 +6,66 @@ export const chatOnboardingTutorial: Tutorial = {
   path: '/chat',
   localStorageKey: 'tutorial_chatOnboardingCompleted',
   steps: [
-    // Pasos 1 y 2 no cambian
     {
       type: 'popover',
       targetElement: '#main-header',
-      title: '¡Bienvenid@ a tu Zona de Práctica!',
-      content: 'Soy FluentBlocks AI, tu compañero para dominar el inglés real. ¡Vamos a ver cómo funciona esto!'
+      title: '¡Hola! Esto será fácil',
+      content: 'Aquí aprenderás inglés real, sin vueltas ni reglas confusas. Solo escribe lo que necesitas y yo lo convierto en una lección.'
     },
     {
       type: 'popover',
       targetElement: '#chat-input',
-      title: 'Tu Cerebro de Mando',
-      content: 'Aquí es donde me pides lo que sea. Desde "cómo usar \'gonna\'" hasta "ayuda para mi entrevista de trabajo".'
+      title: 'Tu Zona de Comando',
+      content: 'Escríbeme cualquier duda. Desde “cómo pedir un café” hasta “cómo hablar con un jefe en inglés”.'
     },
-    // --- CAMBIOS AQUÍ ---
     {
       type: 'action',
-      targetElement: '#chat-input', // Apuntamos al input para posicionar el popover
-      title: '¡Tu Primera Misión!',
-      content: 'Para que veas la magia, voy a escribir una pregunta por ti. Solo tienes que presionar "Enviar" cuando aparezca.',
-      isBlocking: true, // <--- Este paso bloquea el botón "Siguiente"
-      action: { 
-        type: 'PREFILL_INPUT', 
+      targetElement: '#chat-input',
+      title: '¿Te muestro cómo funciona?',
+      content: 'Voy a escribir una pregunta por ti. Solo tienes que presionar "Enviar". Así de simple.',
+      isBlocking: true,
+      action: {
+        type: 'PREFILL_INPUT',
         payload: { text: 'cómo se usa "can" y "could" para pedir algo' }
       }
     },
     {
       type: 'action',
-      title: 'Procesando tu Lección...',
-      content: '¡Genial! Ahora estoy creando una lección interactiva solo para ti. Dame un segundo...',
+      title: 'Creando tu lección...',
+      content: 'Estoy preparando una mini clase solo para ti. Un segundo...',
       isBlocking: true,
       isSkippable: false,
       action: { type: 'WAIT_FOR_AI_RESPONSE' }
     },
-     // --- NUEVOS PASOS AQUÍ ---
-     {
+    {
       type: 'highlight',
-      targetElement: '.interactive-card-wrapper', // Apunta a toda la tarjeta primero
-      title: '¡Lección Lista!',
-      content: '¡Tarán! Esto no es solo texto, es una lección interactiva. Déjame mostrarte las partes clave.'
+      targetElement: '.interactive-card-wrapper',
+      title: '¡Tu clase está lista!',
+      content: 'Esto no es solo texto. Es una lección interactiva que puedes explorar. Te enseño cómo usarla.'
     },
     {
       type: 'popover',
-      targetElement: '#interactive-blocks', // Apunta a los bloques
-      title: 'Bloques Inteligentes',
-      content: 'Pasa el cursor (o toca en el móvil) sobre cada bloque de color para ver su traducción y función. ¡Así entiendes el porqué de la oración!'
+      targetElement: '#interactive-blocks',
+      title: 'Bloques que enseñan',
+      content: 'Cada color tiene una función. Tócalos o pasa el cursor para ver su significado. Así entiendes de verdad.'
     },
     {
       type: 'popover',
-      targetElement: '#audio-player-section', // Apunta a la sección del audio
-      title: 'Escucha y Repite',
-      content: 'Usa el botón de audio para escuchar la pronunciación correcta. ¡La práctica auditiva es fundamental!'
+      targetElement: '#audio-player-section',
+      title: 'Escucha cómo suena',
+      content: 'Presiona el botón de audio para escuchar la frase en inglés. Esto entrena tu oído.'
     },
     {
       type: 'popover',
-      targetElement: '#audio-player-section-slow', // Apunta a la sección del audio
-      title: 'Mas Lento ?',
-      content: 'Este otro botón te ayudara a escuchar la oración mas lento, para que puedas entender mejor la pronunciación.'
+      targetElement: '#audio-player-section-slow',
+      title: '¿Muy rápido?',
+      content: 'Usa este botón para escuchar la frase más lento. Perfecto para entender cada palabra.'
     },
     {
       type: 'popover',
-      targetElement: '#practice-button', // Apunta al botón de práctica
-      title: '¡Ahora te Toca a Ti!',
-      content: 'Cuando te sientas listo, presiona aquí para hacer ejercicios y poner a prueba lo que aprendiste. ¡Sin miedo!',
-      // Este es el último paso, el botón dirá "Terminar"
+      targetElement: '#practice-button',
+      title: 'Ahora tú',
+      content: 'Haz clic aquí para practicar lo que viste. Sin miedo a equivocarte. Así es como se aprende.',
     }
   ]
 };

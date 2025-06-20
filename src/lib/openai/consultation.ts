@@ -3,7 +3,6 @@ import OpenAI from 'openai';
 import { exerciseGeneratorSystemPrompt } from './prompts';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// --- SCHEMA ACTUALIZADO: LOS BLOQUES AHORA TIENEN SU PROPIA TRADUCCIÓN ---
 const functionSchema = [
   {
     name: "generateInteractiveExample",
@@ -67,7 +66,7 @@ export async function performConsultation(params: {
       functions: functionSchema,
       function_call: { name: "generateInteractiveExample" },
       temperature: 0.6,
-      max_tokens: 800 // Aumentamos un poco por la data extra
+      max_tokens: 800 
     });
 
     const functionCall = response.choices[0].message.function_call;
@@ -81,10 +80,8 @@ export async function performConsultation(params: {
   }
 }
 
-// --- NUEVA FUNCIÓN PARA GENERAR EJERCICIOS ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function generateExerciseFromLesson(lessonData: any) {
-    // Define el schema JSON que queremos que la IA genere
     const exerciseFunctionSchema = {
       name: "createInteractiveExercise",
       description: "Crea el contenido para una lección y ejercicio interactivo.",
@@ -129,7 +126,6 @@ export async function generateExerciseFromLesson(lessonData: any) {
         model: "gpt-4o-mini",
         messages: [
           { role: "system", content: exerciseGeneratorSystemPrompt },
-          // Le damos a la IA la lección del chat como contexto principal
           { role: "user", content: `Aquí está la lección que el usuario quiere practicar. Por favor, crea un ejercicio basado en ella: ${JSON.stringify(lessonData)}` }
         ],
         functions: [exerciseFunctionSchema],
