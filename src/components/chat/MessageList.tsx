@@ -8,6 +8,19 @@ import { ChatBubble } from './ChatBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { InteractiveExampleCard } from './InteractiveExampleCard';
 
+// --- TIPOS DE DATOS DE LA LECCIÓN (para claridad) ---
+type Block = { text: string; es: string; type: string };
+type ExampleData = {
+  blocks: Block[];
+  spanish_translation: string;
+};
+type LessonData = {
+  pattern: string;
+  example: ExampleData;
+  note: string;
+  challenge: string;
+};
+
 // --- TIPO DE MENSAJE ACTUALIZADO ---
 export type Message = {
   id: number;
@@ -19,15 +32,8 @@ export type Message = {
     content: string;
   } | {
     type: 'examples';
-    content: {
-      pattern: string;
-      examples: {
-        blocks: { text: string; es: string; type: string }[];
-        spanish_translation: string;
-        note: string;
-      }[];
-      challenge: string;
-    };
+    // El 'content' ahora es directamente el objeto LessonData
+    content: LessonData;
   }
 );
 
@@ -89,14 +95,10 @@ export function MessageList({ messages, isAgentTyping }: { messages: Message[], 
               )}
               
               {msg.type === 'examples' && msg.sender === 'agent' && (
-          <div className="interactive-card-wrapper">
-          <InteractiveExampleCard data={{
-            pattern: msg.content.pattern,
-            example: msg.content.examples[0], 
-            note: msg.content.examples[0]?.note || '',
-            challenge: msg.content.challenge
-          }} />
-        </div>
+                <div className="interactive-card-wrapper">
+                  
+                  <InteractiveExampleCard data={msg.content} />
+                </div>
               )}
             </motion.div>
           </React.Fragment>
