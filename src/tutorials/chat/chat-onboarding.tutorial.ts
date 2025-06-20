@@ -26,7 +26,7 @@ export const chatOnboardingTutorial: Tutorial = {
       isBlocking: true,
       action: {
         type: 'PREFILL_INPUT',
-        payload: { text: 'cómo se usa "can" y "could" para pedir algo' }
+        payload: { text: 'cómo puedo decir que me gusta la naturaleza ?' }
       }
     },
     {
