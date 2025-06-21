@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { BookOpen, GraduationCap, Lightbulb } from 'lucide-react';
 import { AudioPlayer } from '../game/AudioPlayer';
+import { useTutorial } from '../../context/TutorialContext';
 
 // --- TIPOS DE DATOS (Basados en nuestro nuevo prompt) ---
 type Block = { text: string; es: string; type: string };
@@ -20,6 +21,7 @@ type LessonData = {
   challenge: string;
 };
 
+
 const blockColors: { [key: string]: string } = {
   subject: 'text-blue-700',
   modal: 'text-emerald-600',
@@ -32,8 +34,11 @@ const blockColors: { [key: string]: string } = {
 
 // --- SUB-COMPONENTE: Título ---
 function LessonTitle({ htmlPattern }: { htmlPattern: string }) {
+
+
+
   return (
-    <div className="flex items-center gap-3">
+    <div id="interactive-card-lesson-title" className="flex items-center gap-3">
       <span className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
         <BookOpen className="w-5 h-5 text-blue-600" />
       </span>
@@ -53,7 +58,7 @@ function LessonTitle({ htmlPattern }: { htmlPattern: string }) {
 // --- SUB-COMPONENTE: El "Aha!" Moment ---
 function BlockyTip({ note }: { note: string }) {
   return (
-    <div className="bg-yellow-100/60 border-l-4 border-yellow-400 p-3 rounded-r-lg">
+    <div id="interactive-card-blocky-tip" className="bg-yellow-100/60 border-l-4 border-yellow-400 p-3 rounded-r-lg">
       <div className="flex items-start gap-3">
         <Lightbulb className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
         <div>
@@ -105,6 +110,12 @@ function ExampleSentence({ example }: { example: ExampleData }) {
 
 // --- SUB-COMPONENTE: El Reto y Botón de Práctica ---
 function PracticeChallenge({ challenge, lessonDataString }: { challenge: string; lessonDataString: string; }) {
+  const { skipTutorial } = useTutorial();
+
+  const handlePracticeClick = () => {
+    skipTutorial(); // Cerrar el tutorial cuando el usuario hace clic en practicar
+  };
+
   return (
     <div id="practice-button" className="mt-4 pt-4 border-t border-gray-200/80 space-y-4">
       <div className="text-center">
@@ -114,6 +125,7 @@ function PracticeChallenge({ challenge, lessonDataString }: { challenge: string;
       <Link href={`/exercises/generated-exercise?lesson=${lessonDataString}`} passHref legacyBehavior>
         <motion.a
           whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
+          onClick={handlePracticeClick}
           className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
         >
           <GraduationCap className="w-5 h-5" />

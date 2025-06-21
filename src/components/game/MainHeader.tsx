@@ -63,7 +63,7 @@ export default function MainHeader({ headerActions }: MainHeaderProps) {
 
             {/* Botón de Menú Móvil */}
             <div className="md:hidden">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
+              <button id="main-menu-button" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
                 <AnimatePresence initial={false} mode="wait">
                   <motion.div
                     key={isMobileMenuOpen ? 'x' : 'menu'}

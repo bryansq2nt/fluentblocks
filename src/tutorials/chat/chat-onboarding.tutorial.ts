@@ -8,14 +8,29 @@ export const chatOnboardingTutorial: Tutorial = {
   steps: [
     {
       type: 'popover',
-      targetElement: '#main-header',
-      title: '¡Hola! Esto será fácil',
+      title: '¡Bienvenido a Fluent Blocks!',
+      isSkippable: false,
       content: 'Aquí aprenderás inglés real, sin vueltas ni reglas confusas. Solo escribe lo que necesitas y yo lo convierto en una lección.'
     },
     {
       type: 'popover',
+      title: 'Explicacion Rapida',
+      isSkippable: false,
+      targetElement: '#main-menu-button',
+      content: 'Este es el menu principal. Aqui puedes regresar a la pagina de inicio o navegar en la plataforma'
+    },
+    {
+      type: 'popover',
+      title: 'Explicacion Rapida',
+      isSkippable: false,
+      targetElement: '#main-menu-button',
+      content: 'Este es el menu principal. Aqui puedes regresar a la pagina de inicio o navegar en la plataforma'
+    },
+    {
+      type: 'popover',
       targetElement: '#chat-input',
-      title: 'Tu Zona de Comando',
+      title: 'Aqui sucede la magia!',
+      isSkippable: false,
       content: 'Escríbeme cualquier duda. Desde “cómo pedir un café” hasta “cómo hablar con un jefe en inglés”.'
     },
     {
@@ -24,9 +39,10 @@ export const chatOnboardingTutorial: Tutorial = {
       title: '¿Te muestro cómo funciona?',
       content: 'Voy a escribir una pregunta por ti. Solo tienes que presionar "Enviar". Así de simple.',
       isBlocking: true,
+      isSkippable: false,
       action: {
         type: 'PREFILL_INPUT',
-        payload: { text: 'cómo puedo decir que me gusta la naturaleza ?' }
+        payload: { text: 'cómo puedo decir que estoy aprendiendo ingles?' }
       }
     },
     {
@@ -39,33 +55,50 @@ export const chatOnboardingTutorial: Tutorial = {
     },
     {
       type: 'highlight',
-      targetElement: '.interactive-card-wrapper',
       title: '¡Tu clase está lista!',
+      isSkippable: false,
       content: 'Esto no es solo texto. Es una lección interactiva que puedes explorar. Te enseño cómo usarla.'
+    },
+    {
+      type: 'popover',
+      title: 'Titulo de tu leccion',
+      isSkippable: false,
+      targetElement: '#interactive-card-lesson-title',
+      content: 'Aqui puedes ver el titulo de la leccion y el contenido de la leccion'
+    },
+    {
+      type: 'popover',
+      title: 'Explicacion rapida',
+      isSkippable: false,
+      targetElement: '#interactive-card-blocky-tip',
+      content: 'Esta es una explicacion rapida de la leccion'
     },
     {
       type: 'popover',
       targetElement: '#interactive-blocks',
       title: 'Bloques que enseñan',
-      content: 'Cada color tiene una función. Tócalos o pasa el cursor para ver su significado. Así entiendes de verdad.'
+      isSkippable: false,
+      content: 'Cada color tiene una función. Tócalos para ver su significado. Así entiendes de verdad.'
     },
     {
       type: 'popover',
-      targetElement: '#audio-player-section',
+      targetElement: '#audio-player-section-normal',
+      isSkippable: false,
       title: 'Escucha cómo suena',
       content: 'Presiona el botón de audio para escuchar la frase en inglés. Esto entrena tu oído.'
     },
     {
       type: 'popover',
       targetElement: '#audio-player-section-slow',
+      isSkippable: false,
       title: '¿Muy rápido?',
       content: 'Usa este botón para escuchar la frase más lento. Perfecto para entender cada palabra.'
     },
     {
       type: 'popover',
-      targetElement: '#practice-button',
+      isSkippable: false,
       title: 'Ahora tú',
-      content: 'Haz clic aquí para practicar lo que viste. Sin miedo a equivocarte. Así es como se aprende.',
+      content: 'Haz clic en el boton de practicar. Sin miedo a equivocarte. Así es como se aprende.',
     }
   ]
 };

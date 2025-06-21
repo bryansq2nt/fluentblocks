@@ -84,6 +84,15 @@ export default function ChatMockup() {
     }, 100);
   }, [messages, isAgentTyping]);
 
+  // Limpiar la conversación cuando se activa el tutorial
+  useEffect(() => {
+    if (isTutorialActive) {
+      setMessages([]);
+      setInputValue('');
+      setIsAgentTyping(false);
+    }
+  }, [isTutorialActive]);
+
   const handleSendMessage = async (text: string) => {
     if (!text.trim() || isAgentTyping) return;
 
