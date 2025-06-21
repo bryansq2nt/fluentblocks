@@ -7,8 +7,7 @@ import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 
-// --- COMPONENTE INTERNO: MenuCard ---
-// Se mantiene dentro del mismo archivo para simplicidad, pero podría ser externo.
+// --- COMPONENTE INTERNO: MenuCard (MODIFICADO PARA SER RESPONSIVE) ---
 const MenuCard = ({ 
   icon: Icon, 
   title, 
@@ -29,7 +28,6 @@ const MenuCard = ({
     green: 'from-green-500 to-green-600',
     orange: 'from-orange-500 to-orange-600',
     purple: 'from-purple-500 to-purple-600',
-    // Nuevo degradado especial para el botón de IA
     special: 'from-blue-600 to-green-500', 
     locked: 'from-gray-400 to-gray-500'
   };
@@ -38,27 +36,35 @@ const MenuCard = ({
     <motion.div
       whileHover={!isLocked ? { scale: 1.02, y: -5 } : {}}
       whileTap={!isLocked ? { scale: 0.98 } : {}}
+      // --- CAMBIOS CLAVE AQUÍ ---
       className={`
-        relative p-6 sm:p-8 rounded-2xl bg-gradient-to-br ${isLocked ? colorClasses.locked : colorClasses[color]}
+        relative p-4 sm:p-6 rounded-2xl bg-gradient-to-br ${isLocked ? colorClasses.locked : colorClasses[color]}
         text-white shadow-lg hover:shadow-2xl transition-all duration-300
-        overflow-hidden h-full flex flex-col justify-between
+        overflow-hidden h-full flex 
+        flex-row items-center gap-4  // <-- NUEVO: Layout horizontal por defecto (móvil)
+        sm:flex-col sm:items-start sm:justify-between // <-- NUEVO: Vuelve a ser vertical en pantallas 'sm' y superiores
         ${isLocked ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}
       `}
     >
-      <div className="relative z-10">
-        <div className="flex items-start justify-between">
-          <div>
-            <Icon className="w-10 h-10 mb-4" />
-            <h3 className="text-xl sm:text-2xl font-bold mb-2">{title}</h3>
-            <p className="text-white/80 text-sm sm:text-base">{subtitle}</p>
-          </div>
-          {isLocked && (
-            <div className="bg-white/20 p-2 rounded-full">
-              <Lock className="w-5 h-5 text-white" />
-            </div>
-          )}
-        </div>
+      {/* Contenedor del ícono */}
+      <div className="flex-shrink-0">
+        {/* CAMBIO: Ícono más pequeño en móvil */}
+        <Icon className="w-8 h-8 sm:w-10 sm:h-10 sm:mb-4" />
       </div>
+
+      {/* Contenedor del texto */}
+      <div className="relative z-10 flex-grow">
+        {/* CAMBIO: Texto más pequeño en móvil */}
+        <h3 className="text-lg sm:text-xl font-bold">{title}</h3>
+        <p className="text-white/80 text-sm">{subtitle}</p>
+      </div>
+      
+      {isLocked && (
+        <div className="bg-white/20 p-2 rounded-full ml-auto flex-shrink-0 sm:ml-0 sm:absolute sm:top-6 sm:right-6">
+           {/* CAMBIO: Posicionamiento del candado */}
+          <Lock className="w-5 h-5 text-white" />
+        </div>
+      )}
     </motion.div>
   );
 
@@ -70,7 +76,7 @@ const MenuCard = ({
 };
 
 
-// --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
+// --- COMPONENTE PRINCIPAL DE LA PÁGINA (Sin cambios necesarios aquí) ---
 export default function HomePage() {
   const { isInstallable, isInstalled, installApp } = usePWAInstall();
 
@@ -85,17 +91,10 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 p-4 sm:p-6 lg:p-8">
       {/* Cabecera */}
-      <header className="max-w-4xl mx-auto mb-12">
-        <div className="flex items-center justify-between">
-          
-          
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
-            FluentBlocks
-          </h1>
-
-          {/* Espaciador para mantener el título centrado */}
-          <div className="w-8 h-8"></div> 
-        </div>
+      <header className="max-w-4xl mx-auto mb-12 text-center">
+        <h1 className="inline-block text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+          FluentBlocks
+        </h1>
       </header>
 
       {/* Título de Bienvenida */}
@@ -133,7 +132,6 @@ export default function HomePage() {
       <div className="max-w-4xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
           
-          {/* Tarjeta Principal de IA (ocupa 2 columnas en desktop) */}
           <div className="md:col-span-2">
             <MenuCard
               icon={Sparkles}
@@ -144,7 +142,6 @@ export default function HomePage() {
             />
           </div>
           
-          {/* Tarjetas Secundarias */}
           <MenuCard
             icon={PuzzleIcon}
             title="Aprender Patrones"
@@ -162,7 +159,6 @@ export default function HomePage() {
             isLocked={false}
           />
           
-          {/* Tarjeta de Ayuda (ocupa 2 columnas en desktop para equilibrio) */}
           <div className="md:col-span-2">
             <MenuCard
               icon={HelpCircle}
