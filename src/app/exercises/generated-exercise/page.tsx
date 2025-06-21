@@ -32,6 +32,7 @@ function PracticePageContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [introCompleted, setIntroCompleted] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sessionCompleted, setSessionCompleted] = useState(false);
 
   // Efecto que se ejecuta una vez para obtener los datos del ejercicio
@@ -109,12 +110,7 @@ function PracticePageContent() {
   }
   
   return (
-    <GeneratedExerciseUserInteractions onSessionComplete={() => {
-      // Solo redirigir si la sesión se ha completado
-      if (sessionCompleted) {
-        router.push('/chat');
-      }
-    }}>
+    
       <div className="min-h-screen bg-gray-50 flex flex-col items-center p-4 pt-24">
         <MainHeader />
         <AnimatePresence>
@@ -129,13 +125,14 @@ function PracticePageContent() {
         </AnimatePresence>
 
         {introCompleted && (
-          <DynamicSentenceBuilder 
-            questions={exerciseData.questions}
-            onSessionComplete={handleSessionComplete}
-          />
+          <GeneratedExerciseUserInteractions>
+            <DynamicSentenceBuilder 
+              questions={exerciseData.questions}
+              onSessionComplete={handleSessionComplete}
+            />
+          </GeneratedExerciseUserInteractions>
         )}
       </div>
-    </GeneratedExerciseUserInteractions>
   );
 }
 

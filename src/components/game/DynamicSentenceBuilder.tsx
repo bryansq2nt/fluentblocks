@@ -43,7 +43,7 @@ export default function DynamicSentenceBuilder({ questions, onSessionComplete }:
     handleNextQuestion,
     handleRetry,
     setShowConfetti,
-  } = useSentenceBuilder(questions, onSessionComplete);
+  } = useSentenceBuilder(questions);
   
   // El renderizado condicional principal sigue aquí.
   if (isSessionComplete) {

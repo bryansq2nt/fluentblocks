@@ -16,7 +16,7 @@ type WordOption = { id: number; word: string };
 type FeedbackStatus = 'idle' | 'correct' | 'incorrect';
 
 // --- El Custom Hook que contiene toda la lógica del juego ---
-export function useSentenceBuilder(questions: Question[], onSessionComplete: () => void) {
+export function useSentenceBuilder(questions: Question[]) {
   // --- Estados del Juego ---
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState<WordOption[]>([]);
@@ -60,6 +60,45 @@ export function useSentenceBuilder(questions: Question[], onSessionComplete: () 
     if (feedback.status === 'correct') playSuccess();
     if (feedback.status === 'incorrect') playError();
   }, [feedback.status, playSuccess, playError]);
+
+  // Auto-complete session when last question is answered correctly
+  useEffect(() => {
+    if (feedback.status === 'correct' && currentQuestionIndex === questions.length - 1) {
+      const timer = setTimeout(() => {
+        try {
+          const stats = getSessionStats();
+          trackInteraction({
+            type: 'SESSION_COMPLETE',
+            timestamp: Date.now(),
+            data: {
+              totalTime: stats.totalTime,
+              correctAnswers: stats.correctAnswers,
+              incorrectAnswers: stats.incorrectAnswers,
+              hintsUsed: stats.hintsUsed,
+              retries: stats.retries
+            }
+          });
+        } catch (error) {
+          console.warn('Could not get session stats:', error);
+          // Still complete the session even if stats fail
+          trackInteraction({
+            type: 'SESSION_COMPLETE',
+            timestamp: Date.now(),
+            data: {
+              totalTime: 0,
+              correctAnswers: 0,
+              incorrectAnswers: 0,
+              hintsUsed: 0,
+              retries: 0
+            }
+          });
+        }
+        setIsSessionComplete(true);
+      }, 2000); // Wait 2 seconds to show the success feedback, then auto-complete
+
+      return () => clearTimeout(timer);
+    }
+  }, [feedback.status, currentQuestionIndex, questions.length, getSessionStats, trackInteraction]);
 
   const handleWordBankTap = (wordOption: WordOption) => {
     setUserAnswer(prev => [...prev, wordOption]);
@@ -131,20 +170,35 @@ export function useSentenceBuilder(questions: Question[], onSessionComplete: () 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
-      const stats = getSessionStats();
-      trackInteraction({
-        type: 'SESSION_COMPLETE',
-        timestamp: Date.now(),
-        data: {
-          totalTime: stats.totalTime,
-          correctAnswers: stats.correctAnswers,
-          incorrectAnswers: stats.incorrectAnswers,
-          hintsUsed: stats.hintsUsed,
-          retries: stats.retries
-        }
-      });
+      try {
+        const stats = getSessionStats();
+        trackInteraction({
+          type: 'SESSION_COMPLETE',
+          timestamp: Date.now(),
+          data: {
+            totalTime: stats.totalTime,
+            correctAnswers: stats.correctAnswers,
+            incorrectAnswers: stats.incorrectAnswers,
+            hintsUsed: stats.hintsUsed,
+            retries: stats.retries
+          }
+        });
+      } catch (error) {
+        console.warn('Could not get session stats:', error);
+        // Still complete the session even if stats fail
+        trackInteraction({
+          type: 'SESSION_COMPLETE',
+          timestamp: Date.now(),
+          data: {
+            totalTime: 0,
+            correctAnswers: 0,
+            incorrectAnswers: 0,
+            hintsUsed: 0,
+            retries: 0
+          }
+        });
+      }
       setIsSessionComplete(true);
-      onSessionComplete();
     }
   };
   
