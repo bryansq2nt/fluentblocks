@@ -133,11 +133,11 @@ export default function HomePage() {
           
           <MenuCard
             icon={User}
-            title="Mi Perfil"
-            subtitle="Progreso y estadísticas"
-            href="/profile"
+            title="Comunidad"
+            subtitle="Apoyanos a seguir creando algo increible!"
+            href="/community"
             color="green"
-            isLocked={true}
+            isLocked={false}
           />
           
           {/* Tarjeta de Ayuda (ocupa 2 columnas en desktop para equilibrio) */}
