@@ -9,7 +9,7 @@ export const chatOnboardingTutorial: Tutorial = {
     {
       type: 'popover',
       title: '¡Bienvenido a FluentBlocks! 👋',
-      isSkippable: true,
+      isSkippable: false,
       content:
         'Aquí aprenderá el inglés que realmente usa en EE.UU. en situaciones diarias. Le mostraré lo básico en menos de un minuto.'
     },
@@ -58,7 +58,7 @@ export const chatOnboardingTutorial: Tutorial = {
       type: 'popover',
       title: 'Explicación breve',
       targetElement: '#interactive-card-lesson-title',
-      isSkippable: true,
+      isSkippable: false,
       content:
         'Esto es lo que aprenderás en esta lección.'
     },
@@ -66,7 +66,7 @@ export const chatOnboardingTutorial: Tutorial = {
       type: 'popover',
       title: 'Consejos 💡',
       targetElement: '#interactive-card-blocky-tip',
-      isSkippable: true,
+      isSkippable: false,
       content:
         'Aquí encontraras información importante sobre el contenido generado.'
     },

@@ -8,6 +8,38 @@ export interface StorageProvider {
   clearStorage(): Promise<void>;
 }
 
+// Implementación que NO guarda nada (para deshabilitar temporalmente el storage)
+export class NoOpStorageProvider implements StorageProvider {
+  async saveInteraction(interaction: UserInteraction): Promise<void> {
+    // No hace nada - no guarda en localStorage
+    console.log('[Storage Disabled] Interaction would be saved:', interaction.type);
+  }
+
+  async saveSessionStats(stats: SessionStats): Promise<void> {
+    // No hace nada - no guarda en localStorage
+    console.log('[Storage Disabled] Session stats would be saved:', {
+      totalTime: stats.totalTime,
+      correctAnswers: stats.correctAnswers,
+      incorrectAnswers: stats.incorrectAnswers
+    });
+  }
+
+  async getInteractions(): Promise<UserInteraction[]> {
+    // Retorna array vacío ya que no hay nada guardado
+    return [];
+  }
+
+  async getSessionStats(): Promise<SessionStats[]> {
+    // Retorna array vacío ya que no hay nada guardado
+    return [];
+  }
+
+  async clearStorage(): Promise<void> {
+    // No hace nada ya que no hay nada que limpiar
+    console.log('[Storage Disabled] Storage clear requested');
+  }
+}
+
 // Implementación para Local Storage
 export class LocalStorageProvider implements StorageProvider {
   private readonly INTERACTIONS_KEY = 'exercise_interactions';
@@ -43,10 +75,12 @@ export class LocalStorageProvider implements StorageProvider {
 
 // Factory para crear el provider adecuado
 export class StorageFactory {
-  static createProvider(type: 'local' | 'database' = 'local'): StorageProvider {
+  static createProvider(type: 'local' | 'database' | 'none' = 'local'): StorageProvider {
     switch (type) {
       case 'local':
         return new LocalStorageProvider();
+      case 'none':
+        return new NoOpStorageProvider();
       case 'database':
         // Aquí implementaremos el DatabaseProvider cuando esté listo
         throw new Error('Database storage not implemented yet');

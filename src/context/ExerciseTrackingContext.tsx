@@ -20,7 +20,7 @@ const ExerciseTrackingContext = createContext<ExerciseTrackingContextType | null
 export function ExerciseTrackingProvider({ children }: { children: React.ReactNode }) {
   const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
   const [interactions, setInteractions] = useState<UserInteraction[]>([]);
-  const [storageProvider] = useState<StorageProvider>(() => StorageFactory.createProvider());
+  const [storageProvider] = useState<StorageProvider>(() => StorageFactory.createProvider('none'));
 
   const trackInteraction = useCallback(async (interaction: UserInteraction) => {
     setInteractions(prev => [...prev, interaction]);
