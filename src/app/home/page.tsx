@@ -2,10 +2,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, HelpCircle, PuzzleIcon, Lock, Sparkles } from 'lucide-react';
+import { User, HelpCircle, PuzzleIcon, Lock, Sparkles, Download } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
 
 // --- COMPONENTE INTERNO: MenuCard ---
 // Se mantiene dentro del mismo archivo para simplicidad, pero podría ser externo.
@@ -72,20 +72,22 @@ const MenuCard = ({
 
 // --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
 export default function HomePage() {
-  const router = useRouter();
+  const { isInstallable, isInstalled, installApp } = usePWAInstall();
+
+  const handleInstall = async () => {
+    try {
+      await installApp();
+    } catch (error) {
+      console.error('Error al instalar la app:', error);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-blue-50 to-green-50 p-4 sm:p-6 lg:p-8">
       {/* Cabecera */}
       <header className="max-w-4xl mx-auto mb-12">
         <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => router.push('/')}
-            className="p-2 hover:bg-white/50 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-600" />
-          </button>
+          
           
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
             FluentBlocks
@@ -103,9 +105,29 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl sm:text-5xl font-bold text-gray-900"
         >
-          ¡Hola! ¿Listo para construir?
+          ¡Hola! ¿Listo para aprender inglés?
         </motion.h2>
       </div>
+
+      {/* Botón de Instalación PWA */}
+      {isInstallable && !isInstalled && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-4xl mx-auto text-center mb-8"
+        >
+          <button
+            onClick={handleInstall}
+            className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-full hover:from-purple-700 hover:to-pink-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+          >
+            <Download className="w-6 h-6" />
+            Instalar App
+          </button>
+          <p className="mt-2 text-sm text-gray-600">
+            Acceso directo en tu pantalla de inicio
+          </p>
+        </motion.div>
+      )}
 
       {/* Menú Principal Rediseñado */}
       <div className="max-w-4xl mx-auto">

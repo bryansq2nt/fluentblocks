@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   title: "FluentBlocks",
   description: "Aprende a construir oraciones en inglés de forma interactiva y divertida, bloque por bloque.",
   
+  manifest: '/manifest.json',
+  
   openGraph: {
     title: 'FluentBlocks - Aprende Inglés Interactivo',
     description: 'Construye tu fluidez, bloque por bloque.',
@@ -41,6 +43,15 @@ export const metadata: Metadata = {
     title: 'FluentBlocks - Aprende Inglés Interactivo',
     description: 'Construye tu fluidez, bloque por bloque.',
     images: ['https://fluentblocks.com/og-image.png'], 
+  },
+  
+  // PWA meta tags
+  themeColor: '#3b82f6',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'FluentBlocks',
   },
 };
 
