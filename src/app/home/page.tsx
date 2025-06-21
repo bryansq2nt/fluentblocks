@@ -4,7 +4,6 @@
 import { motion } from 'framer-motion';
 import { User, HelpCircle, PuzzleIcon, Lock, Sparkles, Download } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 
@@ -73,7 +72,6 @@ const MenuCard = ({
 
 // --- COMPONENTE PRINCIPAL DE LA PÁGINA ---
 export default function HomePage() {
-  const router = useRouter();
   const { isInstallable, isInstalled, installApp } = usePWAInstall();
 
   const handleInstall = async () => {
