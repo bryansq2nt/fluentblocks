@@ -23,18 +23,18 @@ interface NavSection {
 
 // --- NEW CORRECTED & REORDERED DATA ---
 const levels: Level[] = [
-  { id: 1, title: "The '-ing' Form", pattern: "Reglas de ortografía para el gerundio", icon: "⚙️", pageId: "ing" },
-  { id: 4, title: "Present Perfect", pattern: "Sujeto + have/has + participio + extra + tiempo", icon: "🔗", pageId: "presente-perfecto" },
-  { id: 2, title: "Present Continuous", pattern: "Sujeto + am/is/are + verbo-ing + extra", icon: "⚡️" , pageId: "presente-continuo"},
-  { id: 5, title: "Future Simple (Will)", pattern: "Sujeto + will + verbo + objeto + tiempo", icon: "🔮", pageId: "future-will" },
-  { id: 6, title: "Future 'Going to'", pattern: "Sujeto + am/is/are + going to + verbo + extra", icon: "📅", pageId: "future-going-to" },
-
-  { id: 3, title: "Simple Past", pattern: "Sujeto + verbo en pasado + complemento + tiempo", icon: "🕰️", pageId: "pasado-simple" },
-  { id: 7, title: "Modal 'Can'", pattern: "Sujeto + can + verbo + extra", icon: "💪", pageId: "modal-can" },
-  { id: 8, title: "Modal 'Could'", pattern: "Sujeto + could + verbo + extra", icon: "🤔", pageId: "modal-could" },
-  { id: 9, title: "Modal 'Would'", pattern: "Sujeto + would + verbo + extra", icon: "💭", pageId: "modal-would" },
-  { id: 10, title: "Modal 'Should'", pattern: "Sujeto + should + verbo + extra", icon: "🦉", pageId: "modal-should" },
-  { id: 11, title: "Adjective Placement", pattern: "Adjetivo + sustantivo", icon: "🔍", pageId: "adjective-placement" },
+  { id: 0, title: "Adjective Placement", pattern: "Adjetivo + sustantivo", icon: "🔍", pageId: "exercises/adjective-placement" },
+  { id: 1, title: "The '-ing' Form", pattern: "Reglas de ortografía para el gerundio", icon: "⚙️", pageId: "exercises/ing" },
+  { id: 4, title: "Present Perfect", pattern: "Sujeto + have/has + participio + extra + tiempo", icon: "🔗", pageId: "exercises/presente-perfecto" },
+  { id: 2, title: "Present Continuous", pattern: "Sujeto + am/is/are + verbo-ing + extra", icon: "⚡️" , pageId: "exercises/presente-continuo"},
+  { id: 5, title: "Future Simple (Will)", pattern: "Sujeto + will + verbo + objeto + tiempo", icon: "🔮", pageId: "exercises/future-will" },
+  { id: 6, title: "Future 'Going to'", pattern: "Sujeto + am/is/are + going to + verbo + extra", icon: "📅", pageId: "exercises/future-going-to" },
+  { id: 3, title: "Simple Past", pattern: "Sujeto + verbo en pasado + complemento + tiempo", icon: "🕰️", pageId: "exercises/pasado-simple" },
+  { id: 7, title: "Modal 'Can'", pattern: "Sujeto + can + verbo + extra", icon: "💪", pageId: "exercises/modal-can" },
+  { id: 8, title: "Modal 'Could'", pattern: "Sujeto + could + verbo + extra", icon: "🤔", pageId: "exercises/modal-could" },
+  { id: 9, title: "Modal 'Would'", pattern: "Sujeto + would + verbo + extra", icon: "💭", pageId: "exercises/modal-would" },
+  { id: 10, title: "Modal 'Should'", pattern: "Sujeto + should + verbo + extra", icon: "🦉", pageId: "exercises/modal-should" },
+  
 ];
 
 const navSections: NavSection[] = [

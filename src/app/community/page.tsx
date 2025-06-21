@@ -129,6 +129,22 @@ function CommunityPageContent() {
           <div className="mt-8">
             <SocialProof />
           </div>
+          
+          {/* Botón para agregar comentario */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mt-8"
+          >
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center gap-3 px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-blue-600 to-green-600 rounded-full hover:from-blue-700 hover:to-green-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              <MessageSquare className="w-6 h-6" />
+              Publicar comentario
+            </button>
+          </motion.div>
         </motion.header>
 
         <div>

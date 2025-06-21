@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FeedbackProvider } from "../components/game/FeedbackProvider";
+import { ExerciseTrackingProvider } from '@/components/providers/ExerciseTrackingProvider';
+import { TutorialProvider } from "@/context/TutorialContext";
+import { TutorialPlayer } from "@/components/tutorial/TutorialPlayer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -51,9 +54,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <FeedbackProvider>
-          {children}
-        </FeedbackProvider>
+         <TutorialProvider>
+          <ExerciseTrackingProvider>
+            <FeedbackProvider>
+              {children}
+            </FeedbackProvider>
+          </ExerciseTrackingProvider>
+           <TutorialPlayer />
+        </TutorialProvider>
+      
       </body>
     </html>
   );
