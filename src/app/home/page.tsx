@@ -2,7 +2,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, HelpCircle, PuzzleIcon, Lock, Sparkles, Download } from 'lucide-react';
+import { User, HelpCircle, PuzzleIcon, Lock, Sparkles, Download } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { LucideIcon } from 'lucide-react';
@@ -89,13 +89,7 @@ export default function HomePage() {
       {/* Cabecera */}
       <header className="max-w-4xl mx-auto mb-12">
         <div className="flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => router.push('/')}
-            className="p-2 hover:bg-white/50 rounded-full transition-colors"
-          >
-            <ArrowLeft className="w-6 h-6 text-gray-600" />
-          </button>
+          
           
           <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
             FluentBlocks
