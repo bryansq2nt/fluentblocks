@@ -37,7 +37,7 @@ export default function MainHeader({ headerActions }: MainHeaderProps) {
 
   return (
     <>
-      <header id="main-header" className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-gray-200/80">
+      <header  id="main-header" className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-gray-200/80">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo / Título */}
@@ -63,7 +63,7 @@ export default function MainHeader({ headerActions }: MainHeaderProps) {
 
             {/* Botón de Menú Móvil */}
             <div className="md:hidden">
-              <button id="main-menu-button" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
+              <button  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 rounded-md text-gray-600 hover:bg-gray-100">
                 <AnimatePresence initial={false} mode="wait">
                   <motion.div
                     key={isMobileMenuOpen ? 'x' : 'menu'}
