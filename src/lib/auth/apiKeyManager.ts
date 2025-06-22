@@ -54,23 +54,23 @@ export class ApiKeyManager {
 
   // Función helper para hacer requests autenticados
   static async authenticatedFetch(url: string, options: RequestInit = {}): Promise<Response> {
-    const headers = ApiKeyManager.getAuthHeaders();
+    const apiKey = this.getApiKey();
     
-    const response = await fetch(url, {
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
-    });
-
-    // Si la API key es inválida, limpiar el localStorage
-    if (response.status === 401) {
-      ApiKeyManager.removeApiKey();
-      throw new Error('API key inválida. Por favor, autentícate nuevamente.');
+    if (!apiKey) {
+      throw new Error('No API key found');
     }
 
-    return response;
+    const headers = new Headers(options.headers);
+    headers.set('x-api-key', apiKey);
+    
+    // Agregar header personalizado para verificación de origen
+    headers.set('x-app-version', 'fluentblocks-v1.0');
+    headers.set('x-request-source', 'web-app');
+
+    return fetch(url, {
+      ...options,
+      headers,
+    });
   }
 
   // Inicializar API key si no existe

@@ -130,6 +130,62 @@ export async function authMiddleware(request: NextRequest): Promise<NextResponse
       { status: 401 }
     );
   }
+
+  // Verificación de origen para prevenir uso desde herramientas externas
+  const userAgent = request.headers.get('user-agent') || '';
+  const referer = request.headers.get('referer') || '';
+  const origin = request.headers.get('origin') || '';
+  const appVersion = request.headers.get('x-app-version') || '';
+  const requestSource = request.headers.get('x-request-source') || '';
+
+  // Verificar headers personalizados de nuestra aplicación
+  const hasValidAppHeaders = appVersion === 'fluentblocks-v1.0' && requestSource === 'web-app';
+
+  // Lista de patrones que indican que la petición viene de nuestra aplicación
+  const isFromOurApp = 
+    hasValidAppHeaders || // Headers personalizados válidos
+    userAgent.includes('Mozilla') || // Navegadores web
+    userAgent.includes('Chrome') ||
+    userAgent.includes('Safari') ||
+    userAgent.includes('Firefox') ||
+    userAgent.includes('Edge') ||
+    referer.includes('localhost') || // Desarrollo local
+    referer.includes('fluentblocks') || // Tu dominio
+    origin.includes('localhost') ||
+    origin.includes('fluentblocks');
+
+  // Lista de patrones que indican herramientas externas
+  const isExternalTool = 
+    userAgent.includes('Postman') ||
+    userAgent.includes('curl') ||
+    userAgent.includes('Insomnia') ||
+    userAgent.includes('Thunder Client') ||
+    userAgent.includes('REST Client') ||
+    userAgent.includes('HTTPie') ||
+    userAgent.includes('wget') ||
+    userAgent.includes('axios') ||
+    userAgent.includes('fetch');
+
+  // Si es una herramienta externa, rechazar
+  if (isExternalTool) {
+    console.log(`[SECURITY] Acceso bloqueado desde herramienta externa: ${userAgent}`);
+    return NextResponse.json(
+      { error: 'Acceso no autorizado desde herramientas externas' },
+      { status: 403 }
+    );
+  }
+
+  // Si no viene de nuestra aplicación y no es una herramienta conocida, verificar más estrictamente
+  if (!isFromOurApp) {
+    console.log(`[SECURITY] Acceso sospechoso detectado - User-Agent: ${userAgent}, Referer: ${referer}, Origin: ${origin}, App-Version: ${appVersion}, Source: ${requestSource}`);
+    return NextResponse.json(
+      { error: 'Acceso no autorizado' },
+      { status: 403 }
+    );
+  }
+  
+  // Log de acceso exitoso para monitoreo
+  console.log(`[SECURITY] Acceso autorizado - Usuario: ${user.id}, Path: ${pathname}, Headers válidos: ${hasValidAppHeaders}`);
   
   // Verificar rate limiting
   const rateLimitConfig = RATE_LIMITS[pathname];
