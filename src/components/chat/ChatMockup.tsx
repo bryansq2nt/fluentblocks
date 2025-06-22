@@ -68,20 +68,15 @@ export default function ChatMockup() {
       }
     }, [isTutorialActive, currentStep]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  }, [messages, isAgentTyping]);
-
-
-
+  // Scroll automático optimizado
+  const scrollToBottom = () => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
-    setTimeout(() => {
-      chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  }, [messages, isAgentTyping]);
+    const timeoutId = setTimeout(scrollToBottom, 50);
+    return () => clearTimeout(timeoutId);
+  }, [messages, isAgentTyping]); 
 
   // Limpiar la conversación cuando se activa el tutorial
   useEffect(() => {
@@ -116,6 +111,8 @@ export default function ChatMockup() {
     setMessages(newMessages);
     setIsAgentTyping(true);
     setInputValue('');
+    
+
     try {
       const response = await authenticatedFetch('/api/chat', {
         method: 'POST',
@@ -215,8 +212,11 @@ export default function ChatMockup() {
     {/* Chat normal cuando no está bloqueado */}
     {!rateLimitInfo.isBlocked && (
       <>
-        <MessageList messages={messages} isAgentTyping={isAgentTyping} />
-        <div ref={chatEndRef} /> 
+        <MessageList 
+          messages={messages} 
+          isAgentTyping={isAgentTyping} 
+          chatEndRef={chatEndRef}
+        />
         <ChatInput 
             inputValue={inputValue} 
             setInputValue={setInputValue} 

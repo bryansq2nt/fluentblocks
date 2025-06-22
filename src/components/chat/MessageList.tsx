@@ -61,9 +61,20 @@ function getFormattedDate(timestamp: string): string {
 }
 
 // El componente principal de la lista
-export function MessageList({ messages, isAgentTyping }: { messages: Message[], isAgentTyping: boolean }) {
+export function MessageList({ 
+  messages, 
+  isAgentTyping, 
+  chatEndRef 
+}: { 
+  messages: Message[], 
+  isAgentTyping: boolean,
+  chatEndRef: React.RefObject<HTMLDivElement | null>
+}) {
   return (
-    <div className="flex-1 p-4 md:p-6 overflow-y-auto" style={{fontFamily: 'Inter, sans-serif'}}>
+    <div 
+      className="flex-1 p-4 md:p-6 overflow-y-auto" 
+      style={{fontFamily: 'Inter, sans-serif'}}
+    >
       {messages.map((msg, index) => {
         const prevMsg = messages[index - 1];
         
@@ -113,6 +124,9 @@ export function MessageList({ messages, isAgentTyping }: { messages: Message[], 
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Elemento de referencia para scroll automático */}
+      <div ref={chatEndRef} />
     </div>
   );
 }
