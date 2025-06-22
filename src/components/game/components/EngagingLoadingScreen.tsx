@@ -10,30 +10,38 @@ interface EngagingLoadingScreenProps {
 }
 
 export function EngagingLoadingScreen({ category }: EngagingLoadingScreenProps) {
-  // La lógica de los tips (estado e intervalo) se ha eliminado de aquí.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [animationData, setAnimationData] = useState<any>(null);
 
-  // El efecto para cargar la animación Lottie no cambia.
   useEffect(() => {
-    const loadAnimation = async () => {
+    // Seleccionar una animación al azar basada en la categoría
+    const getRandomAnimation = async () => {
+      const loadingAnimations = [
+        '/animations/lotties/loading/geek-cat.json',
+        '/animations/lotties/loading/llama.json',
+        '/animations/lotties/loading/planetjson.json',
+        '/animations/lotties/loading/robotjson.json',
+        '/animations/lotties/loading/sleeping-bird.json'
+      ];
+      
+      const randomIndex = Math.floor(Math.random() * loadingAnimations.length);
+      const randomPath = loadingAnimations[randomIndex];
+      
       try {
-        const apiResponse = await fetch(`/api/lottie/${category}`);
-        if (!apiResponse.ok) throw new Error('Failed to get lottie path from API');
-        
-        const { path } = await apiResponse.json();
-        
-        const lottieResponse = await fetch(path);
-        if (!lottieResponse.ok) throw new Error('Failed to fetch lottie JSON');
-
-        const data = await lottieResponse.json();
+        const response = await fetch(randomPath);
+        if (!response.ok) throw new Error('Failed to fetch lottie JSON');
+        const data = await response.json();
         setAnimationData(data);
       } catch (error) {
         console.error("Error al cargar la animación Lottie:", error);
       }
     };
 
-    loadAnimation();
+    // Para la categoría 'loading', usamos las animaciones de loading
+    if (category === 'loading') {
+      getRandomAnimation();
+    }
+    // Aquí puedes agregar más categorías si las necesitas
   }, [category]);
 
   return (

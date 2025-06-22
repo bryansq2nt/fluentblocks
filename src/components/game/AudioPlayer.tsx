@@ -2,9 +2,10 @@
 
 'use client';
 
-import { useState, forwardRef, useImperativeHandle, useCallback } from 'react';
+import { useState, forwardRef, useImperativeHandle, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Volume2, Loader2, Snail } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AudioPlayerProps {
   sentence: string;
@@ -19,6 +20,8 @@ const slowSpeeds = [0.75, 0.5];
 export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentence }, ref) => {
   const [status, setStatus] = useState<'idle' | 'loading'>('idle');
   const [slowSpeedIndex, setSlowSpeedIndex] = useState(0);
+  const { authenticatedFetch } = useAuth();
+  const audioUrlCache = useRef(new Map<string, string>());
 
   const performPlay = useCallback((url: string, speed: number) => {
     const audio = new Audio(url);
@@ -33,36 +36,39 @@ export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentenc
 
   const handlePlay = useCallback(async (speed: number) => {
     if (!sentence || status === 'loading') return;
+    
+    if (audioUrlCache.current.has(sentence)) {
+      const cachedUrl = audioUrlCache.current.get(sentence)!;
+      performPlay(cachedUrl, speed);
+      return;
+    }
+
     setStatus('loading');
-
-    const fileName = sentence.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.mp3';
-    const publicUrl = `https://store_FwRpzKasFEerHgsb.public.blob.vercel-storage.com/audios/${fileName}`;
-
     try {
-      const response = await fetch(publicUrl, { method: 'HEAD' });
-      
-      if (response.ok) {
-        performPlay(publicUrl, speed);
-      } else {
-        const generateResponse = await fetch('/api/generate-audio', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: sentence }),
-        });
+      const generateResponse = await authenticatedFetch('/api/generate-audio', {
+        method: 'POST',
+        body: JSON.stringify({ text: sentence }),
+      });
 
-        if (!generateResponse.ok) throw new Error("La generación en el servidor falló.");
-
-        const blobResult = await generateResponse.json();
-        performPlay(blobResult.url, speed); 
+      if (!generateResponse.ok) {
+        throw new Error(`La generación en el servidor falló: ${generateResponse.statusText}`);
       }
+
+      const result = await generateResponse.json();
+      
+      if (!result.url) {
+        throw new Error("La respuesta de la API no contenía una URL de audio.");
+      }
+
+      audioUrlCache.current.set(sentence, result.url);
+      performPlay(result.url, speed); 
+      
     } catch (error) {
       console.error("Error en el proceso de reproducción/generación:", error);
       setStatus('idle');
     }
-  }, [sentence, status, performPlay]);
+  }, [sentence, status, performPlay, authenticatedFetch]);
 
-  // AÑADIDO: `useImperativeHandle` expone funciones al componente padre a través de la `ref`.
-  // Aquí exponemos una única función llamada `play`.
   useImperativeHandle(ref, () => ({
     play(speed: number = 1.0) {
       handlePlay(speed);
@@ -79,7 +85,6 @@ export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentenc
 
   return (
     <div className="flex items-center gap-2">
-      {/* Botón de Reproducir Normal */}
       <div>
       <motion.button 
       id="audio-player-section-normal"
@@ -99,7 +104,6 @@ export const AudioPlayer = forwardRef<PlayerHandle, AudioPlayerProps>(({ sentenc
         )}
       </motion.button>
       </div>
-      {/* Botón de Reproducir Lento */}
       <div id="audio-player-section-slow">
 
       <motion.button
