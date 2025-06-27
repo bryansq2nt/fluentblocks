@@ -4,6 +4,7 @@
 // Importaciones necesarias de React
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 
 // Definimos el tipo de dato para un comentario individual
 type Comment = {
@@ -49,12 +50,13 @@ const CommentsFeed = forwardRef<CommentsFeedHandle>((props, ref) => {
   // --- ESTADO Y LÓGICA INTERNA DEL COMPONENTE ---
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { authenticatedFetch } = useAuth();
 
   // La función para cargar los comentarios ahora vive aquí dentro
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/comments'); // Llama a nuestra propia API
+      const response = await authenticatedFetch('/api/comments'); // Llama a nuestra propia API
       if (!response.ok) throw new Error("La respuesta de la red no fue correcta");
       
       const data = await response.json();

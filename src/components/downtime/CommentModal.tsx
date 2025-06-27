@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useAuth } from '@/hooks/useAuth';
 
 // Definimos los props que el componente recibirá
 type Props = {
@@ -26,6 +27,7 @@ export default function CommentModal({ isOpen, onClose, onCommentSubmitted }: Pr
   const [passionLevel, setPassionLevel] = useState(5);
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { authenticatedFetch } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,9 +45,8 @@ export default function CommentModal({ isOpen, onClose, onCommentSubmitted }: Pr
         appName: 'FluentBlocks',
         source: 'feedback-modal'
       };
-      await fetch('/api/comments', {
+      await authenticatedFetch('/api/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       onCommentSubmitted();
