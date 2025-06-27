@@ -1,10 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { FeedbackProvider } from "../components/game/FeedbackProvider";
 import { ExerciseTrackingProvider } from '@/components/providers/ExerciseTrackingProvider';
 import { TutorialProvider } from "@/context/TutorialContext";
 import { TutorialPlayer } from "@/components/tutorial/TutorialPlayer";
+import AuthInitializer from "@/components/security/AuthInitializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,13 +47,19 @@ export const metadata: Metadata = {
   },
   
   // PWA meta tags
-  themeColor: '#3b82f6',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
     title: 'FluentBlocks',
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#3b82f6',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -65,15 +72,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-         <TutorialProvider>
-          <ExerciseTrackingProvider>
-            <FeedbackProvider>
-              {children}
-            </FeedbackProvider>
-          </ExerciseTrackingProvider>
-           <TutorialPlayer />
-        </TutorialProvider>
-      
+        <AuthInitializer>
+          <TutorialProvider>
+            <ExerciseTrackingProvider>
+              <FeedbackProvider>
+                {children}
+              </FeedbackProvider>
+            </ExerciseTrackingProvider>
+            <TutorialPlayer />
+          </TutorialProvider>
+        </AuthInitializer>
       </body>
     </html>
   );

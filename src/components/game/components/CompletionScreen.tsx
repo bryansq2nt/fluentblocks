@@ -9,18 +9,23 @@ interface CompletionScreenProps {
 export function CompletionScreen({ onSessionComplete }: CompletionScreenProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [animationData, setAnimationData] = useState<any>(null);
+
   useEffect(() => {
     const loadAnimation = async () => {
+      const welldoneAnimations = [
+        '/animations/lotties/welldone/check.json',
+        '/animations/lotties/welldone/happy-girl.json',
+        '/animations/lotties/welldone/happy-heart.json',
+        '/animations/lotties/welldone/like.json'
+      ];
+      
+      const randomIndex = Math.floor(Math.random() * welldoneAnimations.length);
+      const randomPath = welldoneAnimations[randomIndex];
+      
       try {
-        const apiResponse = await fetch(`/api/lottie/${"welldone"}`);
-        if (!apiResponse.ok) throw new Error('Failed to get lottie path from API');
-        
-        const { path } = await apiResponse.json();
-        
-        const lottieResponse = await fetch(path);
-        if (!lottieResponse.ok) throw new Error('Failed to fetch lottie JSON');
-
-        const data = await lottieResponse.json();
+        const response = await fetch(randomPath);
+        if (!response.ok) throw new Error('Failed to fetch lottie JSON');
+        const data = await response.json();
         setAnimationData(data);
       } catch (error) {
         console.error("Error al cargar la animación Lottie:", error);
@@ -29,6 +34,7 @@ export function CompletionScreen({ onSessionComplete }: CompletionScreenProps) {
 
     loadAnimation();
   }, []);
+
   return (
     <div className="p-8 text-center flex flex-col items-center justify-center h-full min-h-[60vh]">
       <motion.div

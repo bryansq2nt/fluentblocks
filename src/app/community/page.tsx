@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import SocialProof from '@/components/downtime/SocialProof';
+import { useAuth } from '@/hooks/useAuth';
 
 // Importa el componente Masonry
 import Masonry from 'react-masonry-css';
@@ -68,11 +69,12 @@ function CommunityPageContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const searchParams = useSearchParams();
   const effectRan = useRef(false);
+  const { authenticatedFetch } = useAuth();
   
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/comments');
+      const response = await authenticatedFetch('/api/comments');
       if (!response.ok) throw new Error('La respuesta de la red no fue correcta');
       const data = await response.json();
       setComments(data.comments || []);

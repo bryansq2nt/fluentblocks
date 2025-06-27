@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { generateExerciseFromLesson } from '@/lib/openai/consultation';
+import { getUserFromRequest } from '@/lib/auth/middleware';
 
 const cleanPunctuation = (words: string[]): string[] => {
     if (words.length === 0) return [];
@@ -20,10 +21,19 @@ const cleanPunctuation = (words: string[]): string[] => {
 
 export async function POST(request: Request) {
   try {
+    // Obtener información del usuario autenticado
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: 'Usuario no autenticado' }, { status: 401 });
+    }
+
     const { lessonData } = await request.json();
     if (!lessonData) {
       return NextResponse.json({ error: 'No se proporcionaron datos de la lección' }, { status: 400 });
     }
+
+    // Log del uso para monitoreo
+    console.log(`[EXERCISE] Usuario ${user.id} (${user.role}) generando ejercicio`);
 
     const exerciseJson = await generateExerciseFromLesson(lessonData);
     const cleanedExercise = {
@@ -34,6 +44,10 @@ export async function POST(request: Request) {
           englishCorrect: cleanPunctuation(q.englishCorrect),
         })),
       };
+
+    // Log de respuesta exitosa
+    console.log(`[EXERCISE] Usuario ${user.id} completó generación exitosamente`);
+    
     return NextResponse.json(cleanedExercise);
 
   } catch (error) {

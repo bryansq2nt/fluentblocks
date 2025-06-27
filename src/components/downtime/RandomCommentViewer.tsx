@@ -3,6 +3,7 @@
 
 // Importa los hooks necesarios
 import { useState, useEffect, useMemo, forwardRef, useImperativeHandle } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 // Importa los 3 componentes de visualización
 import FloatingComments from './FloatingComments';
@@ -19,6 +20,7 @@ export type RandomCommentViewerHandle = {
 const RandomCommentViewer = forwardRef<RandomCommentViewerHandle>((props, ref) => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { authenticatedFetch } = useAuth();
 
   const RandomViewer = useMemo(() => {
     return FloatingComments;
@@ -28,7 +30,7 @@ const RandomCommentViewer = forwardRef<RandomCommentViewerHandle>((props, ref) =
   const fetchComments = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/comments');
+      const response = await authenticatedFetch('/api/comments');
       const data = await response.json();
       setComments(data.comments || []);
     } catch (error) {

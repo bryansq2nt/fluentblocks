@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, XCircle } from 'lucide-react';
 import { LessonIntro } from '@/components/game/LessonIntro'; // Asegúrate de que la ruta sea correcta
@@ -9,6 +9,9 @@ import DynamicSentenceBuilder from '@/components/game/DynamicSentenceBuilder'; /
 import MainHeader from '@/components/game/MainHeader';
 import { GeneratedExerciseUserInteractions } from '@/components/game/GeneratedExerciseUserInteractions';
 import { EngagingLoadingScreen } from '@/components/game/components/EngagingLoadingScreen';
+import { useAuth } from '@/hooks/useAuth'; // Importar hook
+import { RateLimitMessage } from '@/components/common/RateLimitMessage'; // Importar el nuevo componente
+
 // --- Tipos de datos que esperamos de la API ---
 interface Question {
   spanish: string;
@@ -27,6 +30,7 @@ interface ExerciseData {
 function PracticePageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { authenticatedFetch, rateLimitInfo } = useAuth(); // Obtener rateLimitInfo
   
   const [exerciseData, setExerciseData] = useState<ExerciseData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,23 +38,35 @@ function PracticePageContent() {
   const [introCompleted, setIntroCompleted] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sessionCompleted, setSessionCompleted] = useState(false);
+  const hasGeneratedRef = useRef(false); // Cambiado a useRef para evitar re-renders
 
   // Efecto que se ejecuta una vez para obtener los datos del ejercicio
   useEffect(() => {
+    console.log('[DEBUG] useEffect ejecutándose, searchParams:', searchParams.toString());
     const lessonParam = searchParams.get('lesson');
+    console.log('[DEBUG] lessonParam:', lessonParam ? 'existe' : 'no existe');
+    
+    // Evitar llamadas duplicadas
+    if (hasGeneratedRef.current) {
+      console.log('[DEBUG] Ya se generó el ejercicio, saltando...');
+      return;
+    }
+    
     if (lessonParam) {
       try {
         // Decodifica y parsea los datos de la lección que vienen en la URL
         const lessonData = JSON.parse(decodeURIComponent(lessonParam));
+        console.log('[DEBUG] lessonData parseado correctamente');
         
         const generateExercise = async () => {
+          console.log('[DEBUG] Iniciando generateExercise');
+          hasGeneratedRef.current = true; // Marcar como generado inmediatamente
           setIsLoading(true);
           setError(null);
           try {
             // Llama a nuestra nueva API para que la IA genere el ejercicio
-            const response = await fetch('/api/generate-exercise', {
+            const response = await authenticatedFetch('/api/generate-exercise', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ lessonData }),
             });
 
@@ -60,10 +76,13 @@ function PracticePageContent() {
             }
 
             const data = await response.json();
+            console.log('[DEBUG] Ejercicio generado exitosamente');
             setExerciseData(data);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
           } catch (e: any) {
+            console.error('[DEBUG] Error en generateExercise:', e);
             setError(e.message);
+            hasGeneratedRef.current = false; // Resetear en caso de error para permitir reintento
           } finally {
             setIsLoading(false);
           }
@@ -80,7 +99,7 @@ function PracticePageContent() {
       setError("No se encontraron datos de la lección para practicar.");
       setIsLoading(false);
     }
-  }, [searchParams]);
+  }, [searchParams, authenticatedFetch]); // Removido hasGenerated de las dependencias
 
   // Esta función se pasa al componente LessonIntro
   const handleIntroComplete = () => {
@@ -95,8 +114,18 @@ function PracticePageContent() {
 
   // --- Renderizado Condicional de la Página ---
 
+  // Prioridad 1: Mostrar mensaje de Rate Limit si el usuario está bloqueado
+  if (rateLimitInfo.isBlocked) {
+    return (
+      <RateLimitMessage 
+        retryAfter={rateLimitInfo.retryAfter}
+        message="Has generado muchos ejercicios muy rápido. ¡Dale un respiro a nuestra IA!"
+      />
+    );
+  }
+
   if (isLoading) {
-    return  <EngagingLoadingScreen category="loading" />;
+    return <EngagingLoadingScreen category="loading" />;
   }
 
   if (error || !exerciseData) {

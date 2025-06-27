@@ -2,6 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { put, head } from '@vercel/blob'; // Importar 'put' y 'head'
+import { getUserFromRequest } from '@/lib/auth/middleware';
 
 // NO necesitas 'node-fetch'. Las API Routes de Next.js tienen 'fetch' globalmente.
 // NO necesitas 'fs' ni 'path'. Todo se maneja en la nube.
@@ -10,6 +11,12 @@ const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const VOICE_ID = 'TX3LPaxmHKxFdv7VOQHJ'; 
 
 export async function POST(request: Request) {
+  // Obtener información del usuario autenticado
+  const user = await getUserFromRequest(request);
+  if (!user) {
+    return NextResponse.json({ error: 'Usuario no autenticado' }, { status: 401 });
+  }
+
   // 1. Verificación más robusta de la API Key
   if (!ELEVENLABS_API_KEY) {
     console.error("Error: La variable de entorno ELEVENLABS_API_KEY no está configurada.");
@@ -17,7 +24,7 @@ export async function POST(request: Request) {
   }
 
   // 2. Obtener el texto de la oración
-  let text;
+  let text: string;
   try {
     const body = await request.json();
     text = body.text;
@@ -30,15 +37,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "El texto es requerido y debe ser un string." }, { status: 400 });
   }
 
+  // Log del uso para monitoreo
+  console.log(`[AUDIO] Usuario ${user.id} (${user.role}) generando audio: "${text.substring(0, 50)}..."`);
+
   const fileName = text.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.mp3';
   const blobPath = `audios/${fileName}`;
 
+  // 3. (OPCIONAL PERO RECOMENDADO) Verificar si el archivo ya existe en Vercel Blob
+  // Esto evita generar un audio si otro usuario lo pidió un segundo antes.
   try {
-    // 3. (OPCIONAL PERO RECOMENDADO) Verificar si el archivo ya existe en Vercel Blob
-    // Esto evita generar un audio si otro usuario lo pidió un segundo antes.
     const existingBlob = await head(blobPath);
     if (existingBlob) {
-      console.log(`Blob ya existe para: ${text}`);
+      console.log(`[AUDIO] Usuario ${user.id} - Blob ya existe para: ${text}`);
       return NextResponse.json({ success: true, url: existingBlob.url, message: "El archivo ya existía." });
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,7 +58,6 @@ export async function POST(request: Request) {
     }
     // Si es 404, continuamos con la generación, que es lo esperado.
   }
-
 
   try {
     // 4. Llamar a la API de ElevenLabs
@@ -80,6 +89,9 @@ export async function POST(request: Request) {
       access: 'public',
       contentType: 'audio/mpeg',
     });
+
+    // Log de respuesta exitosa
+    console.log(`[AUDIO] Usuario ${user.id} completó generación exitosamente`);
 
     return NextResponse.json(blob);
 
