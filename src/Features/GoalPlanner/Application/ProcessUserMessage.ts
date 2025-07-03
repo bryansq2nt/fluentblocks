@@ -10,12 +10,11 @@ export interface ProcessUserMessageDependencies {
   aiService: IGoalPlannerAIService;
 }
 
-// --- Datos de entrada para el caso de uso (ACTUALIZADO) ---
+// --- Datos de entrada para el caso de uso ---
 export interface ProcessUserMessageCommand {
   userId: string;
   message: string;
   roadmapId?: string;
-  // Añadimos el historial de la conversación
   conversationHistory: { role: 'user' | 'assistant'; content: string }[];
 }
 
@@ -29,20 +28,19 @@ export class ProcessUserMessage {
     this.aiService = aiService;
   }
 
-  public async execute(command: ProcessUserMessageCommand): Promise<AIResponse> {
-    // 1. Cargar o crear el Roadmap (nuestro estado de conversación)
+  public async execute(command: ProcessUserMessageCommand): Promise<{ aiResponse: AIResponse; roadmap: Roadmap }> {
+    // 1. Cargar o crear el Roadmap (con la nueva lógica)
     let roadmap = await this.findOrCreateRoadmap(command.userId, command.roadmapId);
 
     // 2. Actualizar el dominio con la acción del usuario
-    if (roadmap.conversationState === 'GREETING_SENT') {
+    if (roadmap.conversationState === 'GREETING_SENT' && command.message) {
         roadmap.defineGoal(command.message);
     }
     
-    // 3. Obtener la siguiente acción de la IA (ACTUALIZADO)
-    // Pasamos el historial completo de la conversación
+    // 3. Obtener la siguiente acción de la IA
     const aiResponse = await this.aiService.getNextStep(
       roadmap.toData(), 
-      command.conversationHistory // Pasamos el historial
+      command.conversationHistory
     );
     
     // 4. Actualizar el dominio con la respuesta de la IA
@@ -53,22 +51,34 @@ export class ProcessUserMessage {
     // 5. Guardar el estado actualizado
     await this.roadmapRepository.save(roadmap);
 
-    // 6. Devolver la respuesta de la IA para que la UI la muestre
-    return aiResponse;
+    // 6. Devolver la respuesta y el roadmap completo
+    return { aiResponse, roadmap };
   }
 
+  /**
+   * Lógica actualizada para encontrar o crear un Roadmap.
+   * Ahora prioriza la intención del frontend.
+   */
   private async findOrCreateRoadmap(userId: string, roadmapId?: string): Promise<Roadmap> {
+    // Si el frontend nos da un ID, lo usamos. Es la fuente de verdad.
     if (roadmapId) {
       const roadmap = await this.roadmapRepository.findById(roadmapId);
-      if (roadmap) return roadmap;
+      // Si se encontró, lo devolvemos. Si no (quizás se borró), caerá al siguiente paso y creará uno nuevo.
+      if (roadmap) {
+        return roadmap;
+      }
     }
 
-    const existingRoadmap = await this.roadmapRepository.findByUserId(userId);
-    if (existingRoadmap && existingRoadmap.conversationState !== 'COMPLETED') {
-      return existingRoadmap;
-    }
-
+    // SI NO HAY ROADMAP ID (undefined), el frontend indica que quiere empezar una nueva conversación.
+    // IGNORAMOS cualquier roadmap activo anterior y creamos uno nuevo.
+    // Esto soluciona el problema de la "conversación zombie" al refrescar la página.
+    
     const newRoadmap = Roadmap.startConversation(userId);
+    
+    // ¡Importante! Debemos guardarlo inmediatamente para que tenga un ID persistente
+    // que se pueda usar en las siguientes interacciones de esta misma conversación.
+    await this.roadmapRepository.save(newRoadmap); 
+    
     return newRoadmap;
   }
 }

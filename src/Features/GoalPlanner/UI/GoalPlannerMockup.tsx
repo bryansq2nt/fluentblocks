@@ -42,17 +42,48 @@ export function GoalPlannerMockup() {
   };
   
   const handleConfirmProposal = async () => {
+    // Ahora el roadmapId debería estar definido
+    if (!roadmapId) {
+        console.error("Intento de confirmar sin roadmapId");
+        addMessage({
+            id: Date.now(),
+            type: 'text',
+            sender: 'agent',
+            content: 'Uups, parece que perdí la referencia de nuestro plan. ¿Podrías intentar refrescar la página?',
+            timestamp: new Date().toISOString()
+        });
+        return;
+    }
+
     addMessage({
         id: Date.now(),
         type: 'text',
         sender: 'agent',
-        content: "¡Genial! Preparando tu mapa de aprendizaje... 🚀",
+        content: "¡Genial! Guardando tu plan y preparando tu mapa... 🚀",
         timestamp: new Date().toISOString()
     });
     setIsAwaitingConfirmation(false);
-    setTimeout(() => {
-        router.push(`/roadmap/${roadmapId || 'default'}`);
-    }, 1500);
+
+    try {
+      await authenticatedFetch('/api/goal-planner/confirm', {
+        method: 'POST',
+        body: JSON.stringify({ roadmapId }),
+      });
+
+      setTimeout(() => {
+          router.push(`/roadmap/${roadmapId}`);
+      }, 1500);
+
+    } catch (error) {
+        console.error("Error al confirmar el roadmap:", error);
+        addMessage({
+            id: Date.now() + 1,
+            type: 'text',
+            sender: 'agent',
+            content: 'Uups, hubo un problema al guardar tu plan. Por favor, intenta de nuevo.',
+            timestamp: new Date().toISOString()
+        });
+    }
   };
   
   const handleRequestRevision = () => {
@@ -89,11 +120,9 @@ export function GoalPlannerMockup() {
             role: msg.sender === 'user' ? 'user' : 'assistant',
             content: msg.content as string
         }));
-    // Quitamos el saludo inicial para no confundir a la IA
     if(conversationHistory.length > 0 && conversationHistory[0].role === 'assistant') {
         conversationHistory.shift();
     }
-
 
     try {
       const response = await authenticatedFetch('/api/goal-planner/message', {
@@ -110,7 +139,11 @@ export function GoalPlannerMockup() {
         throw new Error(errorData.error || 'La respuesta de la red no fue exitosa.');
       }
 
-      const agentResponseData: AIResponse = await response.json();
+      // LEEMOS LA NUEVA ESTRUCTURA Y GUARDAMOS EL ID
+      const { aiResponse, roadmapId: newRoadmapId } = await response.json();
+      setRoadmapId(newRoadmapId);
+      
+      const agentResponseData: AIResponse = aiResponse;
       
       if (agentResponseData.type === 'PROPOSAL') {
         const proposalContent: RoadmapProposalData = {
@@ -118,7 +151,6 @@ export function GoalPlannerMockup() {
           milestones: agentResponseData.data.milestones,
           accompanyingMessage: agentResponseData.accompanyingMessage,
         };
-        if (!roadmapId) setRoadmapId(Date.now().toString()); 
         
         addMessage({
           id: Date.now() + 1,

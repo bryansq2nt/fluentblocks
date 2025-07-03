@@ -25,7 +25,6 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    // Extraemos el historial del body
     const { message, roadmapId, conversationHistory } = body;
 
     if (!message || !conversationHistory) {
@@ -38,14 +37,19 @@ export async function POST(request: Request) {
       userId: user.id,
       message,
       roadmapId,
-      conversationHistory, // Pasamos el historial al comando
+      conversationHistory,
     };
 
-    console.log(`[GOAL_PLANNER] Ejecutando comando para usuario ${user.id}:`, command);
-    const aiResponse = await processUserMessage.execute(command);
-    console.log(`[GOAL_PLANNER] Respuesta de la IA:`, aiResponse);
+    // Obtenemos el resultado completo del caso de uso
+    const { aiResponse, roadmap } = await processUserMessage.execute(command);
     
-    return NextResponse.json(aiResponse);
+    console.log(`[GOAL_PLANNER] Comando completado para roadmap ${roadmap.id}`);
+
+    // Devolvemos la nueva estructura de respuesta, incluyendo el ID
+    return NextResponse.json({
+      aiResponse: aiResponse,
+      roadmapId: roadmap.id,
+    });
 
   } catch (error) {
     console.error('Error en la ruta /api/goal-planner/message:', error);
