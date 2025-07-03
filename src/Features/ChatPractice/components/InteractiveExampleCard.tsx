@@ -5,8 +5,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { BookOpen, GraduationCap, Lightbulb } from 'lucide-react';
-import { AudioPlayer } from '../game/AudioPlayer';
-import { useTutorial } from '../../context/TutorialContext';
+import { AudioPlayer } from '@/components/game/AudioPlayer';
+import { useTutorial } from '@/context/TutorialContext';
 
 // --- TIPOS DE DATOS (Basados en nuestro nuevo prompt) ---
 type Block = { text: string; es: string; type: string };

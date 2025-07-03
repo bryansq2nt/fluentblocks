@@ -1,7 +1,7 @@
 // app/api/generate-exercise/route.ts
 
 import { NextResponse } from 'next/server';
-import { generateExerciseFromLesson } from '@/lib/openai/consultation';
+import { generateExerciseFromLesson } from '@/Features/ChatPractice/Lib/OpenAI/consultation';
 import { getUserFromRequest } from '@/lib/auth/middleware';
 
 const cleanPunctuation = (words: string[]): string[] => {

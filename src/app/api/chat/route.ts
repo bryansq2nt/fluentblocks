@@ -1,8 +1,8 @@
 // app/api/chat/route.ts
 
 import { NextResponse } from 'next/server';
-import { tropicalizedEnglishSystemPrompt } from '@/lib/openai/prompts'; 
-import { performConsultation } from '@/lib/openai/consultation';  
+import { tropicalizedEnglishSystemPrompt } from '@/Features/ChatPractice/Lib/OpenAI/prompts'; 
+import { performConsultation } from '@/Features/ChatPractice/Lib/OpenAI/consultation';  
 import { getUserFromRequest } from '@/lib/auth/middleware';
 
 export async function POST(request: Request) {

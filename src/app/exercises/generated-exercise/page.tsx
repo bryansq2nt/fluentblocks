@@ -6,7 +6,7 @@ import { Loader2, XCircle } from 'lucide-react';
 import { LessonIntro } from '@/components/game/LessonIntro'; // Asegúrate de que la ruta sea correcta
 import { AnimatePresence } from 'framer-motion';
 import DynamicSentenceBuilder from '@/components/game/DynamicSentenceBuilder'; // Importa el nuevo constructor
-import MainHeader from '@/components/game/MainHeader';
+import MainHeader from '@/shared/Components/MainHeader';
 import { GeneratedExerciseUserInteractions } from '@/components/game/GeneratedExerciseUserInteractions';
 import { EngagingLoadingScreen } from '@/components/game/components/EngagingLoadingScreen';
 import { useAuth } from '@/hooks/useAuth'; // Importar hook

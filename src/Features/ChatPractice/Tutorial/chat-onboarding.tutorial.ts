@@ -1,5 +1,5 @@
 // tutorials/chat/chat-onboarding.tutorial.ts
-import { Tutorial } from '../tutorial.types';
+import { Tutorial } from '@/tutorials/tutorial.types';
 
 export const chatOnboardingTutorial: Tutorial = {
   id: 'chat-onboarding',
