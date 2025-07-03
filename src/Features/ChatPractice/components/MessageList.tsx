@@ -7,6 +7,7 @@ import { AgentAvatar } from './AgentAvatar';
 import { ChatBubble } from './ChatBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { InteractiveExampleCard } from './InteractiveExampleCard';
+import { RoadmapProposalCard, RoadmapProposalData } from '@/Features/GoalPlanner/UI/RoadmapProposalCard';
 
 // --- TIPOS DE DATOS DE LA LECCIÓN (para claridad) ---
 type Block = { text: string; es: string; type: string };
@@ -21,7 +22,6 @@ type LessonData = {
   challenge: string;
 };
 
-// --- TIPO DE MENSAJE ACTUALIZADO ---
 export type Message = {
   id: number;
   sender: 'user' | 'agent';
@@ -31,9 +31,11 @@ export type Message = {
     type: 'text';
     content: string;
   } | {
-    type: 'examples';
-    // El 'content' ahora es directamente el objeto LessonData
+    type: 'examples'; // El de tu feature anterior
     content: LessonData;
+  } | {
+    type: 'roadmap_proposal'; // <-- NUEVO TIPO DE MENSAJE
+    content: RoadmapProposalData;
   }
 );
 
@@ -60,16 +62,23 @@ function getFormattedDate(timestamp: string): string {
     return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
+type MessageListProps = {
+  messages: Message[];
+  isAgentTyping: boolean;
+  chatEndRef: React.RefObject<HTMLDivElement>;
+  // 1. AÑADIMOS LAS FUNCIONES DE CALLBACK COMO PROPS OPCIONALES
+  onConfirmProposal?: () => void;
+  onRequestRevision?: () => void;
+};
+
 // El componente principal de la lista
 export function MessageList({ 
   messages, 
   isAgentTyping, 
-  chatEndRef 
-}: { 
-  messages: Message[], 
-  isAgentTyping: boolean,
-  chatEndRef: React.RefObject<HTMLDivElement | null>
-}) {
+  chatEndRef,
+  onConfirmProposal, 
+  onRequestRevision, 
+}: MessageListProps) {
   return (
     <div 
       className="flex-1 p-4 md:p-6 overflow-y-auto" 
@@ -111,6 +120,16 @@ export function MessageList({
                   <InteractiveExampleCard data={msg.content} />
                 </div>
               )}
+
+{msg.type === 'roadmap_proposal' && msg.sender === 'agent' && (
+                <RoadmapProposalCard 
+                  data={msg.content} 
+                  // Pasaremos funciones para manejar los botones
+                  onConfirm={onConfirmProposal || (() => {})}
+                  onRevise={onRequestRevision || (() => {})}
+                />
+              )}
+              
             </motion.div>
           </React.Fragment>
         );
