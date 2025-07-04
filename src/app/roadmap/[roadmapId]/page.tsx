@@ -153,8 +153,7 @@ export default function RoadmapPage() {
                 {index + 1}
               </div>
               <div className="w-full">
-                <MilestoneNode milestone={milestone} />
-              </div>
+              <MilestoneNode milestone={milestone} roadmapId={roadmap.id} />              </div>
             </motion.div>
           ))}
           

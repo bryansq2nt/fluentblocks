@@ -42,7 +42,7 @@ const statusConfig = {
   },
 };
 
-export function MilestoneNode({ milestone }: { milestone: MilestoneData }) {
+export function MilestoneNode({ milestone, roadmapId }: { milestone: MilestoneData, roadmapId: string }) {
   const config = statusConfig[milestone.status as keyof typeof statusConfig];
   const Icon = config.icon;
 
@@ -63,7 +63,7 @@ export function MilestoneNode({ milestone }: { milestone: MilestoneData }) {
   );
 
   if (config.isClickable) {
-    return <Link href={`/exercises/milestone/${milestone.id}`} legacyBehavior><a>{content}</a></Link>;
+    return <Link href={`/exercises/milestone/${milestone.id}?roadmapId=${roadmapId}`}>{content}</Link>;
   }
 
   return <div>{content}</div>;

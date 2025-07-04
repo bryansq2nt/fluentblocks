@@ -20,6 +20,8 @@ const RATE_LIMITS: Record<string, RateLimitConfig> = {
   '/api/generate-exercise': { windowMs: 60000, maxRequests: 3 }, // 3 requests por minuto
   '/api/generate-audio': { windowMs: 60000, maxRequests: 10 }, // 10 requests por minuto 
   '/api/comments': { windowMs: 60000, maxRequests: 20 }, // 20 requests por minuto
+  '/api/goal-planner/message': { windowMs: 60000, maxRequests: 15 }, // Permitimos más interacciones en la conversación
+  '/api/exercises/generate-from-milestone': { windowMs: 60000, maxRequests: 3 },
 };
 
 // Store para rate limiting. Estructura: Map<userID, Map<windowID, count>>

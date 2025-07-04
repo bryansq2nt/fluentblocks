@@ -65,8 +65,7 @@ function getFormattedDate(timestamp: string): string {
 type MessageListProps = {
   messages: Message[];
   isAgentTyping: boolean;
-  chatEndRef: React.RefObject<HTMLDivElement>;
-  // 1. AÑADIMOS LAS FUNCIONES DE CALLBACK COMO PROPS OPCIONALES
+  chatEndRef: React.RefObject<HTMLDivElement | null>;
   onConfirmProposal?: () => void;
   onRequestRevision?: () => void;
 };

@@ -1,4 +1,17 @@
 // src/Features/GoalPlanner/Infrastructure/InMemoryRoadmapRepository.ts (Versión Final y Persistente)
+
+// ===================================================================================
+// ==! ¡ATENCIÓN: REPOSITORIO EN MEMORIA!                                            ==
+// ==                                                                               ==
+// == Este repositorio es SOLO PARA DESARROLLO.                                     ==
+// == Guarda los datos en una variable global, que se pierde si el servidor se      ==
+// == reinicia por completo.                                                        ==
+// ==                                                                               ==
+// == TODO: Reemplazar esta implementación por una que utilice una base de datos    ==
+// == persistente (ej: Postgres con Prisma, Firebase, Supabase, etc.).              ==
+// == El punto de cambio será en el `compose...UseCase` de cada ruta de la API.     ==
+// =================================e===================================================
+
 import { Roadmap, RoadmapData } from '../Domain/Roadmap';
 import { IRoadmapRepository } from '../Domain/IRoadmapRepository';
 

@@ -5,10 +5,10 @@ import { InMemoryRoadmapRepository } from '@/Features/GoalPlanner/Infrastructure
 
 export async function GET(
   request: Request,
-  { params }: { params: { roadmapId: string } }
+  { params }: { params: Promise<{ roadmapId: string }> }
 ) {
   try {
-    const roadmapId = params.roadmapId;
+    const { roadmapId } = await params;
     if (!roadmapId) {
       return NextResponse.json({ error: 'Falta roadmapId' }, { status: 400 });
     }
